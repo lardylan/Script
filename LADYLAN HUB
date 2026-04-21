@@ -1,0 +1,125 @@
+-- CONFIGURACIÓN
+local CorrectKey = "LUCKY BLOCK"
+local BaseCoords = Vector3.new(0, 50, 0) -- Cambia esto por tu posición de base
+
+-- CREACIÓN DE LA INTERFAZ
+local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+ScreenGui.Name = "LardylanHubGui"
+
+-- PANEL PRINCIPAL
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 250, 0, 250)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -125)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.BorderSizePixel = 2
+MainFrame.Active = true
+MainFrame.Draggable = true -- Para que puedas mover el menú por la pantalla
+
+-- TÍTULO DEL HUB (NUEVO)
+local HubTitle = Instance.new("TextLabel", MainFrame)
+HubTitle.Text = "LARDYLAN HUB"
+HubTitle.Size = UDim2.new(1, 0, 0, 40)
+HubTitle.Position = UDim2.new(0, 0, 0, 10)
+HubTitle.BackgroundTransparency = 1
+HubTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+HubTitle.TextSize = 22
+HubTitle.Font = Enum.Font.GothamBold
+
+-- BOTÓN CERRAR (X)
+local CloseBtn = Instance.new("TextButton", MainFrame)
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+
+-- BOTÓN MINIMIZAR (-)
+local MinimizeBtn = Instance.new("TextButton", MainFrame)
+MinimizeBtn.Text = "-"
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -70, 0, 5)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+MinimizeBtn.TextColor3 = Color3.new(1, 1, 1)
+
+-- CÍRCULO FLOTANTE (MINIMIZADO)
+local FloatingCircle = Instance.new("ImageButton", ScreenGui)
+FloatingCircle.Size = UDim2.new(0, 60, 0, 60)
+FloatingCircle.Position = UDim2.new(0.1, 0, 0.5, 0)
+FloatingCircle.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+FloatingCircle.Visible = false
+-- Hacerlo redondo
+local Corner = Instance.new("UICorner", FloatingCircle)
+Corner.CornerRadius = UDim.new(1, 0)
+
+-- INPUT DE KEY
+local KeyInput = Instance.new("TextBox", MainFrame)
+KeyInput.PlaceholderText = "Escribe la Key aquí..."
+KeyInput.Size = UDim2.new(0, 200, 0, 40)
+KeyInput.Position = UDim2.new(0.5, -100, 0.35, 0)
+
+-- BOTÓN IR A LA BASE
+local TeleportBtn = Instance.new("TextButton", MainFrame)
+TeleportBtn.Text = "IR A LA BASE"
+TeleportBtn.Size = UDim2.new(0, 180, 0, 45)
+TeleportBtn.Position = UDim2.new(0.5, -90, 0.7, 0)
+TeleportBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+TeleportBtn.TextColor3 = Color3.new(1, 1, 1)
+TeleportBtn.Visible = false -- Solo se activa con la Key
+
+-- FUNCIONES
+local function teleport()
+    local char = game.Players.LocalPlayer.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = CFrame.new(BaseCoords)
+    end
+end
+
+-- Lógica de Key
+KeyInput.Changed:Connect(function()
+    if KeyInput.Text == CorrectKey then
+        TeleportBtn.Visible = true
+        KeyInput.BackgroundColor3 = Color3.fromRGB(0, 100, 0)
+    end
+end)
+
+TeleportBtn.MouseButton1Click:Connect(teleport)
+
+-- Lógica de minimizar/abrir
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    FloatingCircle.Visible = true
+end)
+
+FloatingCircle.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    FloatingCircle.Visible = false
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- Hacer que el círculo sea movible
+local UserInputService = game:GetService("UserInputService")
+local dragging, dragInput, dragStart, startPos
+
+FloatingCircle.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = FloatingCircle.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        FloatingCircle.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
