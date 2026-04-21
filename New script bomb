@@ -105,6 +105,89 @@ invisBtn.MouseButton1Click:Connect(function()
     end
 end)
 
+-- LISTA DE JUGADORES (CORREGIDA PARA DELTA)
+playerListFrame.Parent = mainFrame
+playerListFrame.Size = UDim2.new(1, 0, 1, 0) -- Tamaño completo
+playerListFrame.Position = UDim2.new(1.05, 0, 0, 0) -- Aparece al lado
+playerListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+playerListFrame.Visible = false
+playerListFrame.ScrollBarThickness = 5
+Instance.new("UICorner", playerListFrame)
+
+local listLayout = Instance.new("UIListLayout", playerListFrame)
+listLayout.Padding = UDim.new(0, 5)
+
+selectedLabel.MouseButton1Click:Connect(function()
+    playerListFrame.Visible = not playerListFrame.Visible
+    if playerListFrame.Visible then
+        for _, v in pairs(playerListFrame:GetChildren()) do 
+            if v:IsA("TextButton") then v:Destroy() end 
+        end
+        local players = game.Players:GetPlayers()
+        playerListFrame.CanvasSize = UDim2.new(0, 0, 0, #players * 35) -- AJUSTA EL TAMAÑO DE LA HOJA
+        
+        for _, p in pairs(players) do
+            if p ~= player then
+                local b = Instance.new("TextButton", playerListFrame)
+                b.Size = UDim2.new(0.9, 0, 0, 30)
+                b.Position = UDim2.new(0.05, 0, 0, 0)
+                b.Text = p.Name
+                b.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Color más visible
+                b.TextColor3 = Color3.new(1, 1, 1)
+                b.Font = Enum.Font.SourceSansBold
+                Instance.new("UICorner", b)
+                
+                b.MouseButton1Click:Connect(function()
+                    targetPlayer = p
+                    selectedLabel.Text = "Listo: " .. p.Name
+                    playerListFrame.Visible = false
+                end)
+            end
+        end
+    end
+end)
+tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", tpPlayerBtn)
+tpPlayerBtn.MouseButton1Click:Connect(function()
+    local char = getChar()
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        char.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+    end
+end)
+
+speedBtn.Parent = mainFrame
+speedBtn.Text = "VELOCIDAD: OFF"
+speedBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
+speedBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+speedBtn.BackgroundColor3 = Color3.fromRGB(0, 130, 0)
+speedBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", speedBtn)
+speedBtn.MouseButton1Click:Connect(function()
+    speedActive = not speedActive
+    local char = getChar()
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.WalkSpeed = speedActive and 100 or 16
+        speedBtn.Text = speedActive and "VELOCIDAD: ON" or "VELOCIDAD: OFF"
+    end
+end)
+
+invisBtn.Parent = mainFrame
+invisBtn.Text = "INVISIBILIDAD"
+invisBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
+invisBtn.Position = UDim2.new(0.05, 0, 0.80, 0)
+invisBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+invisBtn.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", invisBtn)
+invisBtn.MouseButton1Click:Connect(function()
+    local char = getChar()
+    for _, obj in pairs(char:GetDescendants()) do
+        if obj:IsA("BasePart") or obj:IsA("Decal") then
+            obj.Transparency = (obj.Transparency == 0 and 1 or 0)
+        end
+    end
+end)
+
 playerListFrame.Parent = mainFrame
 playerListFrame.Size = UDim2.new(1, 0, 0.8, 0)
 playerListFrame.Position = UDim2.new(1.05, 0, 0.1, 0)
