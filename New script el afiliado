@@ -1,33 +1,23 @@
---[[ 
-    LARDYLAN HUB - ARENA DE FRANCOTIRADORES
-    Compatible con Delta y Fluxus
-]]
-
--- 1. CONFIGURACIÓN DE SEGURIDAD
-local JUEGO_PERMITIDO_ID = 0 -- CAMBIA ESTO POR EL ID DEL JUEGO
+local JUEGO_PERMITIDO_ID = 0 
 local FECHA_EXPIRACION = os.time({year = 2026, month = 4, day = 21, hour = 18, min = 0})
-local DURACION_SESION = 7200 -- 2 horas
+local DURACION_SESION = 7200 
 
--- SERVICIOS
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- 2. VALIDACIONES INICIALES
 if game.PlaceId ~= JUEGO_PERMITIDO_ID and JUEGO_PERMITIDO_ID ~= 0 then
     LocalPlayer:Kick("ESTE SCRIPT NO ES PARA ESTE JUEGO")
     return
 end
 
 if os.time() > FECHA_EXPIRACION then
-    print("ESTE SCRIPT YA EXPIRO")
     LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
     return
 end
 
--- 3. ANUNCIO RAINBOW (LARDYLAN HUB)
 local function showRainbowIntro()
     local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
     local label = Instance.new("TextLabel", screenGui)
@@ -52,7 +42,6 @@ local function showRainbowIntro()
 end
 showRainbowIntro()
 
--- 4. DIBUJO DEL FOV (Círculo sin relleno)
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Thickness = 2
 FOVCircle.Color = Color3.fromRGB(0, 255, 255)
@@ -60,9 +49,71 @@ FOVCircle.Radius = 150
 FOVCircle.Filled = false
 FOVCircle.Visible = true
 
--- 5. ESP Y ANTENAS AZULES
 local function applyESP(plr)
     local function createVisuals()
+        if plr.Character then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "LardylanESP"
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.4
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = plr.Character
+            
+            local antenna = Instance.new("Part")
+            antenna.Size = Vector3.new(0.3, 25, 0.3)
+            antenna.Color = Color3.fromRGB(0, 0, 255)
+            antenna.CanCollide = false
+            antenna.Material = Enum.Material.Neon
+            antenna.Parent = plr.Character
+            
+            local weld = Instance.new("Weld")
+            weld.Part0 = plr.Character:WaitForChild("Head")
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 12.5, 0)
+            weld.Parent = antenna
+        end
+    end
+    plr.CharacterAdded:Connect(createVisuals)
+    createVisuals()
+end
+
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then applyESP(p) end
+end
+Players.PlayerAdded:Connect(applyESP)
+
+local function getTarget()
+    local target = nil
+    local shortestDist = FOVCircle.Radius
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if dist < shortestDist then
+                    target = v.Character.Head
+                    shortestDist = dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+local startTime = os.time()
+
+RunService.RenderStepped:Connect(function()
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local head = getTarget()
+    if head then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
+    end
+    if os.time() - startTime >= DURACION_SESION then
+        LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
+    end
+end)
         if plr.Character then
             -- ESP Cuerpo Azul (Highlight)
             local highlight = Instance.new("Highlight")
