@@ -1,70 +1,177 @@
--- Script para "EL AFILADO" - Botón de Teletransporte
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local rootPart = character:WaitForChild("HumanoidRootPart")
+--[[ 
+    LARDYLAN HUB - ARENA DE FRANCOTIRADORES
+    Compatible con Delta y Fluxus
+]]
 
--- Coordenadas de destino
-local destino = Vector3.new(-276, 90, -276)
+-- 1. CONFIGURACIÓN DE SEGURIDAD
+local JUEGO_PERMITIDO_ID = 0 -- CAMBIA ESTO POR EL ID DEL JUEGO
+local FECHA_EXPIRACION = os.time({year = 2026, month = 4, day = 21, hour = 18, min = 0})
+local DURACION_SESION = 7200 -- 2 horas
 
--- 1. CREAR LA INTERFAZ (Botón Flotante)
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "TeleportGui"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = player:WaitForChild("PlayerGui")
+-- SERVICIOS
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
 
-local boton = Instance.new("TextButton")
-boton.Name = "TeleportButton"
-boton.Size = UDim2.new(0, 150, 0, 50)
-boton.Position = UDim2.new(0.5, -75, 0.5, -25) -- Centro de la pantalla inicial
-boton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-boton.TextColor3 = Color3.new(1, 1, 1)
-boton.Text = "TELETRANSPORTARSE"
-boton.Font = Enum.Font.SourceSansBold
-boton.TextSize = 14
-boton.Parent = screenGui
+-- 2. VALIDACIONES INICIALES
+if game.PlaceId ~= JUEGO_PERMITIDO_ID and JUEGO_PERMITIDO_ID ~= 0 then
+    LocalPlayer:Kick("ESTE SCRIPT NO ES PARA ESTE JUEGO")
+    return
+end
 
--- Hacer el botón redondeado
-local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
-corner.Parent = boton
+if os.time() > FECHA_EXPIRACION then
+    print("ESTE SCRIPT YA EXPIRO")
+    LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
+    return
+end
 
--- 2. FUNCIÓN DE TELETRANSPORTE
-boton.MouseButton1Click:Connect(function()
-    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(destino)
-        print("Teletransportado a: " .. tostring(destino))
+-- 3. ANUNCIO RAINBOW (LARDYLAN HUB)
+local function showRainbowIntro()
+    local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+    local label = Instance.new("TextLabel", screenGui)
+    label.Size = UDim2.new(1, 0, 0.1, 0)
+    label.Position = UDim2.new(0, 0, 0.1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = "LARDYLAN HUB"
+    label.TextScaled = true
+    label.Font = Enum.Font.LuckiestGuy
+    
+    local rainbowConn
+    rainbowConn = RunService.RenderStepped:Connect(function()
+        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    end)
+
+    task.delay(5, function()
+        rainbowConn:Disconnect()
+        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+        task.wait(1)
+        screenGui:Destroy()
+    end)
+end
+showRainbowIntro()
+
+-- 4. DIBUJO DEL FOV (Círculo sin relleno)
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Thickness = 2
+FOVCircle.Color = Color3.fromRGB(0, 255, 255)
+FOVCircle.Radius = 150
+FOVCircle.Filled = false
+FOVCircle.Visible = true
+
+-- 5. ESP Y ANTENAS AZULES
+local function applyESP(plr)
+    local function createVisuals()
+        if plr.Character then
+            -- ESP Cuerpo Azul (Highlight)
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "LardylanESP"
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.4
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = plr.Character
+            
+            -- Antena Azul (Palo gigante)
+            local antenna = Instance.new("Part")
+            antenna.Size = Vector3.new(0.3, 25, 0.3)
+            antenna.Color = Color3.fromRGB(0, 0, 255)
+            antenna.CanCollide = false
+            antenna.Material = Enum.Material.Neon
+            antenna.Parent = plr.Character
+            
+            local weld = Instance.new("Weld")
+            weld.Part0 = plr.Character:WaitForChild("Head")
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 12.5, 0)
+            weld.Parent = antenna
+        end
+    end
+    plr.CharacterAdded:Connect(createVisuals)
+    createVisuals()
+end
+
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then applyESP(p) end
+end
+Players.PlayerAdded:Connect(applyESP)
+
+-- 6. LÓGICA AIMBOT (Cabeza)
+local function getTarget()
+    local target = nil
+    local shortestDist = FOVCircle.Radius
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if dist < shortestDist then
+                    target = v.Character.Head
+                    shortestDist = dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+-- 7. BUCLE PRINCIPAL (Aimbot + Contador de 2h)
+local startTime = os.time()
+
+RunService.RenderStepped:Connect(function()
+    -- Centrar FOV
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    
+    -- Apuntar si hay objetivo
+    local head = getTarget()
+    if head then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
+    end
+    
+    -- Verificar tiempo de sesión (2 horas)
+    if os.time() - startTime >= DURACION_SESION then
+        LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
     end
 end)
 
--- 3. HACER EL BOTÓN MOVIBLE (Para que sea "flotante")
-local dragging, dragInput, dragStart, startPos
+print("Lardylan Hub cargado correctamente.")
+            weld.Part0 = plr.Character:WaitForChild("Head")
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 10, 0)
+            weld.Parent = antenna
+        end
+    end
+    plr.CharacterAdded:Connect(apply)
+    apply()
+end
 
-boton.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = boton.Position
+for _, p in pairs(game.Players:GetPlayers()) do
+    if p ~= Player then createESP(p) end
+end
+game.Players.PlayerAdded:Connect(createESP)
+
+-- 4. BUCLE DE EJECUCIÓN Y CONTADOR
+local startTime = os.time()
+
+RunService.RenderStepped:Connect(function()
+    -- Actualizar posición FOV por si cambia resolución
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    
+    -- Ejecutar Aimbot
+    local head = getClosestPlayerInFOV()
+    if head then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
+    end
+    
+    -- Contador de 2 horas
+    local elapsed = os.time() - startTime
+    if elapsed >= DURACION_SESION then
+        game.Players.LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
     end
 end)
-
-boton.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = false
-    end
-end)
-
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-        local delta = input.Position - dragStart
-        boton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", tpPlayerBtn)
-tpPlayerBtn.MouseButton1Click:Connect(function()
-    local char = getChar()
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+char.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
     end
 end)
 
@@ -261,5 +368,121 @@ Instance.new("UICorner", tpPlayerBtn)
 tpPlayerBtn.MouseButton1Click:Connect(function()
     if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
         player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
+    end
+end)
+local JUEGO_PERMITIDO_ID = 0 
+local FECHA_EXPIRACION = os.time({year = 2026, month = 4, day = 21, hour = 18, min = 0})
+local DURACION_SESION = 7200 
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Camera = workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+
+if game.PlaceId ~= JUEGO_PERMITIDO_ID and JUEGO_PERMITIDO_ID ~= 0 then
+    LocalPlayer:Kick("ESTE SCRIPT NO ES PARA ESTE JUEGO")
+    return
+end
+
+if os.time() > FECHA_EXPIRACION then
+    LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
+    return
+end
+
+local function showRainbowIntro()
+    local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+    local label = Instance.new("TextLabel", screenGui)
+    label.Size = UDim2.new(1, 0, 0.1, 0)
+    label.Position = UDim2.new(0, 0, 0.1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = "LARDYLAN HUB"
+    label.TextScaled = true
+    label.Font = Enum.Font.LuckiestGuy
+    
+    local rainbowConn
+    rainbowConn = RunService.RenderStepped:Connect(function()
+        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    end)
+
+    task.delay(5, function()
+        rainbowConn:Disconnect()
+        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+        task.wait(1)
+        screenGui:Destroy()
+    end)
+end
+showRainbowIntro()
+
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Thickness = 2
+FOVCircle.Color = Color3.fromRGB(0, 255, 255)
+FOVCircle.Radius = 150
+FOVCircle.Filled = false
+FOVCircle.Visible = true
+
+local function applyESP(plr)
+    local function createVisuals()
+        if plr.Character then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "LardylanESP"
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.4
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = plr.Character
+            
+            local antenna = Instance.new("Part")
+            antenna.Size = Vector3.new(0.3, 25, 0.3)
+            antenna.Color = Color3.fromRGB(0, 0, 255)
+            antenna.CanCollide = false
+            antenna.Material = Enum.Material.Neon
+            antenna.Parent = plr.Character
+            
+            local weld = Instance.new("Weld")
+            weld.Part0 = plr.Character:WaitForChild("Head")
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 12.5, 0)
+            weld.Parent = antenna
+        end
+    end
+    plr.CharacterAdded:Connect(createVisuals)
+    createVisuals()
+end
+
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then applyESP(p) end
+end
+Players.PlayerAdded:Connect(applyESP)
+
+local function getTarget()
+    local target = nil
+    local shortestDist = FOVCircle.Radius
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if dist < shortestDist then
+                    target = v.Character.Head
+                    shortestDist = dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+local startTime = os.time()
+
+RunService.RenderStepped:Connect(function()
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local head = getTarget()
+    if head then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
+    end
+    if os.time() - startTime >= DURACION_SESION then
+        LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
     end
 end)
