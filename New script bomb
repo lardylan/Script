@@ -2,46 +2,112 @@ local player = game.Players.LocalPlayer
 local screenGui = Instance.new("ScreenGui")
 local mainFrame = Instance.new("Frame")
 local titleLabel = Instance.new("TextLabel")
-local teleportBtn = Instance.new("TextButton")
+local tpPisoBtn = Instance.new("TextButton")
+local selectedLabel = Instance.new("TextButton") -- Texto/Boton para elegir jugador
+local tpPlayerBtn = Instance.new("TextButton")
+local playerListFrame = Instance.new("ScrollingFrame")
 
-local destinoX, destinoY, destinoZ = -43, 24, -43
+local targetPlayer = nil -- Aquí guardamos al jugador elegido
 
+-- Configuración Menú (Lo hice más alto para los nuevos botones)
 screenGui.Parent = player:WaitForChild("PlayerGui")
 screenGui.ResetOnSpawn = false
 
 mainFrame.Parent = screenGui
-mainFrame.Size = UDim2.new(0, 160, 0, 90)
-mainFrame.Position = UDim2.new(0.5, -80, 0.4, 0)
+mainFrame.Size = UDim2.new(0, 180, 0, 180)
+mainFrame.Position = UDim2.new(0.5, -90, 0.3, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 mainFrame.Active = true
 mainFrame.Draggable = true
 
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 10)
 corner.Parent = mainFrame
 
+-- Título LARDYLAN
 titleLabel.Parent = mainFrame
 titleLabel.Text = "LARDYLAN"
-titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
+titleLabel.Size = UDim2.new(1, 0, 0.2, 0)
 titleLabel.BackgroundTransparency = 1
 titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
 titleLabel.Font = Enum.Font.SourceSansBold
 titleLabel.TextSize = 20
 
-teleportBtn.Parent = mainFrame
-teleportBtn.Text = "TELETRANSPORTARSE"
-teleportBtn.Size = UDim2.new(0.9, 0, 0.4, 0)
-teleportBtn.Position = UDim2.new(0.05, 0, 0.5, 0)
-teleportBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
-teleportBtn.TextColor3 = Color3.new(1, 1, 1)
-teleportBtn.Font = Enum.Font.SourceSansBold
-teleportBtn.TextSize = 13
+-- BOTÓN 1: Teleport al Piso (-43, 24, -43)
+tpPisoBtn.Parent = mainFrame
+tpPisoBtn.Text = "PISO SEGURO"
+tpPisoBtn.Size = UDim2.new(0.9, 0, 0.2, 0)
+tpPisoBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+tpPisoBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+tpPisoBtn.TextColor3 = Color3.new(1, 1, 1)
+tpPisoBtn.Font = Enum.Font.SourceSansBold
+tpPisoBtn.TextSize = 12
+Instance.new("UICorner", tpPisoBtn)
 
-local btnCorner = Instance.new("UICorner")
-btnCorner.Parent = teleportBtn
-
-teleportBtn.MouseButton1Click:Connect(function()
+tpPisoBtn.MouseButton1Click:Connect(function()
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = CFrame.new(destinoX, destinoY, destinoZ)
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(-43, 24, -43)
+    end
+end)
+
+-- SELECCIONAR JUGADOR (Texto interactivo)
+selectedLabel.Parent = mainFrame
+selectedLabel.Text = "Seleccionar Jugador..."
+selectedLabel.Size = UDim2.new(0.9, 0, 0.15, 0)
+selectedLabel.Position = UDim2.new(0.05, 0, 0.45, 0)
+selectedLabel.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+selectedLabel.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+selectedLabel.Font = Enum.Font.SourceSansItalic
+selectedLabel.TextSize = 12
+Instance.new("UICorner", selectedLabel)
+
+-- LISTA FLOTANTE (Se abre al tocar el nombre)
+playerListFrame.Parent = mainFrame
+playerListFrame.Size = UDim2.new(1, 0, 1, 0)
+playerListFrame.Position = UDim2.new(1.1, 0, 0, 0)
+playerListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+playerListFrame.Visible = false
+playerListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+
+local function updatePlayerList()
+    playerListFrame:ClearAllChildren()
+    local layout = Instance.new("UIListLayout", playerListFrame)
+    local count = 0
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player then
+            count = count + 1
+            local btn = Instance.new("TextButton", playerListFrame)
+            btn.Size = UDim2.new(1, 0, 0, 30)
+            btn.Text = p.Name
+            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            btn.TextColor3 = Color3.new(1, 1, 1)
+            btn.MouseButton1Click:Connect(function()
+                targetPlayer = p
+                selectedLabel.Text = "Destino: " .. p.Name
+                playerListFrame.Visible = false
+            end)
+        end
+    end
+    playerListFrame.CanvasSize = UDim2.new(0, 0, 0, count * 30)
+end
+
+selectedLabel.MouseButton1Click:Connect(function()
+    playerListFrame.Visible = not playerListFrame.Visible
+    if playerListFrame.Visible then updatePlayerList() end
+end)
+
+-- BOTÓN 2: Teleport al Jugador (Perfecto para soltar la bomba)
+tpPlayerBtn.Parent = mainFrame
+tpPlayerBtn.Text = "TP AL JUGADOR (BOMBA)"
+tpPlayerBtn.Size = UDim2.new(0.9, 0, 0.25, 0)
+tpPlayerBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Rojo para la bomba
+tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
+tpPlayerBtn.Font = Enum.Font.SourceSansBold
+tpPlayerBtn.TextSize = 11
+Instance.new("UICorner", tpPlayerBtn)
+
+tpPlayerBtn.MouseButton1Click:Connect(function()
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
     end
 end)
