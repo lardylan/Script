@@ -1,0 +1,55 @@
+--[[
+    Script by LARDYLAN
+    Auto-Teleport System
+]]
+
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+local mainFrame = Instance.new("Frame")
+local titleLabel = Instance.new("TextLabel")
+local teleportBtn = Instance.new("TextButton")
+
+-- Coordenadas configuradas
+local destinoX, destinoY, destinoZ = -43, 24, -43
+
+screenGui.Name = "LardylanMenu"
+screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.ResetOnSpawn = false
+
+mainFrame.Name = "Main"
+mainFrame.Parent = screenGui
+mainFrame.Size = UDim2.new(0, 160, 0, 90)
+mainFrame.Position = UDim2.new(0.5, -80, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = mainFrame
+
+titleLabel.Parent = mainFrame
+titleLabel.Text = "LARDYLAN"
+titleLabel.Size = UDim2.new(1, 0, 0.4, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+titleLabel.Font = Enum.Font.GothamBold
+titleLabel.TextSize = 18
+
+teleportBtn.Parent = mainFrame
+teleportBtn.Text = "TELETRANSPORTARSE"
+teleportBtn.Size = UDim2.new(0.9, 0, 0.4, 0)
+teleportBtn.Position = UDim2.new(0.05, 0, 0.5, 0)
+teleportBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+teleportBtn.TextColor3 = Color3.new(1, 1, 1)
+teleportBtn.Font = Enum.Font.GothamBold
+teleportBtn.TextSize = 11
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.Parent = teleportBtn
+
+teleportBtn.MouseButton1Click:Connect(function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(destinoX, destinoY, destinoZ)
+    end
+end)
