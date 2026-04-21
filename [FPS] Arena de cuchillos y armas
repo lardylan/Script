@@ -33,7 +33,101 @@ local function showIntro()
     label.Size = UDim2.new(1, 0, 0.1, 0)
     label.Position = UDim2.new(0, 0, 0.1, 0)
     label.BackgroundTransparency = 1
-    label.Text = "LARDYLAN HUB - WALLBANG ACTIVE"
+    label.Text = "LARDYLAN HUB - HITBOX & WALLBANG"
+    label.TextSize = 45
+    label.Font = Enum.Font.LuckiestGuy
+    
+    local conn = RunService.RenderStepped:Connect(function()
+        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    end)
+
+    task.delay(5, function()
+        conn:Disconnect()
+        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+        task.wait(1.1)
+        screenGui:Destroy()
+    end)
+end
+showIntro()
+
+-- 2. FOV CIRCULAR
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Thickness = 2
+FOVCircle.Color = Color3.fromRGB(0, 255, 255)
+FOVCircle.Radius = 150
+FOVCircle.Filled = false
+FOVCircle.Visible = true
+
+-- 3. ESP, ANTENAS Y HITBOXES GIGANTES
+local function applyHacks(plr)
+    local function modCharacter()
+        if plr ~= LocalPlayer and plr.Character then
+            -- ESP Highlight
+            local highlight = plr.Character:FindFirstChild("LardylanESP") or Instance.new("Highlight", plr.Character)
+            highlight.Name = "LardylanESP"
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            
+            -- HITBOX GIGANTE (Cabeza)
+            local head = plr.Character:WaitForChild("Head")
+            head.Size = Vector3.new(5, 5, 5) -- Tamaño aumentado
+            head.Transparency = 0.5
+            head.CanCollide = false
+            
+            -- Antena Azul
+            local antenna = plr.Character:FindFirstChild("AntenaAzul") or Instance.new("Part", plr.Character)
+            antenna.Name = "AntenaAzul"
+            antenna.Size = Vector3.new(0.5, 30, 0.5)
+            antenna.Color = Color3.fromRGB(0, 0, 255)
+            antenna.Material = Enum.Material.Neon
+            antenna.CanCollide = false
+            
+            local weld = antenna:FindFirstChild("Weld") or Instance.new("Weld", antenna)
+            weld.Part0 = head
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 15, 0)
+        end
+    end
+    plr.CharacterAdded:Connect(function() task.wait(1) modCharacter() end)
+    modCharacter()
+end
+
+for _, p in pairs(Players:GetPlayers()) do applyHacks(p) end
+Players.PlayerAdded:Connect(applyHacks)
+
+-- 4. BUCLE PRINCIPAL (AIMBOT + WALLBANG LOGIC)
+local function getTarget()
+    local target = nil
+    local shortestDist = FOVCircle.Radius
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local head = v.Character.Head
+            local pos, onScreen = Camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if dist < shortestDist then
+                    target = head
+                    shortestDist = dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+RunService.RenderStepped:Connect(function()
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    local targetHead = getTarget()
+    
+    if targetHead then
+        -- Apuntar a la Hitbox Gigante
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
+    end
+    
+    if os.time() - startTime >= DURACION_SESION or checkExpiration() then
+        LocalPlayer:Kick("SESION FINALIZADA / SCRIPT EXPIRO")
+    end
+end)
     label.TextSize = 45
     label.Font = Enum.Font.LuckiestGuy
     
