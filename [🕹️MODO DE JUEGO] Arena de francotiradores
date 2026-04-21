@@ -1,6 +1,7 @@
-local JUEGO_PERMITIDO_ID = 0 
+-- VARIABLES DE SESIÓN Y SEGURIDAD
 local FECHA_EXPIRACION = os.time({year = 2026, month = 4, day = 21, hour = 18, min = 0})
 local DURACION_SESION = 7200 
+local startTime = os.time()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -8,32 +9,119 @@ local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-if game.PlaceId ~= JUEGO_PERMITIDO_ID and JUEGO_PERMITIDO_ID ~= 0 then
-    LocalPlayer:Kick("ESTE SCRIPT NO ES PARA ESTE JUEGO")
-    return
-end
-
+-- VERIFICAR EXPIRACIÓN
 if os.time() > FECHA_EXPIRACION then
     LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
     return
 end
 
-local function showRainbowIntro()
+-- 1. ANUNCIO RAINBOW LARDYLAN HUB
+local function showIntro()
     local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
     local label = Instance.new("TextLabel", screenGui)
     label.Size = UDim2.new(1, 0, 0.1, 0)
     label.Position = UDim2.new(0, 0, 0.1, 0)
     label.BackgroundTransparency = 1
     label.Text = "LARDYLAN HUB"
-    label.TextScaled = true
+    label.TextSize = 40
     label.Font = Enum.Font.LuckiestGuy
     
-    local rainbowConn
-    rainbowConn = RunService.RenderStepped:Connect(function()
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
         label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
     end)
 
     task.delay(5, function()
+        conn:Disconnect()
+        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+        task.wait(1.1)
+        screenGui:Destroy()
+    end)
+end
+showIntro()
+
+-- 2. CONFIGURACIÓN DEL FOV (Círculo)
+local FOVCircle = Drawing.new("Circle")
+FOVCircle.Thickness = 2
+FOVCircle.Color = Color3.fromRGB(0, 255, 255)
+FOVCircle.Radius = 150
+FOVCircle.Filled = false
+FOVCircle.Visible = true
+
+-- 3. ESP Y ANTENAS AZULES
+local function applyESP(plr)
+    local function createVisuals()
+        if plr ~= LocalPlayer and plr.Character then
+            -- Borrar ESP previo si existe
+            if plr.Character:FindFirstChild("LardylanESP") then plr.Character.LardylanESP:Destroy() end
+            if plr.Character:FindFirstChild("AntenaAzul") then plr.Character.AntenaAzul:Destroy() end
+
+            -- Highlight (Cuerpo Azul)
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "LardylanESP"
+            highlight.FillColor = Color3.fromRGB(0, 0, 255)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.5
+            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            highlight.Parent = plr.Character
+            
+            -- Antena (Palo Gigante)
+            local antenna = Instance.new("Part")
+            antenna.Name = "AntenaAzul"
+            antenna.Size = Vector3.new(0.5, 30, 0.5)
+            antenna.Color = Color3.fromRGB(0, 0, 255)
+            antenna.Material = Enum.Material.Neon
+            antenna.CanCollide = false
+            antenna.Parent = plr.Character
+            
+            local weld = Instance.new("Weld")
+            weld.Part0 = plr.Character:WaitForChild("Head")
+            weld.Part1 = antenna
+            weld.C0 = CFrame.new(0, 15, 0)
+            weld.Parent = antenna
+        end
+    end
+    plr.CharacterAdded:Connect(function() task.wait(1) createVisuals() end)
+    createVisuals()
+end
+
+for _, p in pairs(Players:GetPlayers()) do applyESP(p) end
+Players.PlayerAdded:Connect(applyESP)
+
+-- 4. LÓGICA AIMBOT
+local function getTarget()
+    local target = nil
+    local shortestDist = FOVCircle.Radius
+
+    for _, v in pairs(Players:GetPlayers()) do
+        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
+            local head = v.Character.Head
+            local pos, onScreen = Camera:WorldToViewportPoint(head.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if dist < shortestDist then
+                    target = head
+                    shortestDist = dist
+                end
+            end
+        end
+    end
+    return target
+end
+
+-- 5. BUCLE PRINCIPAL
+RunService.RenderStepped:Connect(function()
+    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    
+    local targetHead = getTarget()
+    if targetHead then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
+    end
+    
+    if os.time() - startTime >= DURACION_SESION then
+        LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
+    end
+end)
         rainbowConn:Disconnect()
         TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
         task.wait(1)
