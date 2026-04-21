@@ -1,39 +1,157 @@
--- CONFIGURACIÓN
-local CorrectKey = "LUCKY BLOCK"
-local BaseCoords = Vector3.new(0, 50, 0) -- Cambia esto por tu posición de base
+-- Configuración de Variables
+local KEY_CORRECTA = "LUCKY BLOCK"
+local POSICION_BASE = Vector3.new(0, 50, 0) -- CAMBIA ESTO
 
--- CREACIÓN DE LA INTERFAZ
-local ScreenGui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
-ScreenGui.Name = "LardylanHubGui"
+-- IDs DE SONIDO (Puedes cambiarlos por los que quieras)
+local SOUND_SUCCESS = "rbxassetid://160432334" -- Sonido de éxito
+local SOUND_TP = "rbxassetid://1548304764"      -- Sonido de Teletransporte
+local SOUND_BRAINROT = "rbxassetid://4590662766" -- Sonido gracioso/alerta
 
--- PANEL PRINCIPAL
-local MainFrame = Instance.new("Frame", ScreenGui)
-MainFrame.Size = UDim2.new(0, 250, 0, 250)
-MainFrame.Position = UDim2.new(0.5, -125, 0.5, -125)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.BorderSizePixel = 2
-MainFrame.Active = true
-MainFrame.Draggable = true -- Para que puedas mover el menú por la pantalla
+local Player = game.Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 
--- TÍTULO DEL HUB (NUEVO)
-local HubTitle = Instance.new("TextLabel", MainFrame)
-HubTitle.Text = "LARDYLAN HUB"
-HubTitle.Size = UDim2.new(1, 0, 0, 40)
-HubTitle.Position = UDim2.new(0, 0, 0, 10)
-HubTitle.BackgroundTransparency = 1
-HubTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-HubTitle.TextSize = 22
-HubTitle.Font = Enum.Font.GothamBold
+-- Función para reproducir sonidos
+local function playSound(soundId)
+    local sound = Instance.new("Sound")
+    sound.SoundId = soundId
+    sound.Volume = 1
+    sound.Parent = game.Workspace
+    sound:Play()
+    game.Debris:AddItem(sound, 2) -- Borra el sonido después de 2 segundos
+end
 
--- BOTÓN CERRAR (X)
-local CloseBtn = Instance.new("TextButton", MainFrame)
-CloseBtn.Text = "X"
+-- 1. CREACIÓN DE LA INTERFAZ (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LuckyMenuGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+-- (Menú de Key)
+local FrameKey = Instance.new("Frame")
+FrameKey.Size = UDim2.new(0, 300, 0, 200)
+FrameKey.Position = UDim2.new(0.5, -150, 0.5, -100)
+FrameKey.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+FrameKey.Visible = true
+FrameKey.Parent = ScreenGui
+
+local TextBox = Instance.new("TextBox")
+TextBox.Size = UDim2.new(0, 200, 0, 40)
+TextBox.Position = UDim2.new(0.5, -100, 0.5, -20)
+TextBox.PlaceholderText = "INGRESE LA KEY AQUI🗿"
+TextBox.Parent = FrameKey
+
+local CheckBtn = Instance.new("TextButton")
+CheckBtn.Size = UDim2.new(0, 100, 0, 30)
+CheckBtn.Position = UDim2.new(0.5, -50, 0.75, 0)
+CheckBtn.Text = "VERIFICAR"
+CheckBtn.Parent = FrameKey
+
+-- Botones X y -
+local CloseBtn = Instance.new("TextButton")
 CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -35, 0, 5)
-CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-CloseBtn.TextColor3 = Color3.new(1, 1, 1)
+CloseBtn.Text = "X"
+CloseBtn.Parent = FrameKey
 
--- BOTÓN MINIMIZAR (-)
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+MinimizeBtn.Position = UDim2.new(1, -70, 0, 5)
+MinimizeBtn.Text = "-"
+MinimizeBtn.Parent = FrameKey
+
+-- 2. TEXTO LARDYLAN HUB LATIDOR
+local HubText = Instance.new("TextLabel")
+HubText.Size = UDim2.new(0, 150, 0, 30)
+HubText.Position = UDim2.new(0.1, -15, 0.1, -35)
+HubText.Text = "LARDYLAN HUB"
+HubText.TextColor3 = Color3.fromRGB(255, 255, 255)
+HubText.BackgroundTransparency = 1
+HubText.Font = Enum.Font.GothamBold
+HubText.Visible = false
+HubText.Parent = ScreenGui
+
+local function startBeating()
+    local info = TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true)
+    local goal = {TextSize = 22, TextColor3 = Color3.fromRGB(255, 255, 0)}
+    TweenService:Create(HubText, info, goal):Play()
+end
+
+-- 3. BOTÓN IR A BASE Y BOLA
+local FloatingBall = Instance.new("ImageButton")
+FloatingBall.Size = UDim2.new(0, 50, 0, 50)
+FloatingBall.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
+FloatingBall.Visible = false
+FloatingBall.Parent = ScreenGui
+Instance.new("UICorner", FloatingBall).CornerRadius = UDim.new(1, 0)
+
+local BaseBtn = Instance.new("TextButton")
+BaseBtn.Size = UDim2.new(0, 120, 0, 50)
+BaseBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+BaseBtn.Text = "IR ALA BASE"
+BaseBtn.Visible = false
+BaseBtn.Parent = ScreenGui
+
+-- --- LÓGICA CON SONIDOS ---
+
+local function tpToBase()
+    local char = Player.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        playSound(SOUND_TP) -- 🔊 Sonido de TP
+        char.HumanoidRootPart.CFrame = CFrame.new(POSICION_BASE)
+    end
+end
+
+CheckBtn.MouseButton1Click:Connect(function()
+    if TextBox.Text == KEY_CORRECTA then
+        playSound(SOUND_SUCCESS) -- 🔊 Sonido de Key Correcta
+        FrameKey.Visible = false
+        BaseBtn.Visible = true
+        FloatingBall.Visible = true
+        HubText.Visible = true
+        startBeating()
+    else
+        TextBox.Text = ""
+        TextBox.PlaceholderText = "KEY INCORRECTA ❌"
+    end
+end)
+
+BaseBtn.MouseButton1Click:Connect(tpToBase)
+CloseBtn.MouseButton1Click:Connect(function() FrameKey.Visible = false end)
+MinimizeBtn.MouseButton1Click:Connect(function() FrameKey.Visible = false end)
+FloatingBall.MouseButton1Click:Connect(function() FrameKey.Visible = not FrameKey.Visible end)
+
+-- Movimiento de la bola
+local dragging, dragStart, startPos
+FloatingBall.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = FloatingBall.Position
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        FloatingBall.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+-- Auto-TP con BRAINROT + Sonido
+Player.CharacterChildAdded:Connect(function(child)
+    if child.Name == "BRAINROT" then 
+        playSound(SOUND_BRAINROT) -- 🔊 Sonido cuando agarras el item
+        tpToBase() 
+    end
+end)
 local MinimizeBtn = Instance.new("TextButton", MainFrame)
 MinimizeBtn.Text = "-"
 MinimizeBtn.Size = UDim2.new(0, 30, 0, 30)
