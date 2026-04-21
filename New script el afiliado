@@ -1,68 +1,64 @@
+-- Script para "EL AFILADO" - Botón de Teletransporte
 local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:WaitForChild("HumanoidRootPart")
+
+-- Coordenadas de destino
+local destino = Vector3.new(-276, 90, -276)
+
+-- 1. CREAR LA INTERFAZ (Botón Flotante)
 local screenGui = Instance.new("ScreenGui")
-local mainFrame = Instance.new("Frame")
-local titleLabel = Instance.new("TextLabel")
-local tpPisoBtn = Instance.new("TextButton")
-local selectedLabel = Instance.new("TextButton")
-local tpPlayerBtn = Instance.new("TextButton")
-local speedBtn = Instance.new("TextButton")
-local invisBtn = Instance.new("TextButton")
-local playerListFrame = Instance.new("ScrollingFrame")
-
-local targetPlayer = nil
-local speedActive = false
-
-local function getChar()
-    return player.Character or player.CharacterAdded:Wait()
-end
-
-screenGui.Name = "LardylanMenuFix"
-screenGui.Parent = player:WaitForChild("PlayerGui")
+screenGui.Name = "TeleportGui"
 screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
 
-mainFrame.Parent = screenGui
-mainFrame.Size = UDim2.new(0, 180, 0, 260)
-mainFrame.Position = UDim2.new(0.5, -90, 0.2, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-mainFrame.Active = true
-mainFrame.Draggable = true
-Instance.new("UICorner", mainFrame)
+local boton = Instance.new("TextButton")
+boton.Name = "TeleportButton"
+boton.Size = UDim2.new(0, 150, 0, 50)
+boton.Position = UDim2.new(0.5, -75, 0.5, -25) -- Centro de la pantalla inicial
+boton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+boton.TextColor3 = Color3.new(1, 1, 1)
+boton.Text = "TELETRANSPORTARSE"
+boton.Font = Enum.Font.SourceSansBold
+boton.TextSize = 14
+boton.Parent = screenGui
 
-titleLabel.Parent = mainFrame
-titleLabel.Text = "LARDYLAN PRO"
-titleLabel.Size = UDim2.new(1, 0, 0.12, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
-titleLabel.Font = Enum.Font.GothamBold
-titleLabel.TextSize = 16
+-- Hacer el botón redondeado
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 10)
+corner.Parent = boton
 
-tpPisoBtn.Parent = mainFrame
-tpPisoBtn.Text = "PISO SEGURO"
-tpPisoBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
-tpPisoBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
-tpPisoBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
-tpPisoBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", tpPisoBtn)
-tpPisoBtn.MouseButton1Click:Connect(function()
-    local char = getChar()
-    if char and char:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = CFrame.new(-43, 24, -43)
+-- 2. FUNCIÓN DE TELETRANSPORTE
+boton.MouseButton1Click:Connect(function()
+    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        player.Character.HumanoidRootPart.CFrame = CFrame.new(destino)
+        print("Teletransportado a: " .. tostring(destino))
     end
 end)
 
-selectedLabel.Parent = mainFrame
-selectedLabel.Text = "Elegir Jugador..."
-selectedLabel.Size = UDim2.new(0.9, 0, 0.12, 0)
-selectedLabel.Position = UDim2.new(0.05, 0, 0.30, 0)
-selectedLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-selectedLabel.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", selectedLabel)
+-- 3. HACER EL BOTÓN MOVIBLE (Para que sea "flotante")
+local dragging, dragInput, dragStart, startPos
 
-tpPlayerBtn.Parent = mainFrame
-tpPlayerBtn.Text = "TP A JUGADOR"
-tpPlayerBtn.Size = UDim2.new(0.9, 0, 0.15, 0)
-tpPlayerBtn.Position = UDim2.new(0.05, 0, 0.45, 0)
-tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+boton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = boton.Position
+    end
+end)
+
+boton.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = false
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - dragStart
+        boton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", tpPlayerBtn)
 tpPlayerBtn.MouseButton1Click:Connect(function()
