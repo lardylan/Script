@@ -1,8 +1,8 @@
 -- ==========================================
 -- CONFIGURACION
 -- ==========================================
-local VERSION_SCRIPT = "LARDYLAN V1"
-local KEY_CORRECTA = "V1"
+local VERSION_SCRIPT = "LARDYLAN V2"
+local KEY_CORRECTA = "V2"
 local TITULO_BOTON = "TELETRANSPORTARSE"
 local POS_BASE = CFrame.new(-209, 10, -154)
 
@@ -95,6 +95,6 @@ BtnLog.MouseButton1Click:Connect(function()
     else
         BtnLog.Text = "ERROR"
         task.wait(1)
-        BtnLog.Text = "LOGUEAR"
+        BtnLog.Text = "ENTRAR"
     end
 end)
