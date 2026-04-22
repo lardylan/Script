@@ -1,0 +1,289 @@
+-- ==========================================
+-- LARDYLAN V4 - 5 BOTONES FLOTANTES COMPLETOS
+-- ==========================================
+local Plrs = game:GetService("Players")
+local LP = Plrs.LocalPlayer
+local CG = game:GetService("CoreGui")
+
+local K_3H = "KEY-FREE3HOURSGHTSV2"
+local K_6H = "KEY-FREE6HOURSFXSSV2"
+local K_PERMA = "KEY-FREEPERMANENTEXSFHTSV2"
+
+for _, v in pairs(CG:GetChildren()) do
+    if v.Name == "LARDYLAN_GUI" then v:Destroy() end
+end
+
+local G = Instance.new("ScreenGui", CG)
+G.Name = "LARDYLAN_GUI"
+
+-- ==========================================
+-- LOGIN (LARDYLAN V4)
+-- ==========================================
+local K = Instance.new("Frame", G)
+K.Size = UDim2.new(0, 250, 0, 150)
+K.Position = UDim2.new(0.5, -125, 0.4, 0)
+K.BackgroundColor3 = Color3.fromRGB(30, 0, 60)
+K.Active = true
+K.Draggable = true
+Instance.new("UICorner", K)
+
+local T = Instance.new("TextLabel", K)
+T.Size = UDim2.new(1, 0, 0, 30)
+T.Text = "LARDYLAN V1"
+T.TextColor3 = Color3.fromRGB(180, 0, 255)
+T.BackgroundTransparency = 1
+T.Font = Enum.Font.GothamBold
+T.TextSize = 18
+
+local Input = Instance.new("TextBox", K)
+Input.Size = UDim2.new(0.8, 0, 0, 30)
+Input.Position = UDim2.new(0.1, 0, 0.3, 0)
+Input.PlaceholderText = "Key..."
+Input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Input.TextColor3 = Color3.new(1, 1, 1)
+
+local B = Instance.new("TextButton", K)
+B.Size = UDim2.new(0.8, 0, 0, 30)
+B.Position = UDim2.new(0.1, 0, 0.6, 0)
+B.Text = "LOGUEAR"
+B.BackgroundColor3 = Color3.fromRGB(100, 0, 255)
+B.TextColor3 = Color3.new(1, 1, 1)
+Instance.new("UICorner", B)
+
+-- ==========================================
+-- SISTEMA DE BOTONES FLOTANTES (5 BOTONES)
+-- ==========================================
+local function IniciarScript()
+    K.Visible = false
+    local PosY = 0.15 -- Empieza más arriba para que quepan todos
+
+    local function CrearBotonMarcado(nombre, color, funcion)
+        local Contenedor = Instance.new("Frame", G)
+        Contenedor.Size = UDim2.new(0, 180, 0, 65)
+        Contenedor.Position = UDim2.new(0.02, 0, PosY, 0)
+        Contenedor.BackgroundTransparency = 1
+        Contenedor.Draggable = true
+        Contenedor.Active = true
+
+        local T_Up = Instance.new("TextLabel", Contenedor)
+        T_Up.Size = UDim2.new(1, 0, 0, 15)
+        T_Up.Text = "LARDYLAN V1"
+        T_Up.TextColor3 = Color3.new(1, 1, 1)
+        T_Up.BackgroundTransparency = 1
+        T_Up.Font = Enum.Font.GothamBold
+        T_Up.TextSize = 10
+
+        local Btn = Instance.new("TextButton", Contenedor)
+        Btn.Size = UDim2.new(1, 0, 0, 35)
+        Btn.Position = UDim2.new(0, 0, 0.25, 0)
+        Btn.Text = nombre
+        Btn.BackgroundColor3 = color
+        Btn.TextColor3 = Color3.new(1, 1, 1)
+        Btn.Font = Enum.Font.GothamBold
+        Instance.new("UICorner", Btn)
+
+        local T_Down = Instance.new("TextLabel", Contenedor)
+        T_Down.Size = UDim2.new(1, 0, 0, 15)
+        T_Down.Position = UDim2.new(0, 0, 0.8, 0)
+        T_Down.Text = "LARDYLAN V1"
+        T_Down.TextColor3 = Color3.fromRGB(150, 150, 150)
+        T_Down.BackgroundTransparency = 1
+        T_Down.TextSize = 8
+
+        Btn.MouseButton1Click:Connect(funcion)
+        PosY = PosY + 0.12 -- Espaciado entre botones
+        return Btn
+    end
+
+    -- 1. TELEPORT
+    CrearBotonMarcado("TELEPORT", Color3.fromRGB(255, 120, 0), function()
+        local r = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+        if r then r.CFrame = CFrame.new(-209, 10, -154) end
+    end)
+
+    -- 2. AUTO BREAK (Solo Pico)
+    local breaking = false
+    local btnBreak = CrearBotonMarcado("AUTO BREAK: OFF", Color3.fromRGB(50, 50, 50), function() end)
+    btnBreak.MouseButton1Click:Connect(function()
+        breaking = not breaking
+        btnBreak.Text = breaking and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
+        btnBreak.BackgroundColor3 = breaking and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
+    end)
+
+    -- 3. AUTO CASH
+    local autoCash = false
+    local btnCash = CrearBotonMarcado("AUTO CASH: OFF", Color3.fromRGB(50, 50, 50), function() end)
+    btnCash.MouseButton1Click:Connect(function()
+        autoCash = not autoCash
+        btnCash.Text = autoCash and "AUTO CASH: ON" or "AUTO CASH: OFF"
+        btnCash.BackgroundColor3 = autoCash and Color3.fromRGB(255, 215, 0) or Color3.fromRGB(50, 50, 50)
+    end)
+
+    -- 4. VELOCIDAD (SPEED)
+    local speedOn = false
+    local btnSpeed = CrearBotonMarcado("SPEED: OFF", Color3.fromRGB(50, 50, 50), function() end)
+    btnSpeed.MouseButton1Click:Connect(function()
+        speedOn = not speedOn
+        btnSpeed.Text = speedOn and "SPEED: ON" or "SPEED: OFF"
+        btnSpeed.BackgroundColor3 = speedOn and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(50, 50, 50)
+        LP.Character.Humanoid.WalkSpeed = speedOn and 100 or 16
+    end)
+
+    -- 5. SALTO (INFINITE JUMP)
+    local jumpOn = false
+    local btnJump = CrearBotonMarcado("INF JUMP: OFF", Color3.fromRGB(50, 50, 50), function() end)
+    btnJump.MouseButton1Click:Connect(function()
+        jumpOn = not jumpOn
+        btnJump.Text = jumpOn and "INF JUMP: ON" or "INF JUMP: OFF"
+        btnJump.BackgroundColor3 = jumpOn and Color3.fromRGB(255, 0, 150) or Color3.fromRGB(50, 50, 50)
+    end)
+
+    -- BUCLE LÓGICO PARA FUNCIONES
+    task.spawn(function()
+        game:GetService("UserInputService").JumpRequest:Connect(function()
+            if jumpOn then LP.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping") end
+        end)
+        
+        while task.wait(0.1) do
+            local char = LP.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
+
+            if breaking then
+                local pico = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe") or LP.Backpack:FindFirstChild("Pico") or char:FindFirstChild("Pico")
+                if pico then
+                    if pico.Parent ~= char then char.Humanoid:EquipTool(pico) end
+                    pico:Activate()
+                    for _, o in pairs(workspace:GetDescendants()) do
+                        if o.Name:lower():find("lucky") and o:IsA("BasePart") then
+                            if (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
+                                if o:FindFirstChild("ClickDetector") then fireclickdetector(o.ClickDetector) end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if autoCash then
+                for _, v in pairs(workspace:GetChildren()) do
+                    if v.Name == "Silver" or v.Name == "Gold" or v.Name:find("Brainrot") then
+                        char.HumanoidRootPart.CFrame = (v:IsA("Model") and v.PrimaryPart or v).CFrame
+                        task.wait(0.05)
+                    end
+                end
+            end
+        end
+    end)
+end
+
+B.MouseButton1Click:Connect(function()
+    local key = Input.Text
+    if key == K_3H then task.spawn(function() task.wait(3*3600) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end) IniciarScript()
+    elseif key == K_6H then task.spawn(function() task.wait(6*3600) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end) IniciarScript()
+    elseif key == K_PERMA then IniciarScript()
+    else B.Text = "KEY ERROR" task.wait(1) B.Text = "LOGUEAR" end
+end)
+
+local function Main()
+    K.Visible = false
+    local M = Instance.new("Frame", G)
+    M.Size = UDim2.new(0, 380, 0, 200)
+    M.Position = UDim2.new(0.5, -190, 0.2, 0)
+    M.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    M.Active = true
+    M.Draggable = true
+    M.ClipsDescendants = true
+
+    local F = Instance.new("ImageLabel", M)
+    F.Size = UDim2.new(1, 0, 1, 0)
+    F.Image = I_BG
+    F.ImageTransparency = 0.7
+
+    local Top = Instance.new("TextLabel", M)
+    Top.Size = UDim2.new(1, 0, 0, 30)
+    Top.Text = V_TXT
+    Top.BackgroundColor3 = Color3.fromRGB(80, 0, 255)
+    Top.TextColor3 = Color3.new(1, 1, 1)
+    Top.Font = Enum.Font.GothamBold
+
+    local Img = Instance.new("ImageLabel", M)
+    Img.Size = UDim2.new(0, 110, 0, 110)
+    Img.Position = UDim2.new(0.05, 0, 0.25, 0)
+    Img.Image = I_BACON
+    Img.BackgroundTransparency = 1
+
+    local BT1 = Instance.new("TextButton", M)
+    BT1.Size = UDim2.new(0, 200, 0, 45)
+    BT1.Position = UDim2.new(0.42, 0, 0.25, 0)
+    BT1.Text = "TELETRANSPORTARSE"
+    BT1.BackgroundColor3 = Color3.fromRGB(255, 120, 0)
+    BT1.TextColor3 = Color3.new(1, 1, 1)
+    BT1.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", BT1)
+
+    local BT2 = Instance.new("TextButton", M)
+    BT2.Size = UDim2.new(0, 200, 0, 45)
+    BT2.Position = UDim2.new(0.42, 0, 0.55, 0)
+    BT2.Text = "AUTO BREAK: OFF"
+    BT2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    BT2.TextColor3 = Color3.new(1, 1, 1)
+    BT2.Font = Enum.Font.GothamBold
+    Instance.new("UICorner", BT2)
+
+    BT1.MouseButton1Click:Connect(function()
+        local r = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
+        if r then r.CFrame = P_BASE end
+    end)
+
+    local on = false
+    BT2.MouseButton1Click:Connect(function()
+        on = not on
+        BT2.Text = on and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
+        BT2.BackgroundColor3 = on and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
+        
+        if on then
+            local bp = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
+            if bp then LP.Character.Humanoid:EquipTool(bp) end
+        end
+    end)
+
+    task.spawn(function()
+        while task.wait() do
+            if on then
+                pcall(function()
+                    local char = LP.Character
+                    local tool = char and char:FindFirstChildOfClass("Tool")
+                    if tool then tool:Activate() end
+
+                    for _, o in pairs(workspace:GetDescendants()) do
+                        if o.Name:lower():find("lucky") or o.Name:lower():find("block") then
+                            if o:IsA("BasePart") and (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
+                                if o:FindFirstChild("ClickDetector") then 
+                                    fireclickdetector(o.ClickDetector) 
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end)
+end
+
+-- LÓGICA DE LOGIN CON TIEMPOS
+B.MouseButton1Click:Connect(function()
+    local key = I.Text
+    if key == K_3H then
+        IniciarExpiracion(3 * 3600) -- Activa 3 horas
+        Main()
+    elseif key == K_6H then
+        IniciarExpiracion(6 * 3600) -- Activa 6 horas
+        Main()
+    elseif key == K_PERMA then
+        -- No se llama a IniciarExpiracion, dura para siempre
+        Main()
+    else
+        B.Text = "KEY INVÁLIDA"
+        task.wait(1)
+        B.Text = "LOGUEAR"
+    end
+end)
