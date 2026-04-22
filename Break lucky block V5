@@ -1,68 +1,92 @@
 -- ==========================================
--- LARDYLAN V4 - MEGA UPDATE (10 BOTONES)
+-- LARDYLAN V5 - SWITCH ANIMADOS (15 BOTONES)
 -- ==========================================
 local Plrs = game:GetService("Players")
 local LP = Plrs.LocalPlayer
 local CG = game:GetService("CoreGui")
 local UIS = game:GetService("UserInputService")
+local TS = game:GetService("TweenService")
 
--- LLAVES V4
-local K_3H = "KEY-FREE3HOURSGHTSV2"
-local K_6H = "KEY-FREE6HOURSFXSSV2"
-local K_PERMA = "KEY-FREEPERMANENTEXSFHTSV2"
+-- LLAVES V5
+local K_3H, K_6H, K_PERMA = "KEY-FREE3HOURSGHTSV2", "KEY-FREE6HOURSFXSSV2", "KEY-FREEPERMANENTEXSFHTSV2"
 
-for _, v in pairs(CG:GetChildren()) do
-    if v.Name == "LARDYLAN_V4_GUI" then v:Destroy() end
-end
+for _, v in pairs(CG:GetChildren()) do if v.Name == "LARDYLAN_V5_GUI" then v:Destroy() end end
+local G = Instance.new("ScreenGui", CG); G.Name = "LARDYLAN_V5_GUI"
 
-local G = Instance.new("ScreenGui", CG); G.Name = "LARDYLAN_V4_GUI"
-
--- LOGIN V4
-local K = Instance.new("Frame", G); K.Size = UDim2.new(0, 250, 0, 150); K.Position = UDim2.new(0.5, -125, 0.4, 0); K.BackgroundColor3 = Color3.fromRGB(40, 0, 80); K.Active = true; K.Draggable = true; Instance.new("UICorner", K)
-local T = Instance.new("TextLabel", K); T.Size = UDim2.new(1, 0, 0, 30); T.Text = "LARDYLAN V4"; T.TextColor3 = Color3.fromRGB(200, 0, 255); T.BackgroundTransparency = 1; T.Font = Enum.Font.GothamBold; T.TextSize = 20
-local Input = Instance.new("TextBox", K); Input.Size = UDim2.new(0.8, 0, 0, 30); Input.Position = UDim2.new(0.1, 0, 0.35, 0); Input.PlaceholderText = "Key V4..."; Input.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Input.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Input)
-local B = Instance.new("TextButton", K); B.Size = UDim2.new(0.8, 0, 0, 30); B.Position = UDim2.new(0.1, 0, 0.7, 0); B.Text = "LOGUEAR V4"; B.BackgroundColor3 = Color3.fromRGB(120, 0, 255); B.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", B)
+-- LOGIN V5
+local K = Instance.new("Frame", G); K.Size = UDim2.new(0, 250, 0, 160); K.Position = UDim2.new(0.5, -125, 0.4, 0); K.BackgroundColor3 = Color3.fromRGB(20, 0, 40); K.Active = true; K.Draggable = true; Instance.new("UICorner", K)
+local T = Instance.new("TextLabel", K); T.Size = UDim2.new(1, 0, 0, 35); T.Text = "LARDYLAN V5"; T.TextColor3 = Color3.fromRGB(180, 0, 255); T.BackgroundTransparency = 1; T.Font = Enum.Font.GothamBold; T.TextSize = 22
+local Input = Instance.new("TextBox", K); Input.Size = UDim2.new(0.8, 0, 0, 30); Input.Position = UDim2.new(0.1, 0, 0.35, 0); Input.PlaceholderText = "Key V5..."; Input.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Input.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Input)
+local B = Instance.new("TextButton", K); B.Size = UDim2.new(0.8, 0, 0, 30); B.Position = UDim2.new(0.1, 0, 0.7, 0); B.Text = "LOGUEAR V5"; B.BackgroundColor3 = Color3.fromRGB(100, 0, 255); B.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", B)
 
 local function IniciarScript()
     K.Visible = false
-    
-    local MainFrame = Instance.new("ScrollingFrame", G)
-    MainFrame.Size = UDim2.new(0, 220, 0, 400)
-    MainFrame.Position = UDim2.new(0.02, 0, 0.1, 0)
-    MainFrame.BackgroundTransparency = 1
-    MainFrame.ScrollBarThickness = 5
-    MainFrame.CanvasSize = UDim2.new(0, 0, 0, 800) -- Espacio para muchos botones
-
-    local TopBar = Instance.new("Frame", G)
-    TopBar.Size = UDim2.new(0, 220, 0, 35); TopBar.Position = UDim2.new(0.02, 0, 0.05, 0); TopBar.BackgroundColor3 = Color3.fromRGB(40, 0, 80); Instance.new("UICorner", TopBar)
-    local TitleBtn = Instance.new("TextButton", TopBar); TitleBtn.Size = UDim2.new(0.6, 0, 1, 0); TitleBtn.Text = "LARDYLAN V4"; TitleBtn.TextColor3 = Color3.new(1, 1, 1); TitleBtn.BackgroundTransparency = 1; TitleBtn.Font = Enum.Font.GothamBold
+    local TopBar = Instance.new("Frame", G); TopBar.Size = UDim2.new(0, 230, 0, 35); TopBar.Position = UDim2.new(0.02, 0, 0.05, 0); TopBar.BackgroundColor3 = Color3.fromRGB(40, 0, 80); Instance.new("UICorner", TopBar)
+    local Title = Instance.new("TextButton", TopBar); Title.Size = UDim2.new(0.6, 0, 1, 0); Title.Text = "LARDYLAN V5"; Title.TextColor3 = Color3.new(1, 1, 1); Title.BackgroundTransparency = 1; Title.Font = Enum.Font.GothamBold
     local MinBtn = Instance.new("TextButton", TopBar); MinBtn.Size = UDim2.new(0, 30, 0, 30); MinBtn.Position = UDim2.new(0.65, 0, 0, 0); MinBtn.Text = "-"; MinBtn.TextColor3 = Color3.new(1, 1, 1); MinBtn.BackgroundTransparency = 1; MinBtn.TextSize = 25
     local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 30, 0, 30); CloseBtn.Position = UDim2.new(0.82, 0, 0, 0); CloseBtn.Text = "X"; CloseBtn.TextColor3 = Color3.fromRGB(255, 50, 50); CloseBtn.BackgroundTransparency = 1; CloseBtn.TextSize = 20
 
+    local MainFrame = Instance.new("ScrollingFrame", G); MainFrame.Size = UDim2.new(0, 230, 0, 420); MainFrame.Position = UDim2.new(0.02, 0, 0.1, 0); MainFrame.BackgroundTransparency = 1; MainFrame.ScrollBarThickness = 2; MainFrame.CanvasSize = UDim2.new(0, 0, 0, 1050)
+
     MinBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
-    TitleBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true end)
     CloseBtn.MouseButton1Click:Connect(function() G:Destroy() end)
 
     local PosY = 0
-    local function CrearBoton(nombre, color, funcion)
-        local Cont = Instance.new("Frame", MainFrame); Cont.Size = UDim2.new(0.9, 0, 0, 65); Cont.Position = UDim2.new(0, 5, 0, PosY); Cont.BackgroundTransparency = 1
-        Instance.new("TextLabel", Cont).Text = "LARDYLAN V4"; Cont.TextLabel.Size = UDim2.new(1,0,0,15); Cont.TextLabel.TextColor3 = Color3.new(1,1,1); Cont.TextLabel.BackgroundTransparency = 1; Cont.TextLabel.TextSize = 10
-        local Btn = Instance.new("TextButton", Cont); Btn.Size = UDim2.new(1, 0, 0, 35); Btn.Position = UDim2.new(0, 0, 0.25, 0); Btn.Text = nombre; Btn.BackgroundColor3 = color; Btn.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Btn)
-        Instance.new("TextLabel", Cont).Text = "LARDYLAN V4"; Cont.TextLabel.Position = UDim2.new(0,0,0.8,0); Cont.TextLabel.Size = UDim2.new(1,0,0,15); Cont.TextLabel.TextColor3 = Color3.fromRGB(150,150,150); Cont.TextLabel.BackgroundTransparency = 1; Cont.TextLabel.TextSize = 8
-        Btn.MouseButton1Click:Connect(function() funcion(Btn) end)
-        PosY = PosY + 70
+    local function CrearSwitch(nombre, funcion)
+        local Cont = Instance.new("Frame", MainFrame); Cont.Size = UDim2.new(0.9, 0, 0, 60); Cont.Position = UDim2.new(0, 5, 0, PosY); Cont.BackgroundTransparency = 1
+        local Lbl = Instance.new("TextLabel", Cont); Lbl.Size = UDim2.new(0.6, 0, 1, 0); Lbl.Text = nombre; Lbl.TextColor3 = Color3.new(1, 1, 1); Lbl.BackgroundTransparency = 1; Lbl.Font = Enum.Font.GothamBold; Lbl.TextXAlignment = Enum.TextXAlignment.Left
+
+        local BG = Instance.new("TextButton", Cont); BG.Size = UDim2.new(0, 50, 0, 25); BG.Position = UDim2.new(0.7, 0, 0.3, 0); BG.BackgroundColor3 = Color3.fromRGB(255, 50, 50); BG.Text = ""; Instance.new("UICorner", BG, {CornerRadius = UDim.new(1, 0)})
+        local Circle = Instance.new("Frame", BG); Circle.Size = UDim2.new(0, 21, 0, 21); Circle.Position = UDim2.new(0, 2, 0.5, -10); Circle.BackgroundColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Circle, {CornerRadius = UDim.new(1, 0)})
+
+        local activado = false
+        BG.MouseButton1Click:Connect(function()
+            activado = not activado
+            local pos = activado and UDim2.new(0, 27, 0.5, -10) or UDim2.new(0, 2, 0.5, -10)
+            local col = activado and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
+            TS:Create(Circle, TweenInfo.new(0.2), {Position = pos}):Play()
+            TS:Create(BG, TweenInfo.new(0.2), {BackgroundColor3 = col}):Play()
+            funcion(activado)
+        end)
+        PosY = PosY + 65
     end
 
-    -- 1-3. FUNCIONES ANTERIORES
-    CrearBoton("TELEPORT", Color3.fromRGB(255, 100, 0), function() LP.Character.HumanoidRootPart.CFrame = CFrame.new(-209, 10, -154) end)
-    local autoBreak = false
-    CrearBoton("AUTO BREAK: OFF", Color3.fromRGB(50,50,50), function(b) autoBreak = not autoBreak; b.Text = autoBreak and "AUTO BREAK: ON" or "AUTO BREAK: OFF"; b.BackgroundColor3 = autoBreak and Color3.fromRGB(0,200,100) or Color3.fromRGB(50,50,50) end)
-    local autoCash = false
-    CrearBoton("AUTO CASH: OFF", Color3.fromRGB(50,50,50), function(b) autoCash = not autoCash; b.Text = autoCash and "AUTO CASH: ON" or "AUTO CASH: OFF"; b.BackgroundColor3 = autoCash and Color3.fromRGB(255,200,0) or Color3.fromRGB(50,50,50) end)
+    -- 15 BOTONES CON SWITCH
+    CrearSwitch("TELEPORT", function(val) if val and LP.Character then LP.Character.HumanoidRootPart.CFrame = CFrame.new(-209, 10, -154) end end)
+    local autoBreak = false; CrearSwitch("AUTO BREAK", function(val) autoBreak = val end)
+    local autoCash = false; CrearSwitch("AUTO CASH", function(val) autoCash = val end)
+    local fly = false; CrearSwitch("FLY MODE", function(val) fly = val; if val then local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart); bv.Velocity = Vector3.new(0,0,0); bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge) else for _, v in pairs(LP.Character.HumanoidRootPart:GetChildren()) do if v:IsA("BodyVelocity") then v:Destroy() end end end end)
+    CrearSwitch("PLAYER ESP", function(val) if val then for _, p in pairs(Plrs:GetPlayers()) do if p ~= LP and p.Character then Instance.new("Highlight", p.Character).FillColor = Color3.new(1,0,0) end end end end)
+    CrearSwitch("ULTRA SPEED", function(val) LP.Character.Humanoid.WalkSpeed = val and 120 or 16 end)
+    local click = false; CrearSwitch("AUTO CLICK", function(val) click = val; task.spawn(function() while click do pcall(function() LP.Character:FindFirstChildOfClass("Tool"):Activate() end); task.wait(0.1) end end) end)
+    CrearSwitch("FPS BOOST", function(val) if val then for _,v in pairs(game:GetDescendants()) do if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic end end end end)
+    local ij = false; CrearSwitch("INF JUMP", function(val) ij = val end); UIS.JumpRequest:Connect(function() if ij then LP.Character.Humanoid:ChangeState("Jumping") end end)
+    CrearSwitch("ANTI-AFK", function(val) if val then LP.Idled:Connect(function() game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end) end end)
+    local spin = false; CrearSwitch("SPINBOT", function(val) spin = val; task.spawn(function() while spin do LP.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(50), 0); task.wait() end end) end)
+    local noclip = false; CrearSwitch("NO-CLIP", function(val) noclip = val; game:GetService("RunService").Stepped:Connect(function() if noclip then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) end)
+    CrearSwitch("FULL BRIGHT", function(val) local L = game:GetService("Lighting"); L.Brightness = val and 2 or 1; L.GlobalShadows = not val end)
+    CrearSwitch("REJOIN", function(val) if val then game:GetService("TeleportService"):Teleport(game.PlaceId, LP) end end)
+    CrearSwitch("CHAT SPAM", function(val) if val then game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LARDYLAN V5 ACTIVE!", "All") end end)
 
-    -- 4. FLY (VOLAR)
-    local flying = false
-    CrearBoton("FLY: OFF", Color3.fromRGB(100, 0, 200), function(b)
+    -- BUCLE LÓGICO FARM
+    task.spawn(function()
+        while task.wait(0.1) do
+            local char = LP.Character
+            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
+            if autoCash then for _, v in pairs(workspace:GetChildren()) do if v.Name:find("Cash") or v.Name:find("Brainrot") then char.HumanoidRootPart.CFrame = (v:IsA("BasePart") and v or v.PrimaryPart).CFrame; task.wait(0.05) end end end
+            if autoBreak then
+                local p = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe")
+                if p then if p.Parent ~= char then char.Humanoid:EquipTool(p) end
+                for _, b in pairs(workspace:GetDescendants()) do if b.Name:lower():find("lucky") and b:IsA("BasePart") then char.HumanoidRootPart.CFrame = b.CFrame * CFrame.new(0,4,0); p:Activate(); fireclickdetector(b:FindFirstChild("ClickDetector")); task.wait(0.05); break end end end
+            end
+        end
+    end)
+end
+
+B.MouseButton1Click:Connect(function()
+    local k = Input.Text
+    if k == K_3H or k == K_6H or k == K_PERMA then IniciarScript() else B.Text = "ERR" task.wait(1) B.Text = "LOGUEAR V5" end
+end)
         flying = not flying; b.Text = flying and "FLY: ON" or "FLY: OFF"
         local bv = Instance.new("BodyVelocity")
         if flying then bv.Velocity = Vector3.new(0,0,0); bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge); bv.Parent = LP.Character.HumanoidRootPart
