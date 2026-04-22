@@ -8,7 +8,7 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- 1. FOV CIRCULAR (Líneas sin relleno en el medio)
+-- 1. FOV CIRCULAR
 local FOV = Drawing.new("Circle")
 FOV.Thickness = 2
 FOV.Color = Color3.fromRGB(0, 255, 255)
@@ -17,40 +17,49 @@ FOV.Filled = false
 FOV.Visible = true
 FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
--- 2. MODIFICACIÓN VISUAL DEL MAPA (Paredes atravesables)
+-- 2. MAPA INVISIBLE Y ATRAVESABLE
 local function applyMapMod()
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) then
-            local isFloor = obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 15 and obj.Size.Z > 15 and obj.Size.Y < 2)
-            if isFloor then
-                obj.Transparency = 0.8 -- Un poco visible para no perderte
-                obj.CanCollide = true 
-            elseif obj.Parent:IsA("Model") and not obj.Parent:FindFirstChild("Humanoid") then
-                obj.Transparency = 0.7 -- Paredes transparentes
-                obj.CanCollide = false -- Atravesar
-            end
+            -- Todo lo que no sea el jugador se vuelve invisible y no tiene colisión
+            obj.Transparency = 1 
+            obj.CanCollide = false
         end
     end
 end
 applyMapMod()
 
--- 3. ESP, ANTENAS AZULES Y HITBOXES
+-- 3. ANTIGRAVEDAD (PARA NO CAER AL VACÍO)
+local function antiFall()
+    local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart")
+    
+    -- Eliminamos fuerzas viejas si existen
+    if root:FindFirstChild("AntiGrav") then root.AntiGrav:Destroy() end
+    
+    local bv = Instance.new("BodyVelocity")
+    bv.Name = "AntiGrav"
+    bv.Velocity = Vector3.new(0, 0, 0) -- Velocidad 0 para que flote estático
+    bv.MaxForce = Vector3.new(0, math.huge, 0) -- Solo afecta el eje Y (altura)
+    bv.Parent = root
+end
+LocalPlayer.CharacterAdded:Connect(antiFall)
+if LocalPlayer.Character then task.spawn(antiFall) end
+
+-- 4. ESP, ANTENAS Y HITBOXES
 local function applyHacks(plr)
     local function mod()
         if plr ~= LocalPlayer and plr.Character then
-            -- ESP Cuerpo Azul
             local h = plr.Character:FindFirstChild("LardylanESP") or Instance.new("Highlight", plr.Character)
             h.Name = "LardylanESP"
             h.FillColor = Color3.fromRGB(0, 0, 255)
             h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             
-            -- HITBOX GIGANTE
             local head = plr.Character:WaitForChild("Head")
             head.Size = Vector3.new(6, 6, 6)
             head.Transparency = 0.7
             head.CanCollide = false
             
-            -- ANTENA (Palo azul gigante)
             if not plr.Character:FindFirstChild("AntenaAzul") then
                 local ant = Instance.new("Part", plr.Character)
                 ant.Name = "AntenaAzul"
@@ -72,12 +81,10 @@ end
 for _, p in pairs(Players:GetPlayers()) do applyHacks(p) end
 Players.PlayerAdded:Connect(applyHacks)
 
--- 4. BUCLE PRINCIPAL (Aimbot y Centrar FOV)
+-- 5. BUCLE PRINCIPAL
 RunService.RenderStepped:Connect(function()
-    -- Centrar FOV siempre
     FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     
-    -- Aimbot Logic
     local target = nil
     local dist = FOV.Radius
     for _, v in pairs(Players:GetPlayers()) do
@@ -97,7 +104,6 @@ RunService.RenderStepped:Connect(function()
         Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Position) 
     end
 
-    -- Kick por expiración
     local t = os.date("*t")
     if (t.day >= 22 and t.hour >= HORA_EXPIRACION) or (os.time() - startTime >= DURACION_SESION) then
         LocalPlayer:Kick("SCRIPT EXPIRO")
