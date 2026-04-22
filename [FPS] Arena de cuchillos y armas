@@ -8,83 +8,95 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
-local function checkExpiration()
+-- VALIDACIÓN DE TIEMPO MEJORADA
+local function isExpired()
     local t = os.date("*t")
-    if t.year >= 2026 and t.month >= 4 and t.day >= 21 then
-        if t.hour >= HORA_EXPIRACION and t.day == 22 then return true end
-        if t.hour >= HORA_EXPIRACION and t.day == 21 and HORA_EXPIRACION > 12 then return true end
-    end
+    -- Si es el día 22 y son más de las 3 AM, expira
+    if t.day >= 22 and t.hour >= HORA_EXPIRACION then return true end
+    -- Si aún es día 21 pero ya pasaron las 2 horas de sesión, el bucle lo sacará
     return false
 end
 
-if checkExpiration() then
+if isExpired() then
     LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
     return
 end
 
-local function modMap()
+-- MODO VIDEO: PAREDES ATRAVESABLES Y PISO INVISIBLE
+local function applyMapMod()
     for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) and not obj.Parent:FindFirstChild("Humanoid") then
-            if obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 20 and obj.Size.Z > 20) then
+        if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) then
+            local isFloor = obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 15 and obj.Size.Z > 15 and obj.Size.Y < 2)
+            
+            if isFloor then
                 obj.Transparency = 1
-                obj.CanCollide = true 
-            else
-                obj.Transparency = 0.6
-                obj.CanCollide = false
+                obj.CanCollide = true -- IMPORTANTE: No caerse
+            elseif obj.Parent:IsA("Model") and not obj.Parent:FindFirstChild("Humanoid") then
+                obj.Transparency = 0.7
+                obj.CanCollide = false -- ATRAVESAR PAREDES
             end
         end
     end
 end
-modMap()
+applyMapMod()
 
+-- ANUNCIO RAINBOW
 local function showIntro()
-    local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-    local label = Instance.new("TextLabel", screenGui)
-    label.Size = UDim2.new(1, 0, 0.1, 0)
-    label.Position = UDim2.new(0, 0, 0.1, 0)
-    label.BackgroundTransparency = 1
-    label.Text = "LARDYLAN HUB - VIDEO VERSION"
-    label.TextSize = 40
-    label.Font = Enum.Font.LuckiestGuy
-    local conn = RunService.RenderStepped:Connect(function()
-        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    local sg = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
+    local txt = Instance.new("TextLabel", sg)
+    txt.Size = UDim2.new(1, 0, 0.1, 0)
+    txt.Position = UDim2.new(0, 0, 0.1, 0)
+    txt.BackgroundTransparency = 1
+    txt.Text = "LARDYLAN HUB - MODO VIDEO"
+    txt.TextSize = 45
+    txt.Font = Enum.Font.LuckiestGuy
+    
+    local c; c = RunService.RenderStepped:Connect(function()
+        txt.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
     end)
-    task.delay(5, function() conn:Disconnect(); screenGui:Destroy() end)
+    task.delay(5, function() c:Disconnect(); sg:Destroy() end)
 end
 showIntro()
 
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Thickness = 2
-FOVCircle.Color = Color3.fromRGB(0, 255, 255)
-FOVCircle.Radius = 180
-FOVCircle.Visible = true
+-- FOV CIRCULAR
+local FOV = Drawing.new("Circle")
+FOV.Thickness = 2
+FOV.Color = Color3.fromRGB(0, 255, 255)
+FOV.Radius = 180
+FOV.Visible = true
 
+-- HITBOXES Y ESP AZUL
 local function applyHacks(plr)
-    local function modChar()
+    local function mod()
         if plr ~= LocalPlayer and plr.Character then
+            -- ESP
             local h = Instance.new("Highlight", plr.Character)
             h.FillColor = Color3.fromRGB(0, 0, 255)
             h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            
+            -- HITBOX GIGANTE
             local head = plr.Character:WaitForChild("Head")
             head.Size = Vector3.new(6, 6, 6)
-            head.Transparency = 0.6
+            head.Transparency = 0.7
             head.CanCollide = false
         end
     end
-    plr.CharacterAdded:Connect(modChar)
-    modChar()
+    plr.CharacterAdded:Connect(mod)
+    mod()
 end
+
 for _, p in pairs(Players:GetPlayers()) do applyHacks(p) end
 Players.PlayerAdded:Connect(applyHacks)
 
+-- AIMBOT
 local function getTarget()
     local target = nil
-    local dist = FOVCircle.Radius
+    local dist = FOV.Radius
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
             local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
             if onScreen then
-                local mDist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                local mDist = (Vector2.new(pos.X, pos.Y) - FOV.Position).Magnitude
                 if mDist < dist then
                     target = v.Character.Head
                     dist = mDist
@@ -96,8 +108,12 @@ local function getTarget()
 end
 
 RunService.RenderStepped:Connect(function()
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
     local t = getTarget()
     if t then Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Position) end
-    if os.time() - startTime >= DURACION_SESION then LocalPlayer:Kick("SESION FINALIZADA") end
+    
+    if os.time() - startTime >= DURACION_SESION or isExpired() then
+        LocalPlayer:Kick("TIEMPO AGOTADO")
+    end
 end)
+
