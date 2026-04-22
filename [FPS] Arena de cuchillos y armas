@@ -1,4 +1,4 @@
-local HORA_EXPIRACION = 03
+                    local HORA_EXPIRACION = 03
 local MINUTO_EXPIRACION = 00
 local DURACION_SESION = 18000
 local startTime = os.time()
@@ -17,30 +17,37 @@ FOV.Filled = false
 FOV.Visible = true
 FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
--- 2. MAPA INVISIBLE Y ATRAVESABLE
+-- 2. MODIFICACIÓN DEL MAPA (Piso normal, resto invisible)
 local function applyMapMod()
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) then
-            -- Todo lo que no sea el jugador se vuelve invisible y no tiene colisión
-            obj.Transparency = 1 
-            obj.CanCollide = false
+            -- Detectar si es el piso (por nombre o tamaño)
+            local isFloor = obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 15 and obj.Size.Z > 15 and obj.Size.Y < 2)
+            
+            if isFloor then
+                -- El piso se queda normal
+                obj.Transparency = 0
+                obj.CanCollide = true
+                obj.Visible = true
+            else
+                -- Todo lo demás (paredes, cajas, techos) se vuelve invisible y atravesable
+                obj.Transparency = 1
+                obj.CanCollide = false
+            end
         end
     end
 end
 applyMapMod()
 
--- 3. ANTIGRAVEDAD (PARA NO CAER AL VACÍO)
+-- 3. ANTIGRAVEDAD (PARA SEGURIDAD)
 local function antiFall()
     local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
     local root = char:WaitForChild("HumanoidRootPart")
-    
-    -- Eliminamos fuerzas viejas si existen
     if root:FindFirstChild("AntiGrav") then root.AntiGrav:Destroy() end
-    
     local bv = Instance.new("BodyVelocity")
     bv.Name = "AntiGrav"
-    bv.Velocity = Vector3.new(0, 0, 0) -- Velocidad 0 para que flote estático
-    bv.MaxForce = Vector3.new(0, math.huge, 0) -- Solo afecta el eje Y (altura)
+    bv.Velocity = Vector3.new(0, 0, 0)
+    bv.MaxForce = Vector3.new(0, 4000, 0) -- Fuerza suficiente para no caer pero poder caminar
     bv.Parent = root
 end
 LocalPlayer.CharacterAdded:Connect(antiFall)
