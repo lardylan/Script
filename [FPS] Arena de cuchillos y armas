@@ -1,4 +1,4 @@
-                    local HORA_EXPIRACION = 03
+local HORA_EXPIRACION = 5
 local MINUTO_EXPIRACION = 00
 local DURACION_SESION = 18000
 local startTime = os.time()
