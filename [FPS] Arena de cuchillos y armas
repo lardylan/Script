@@ -8,69 +8,39 @@ local RunService = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- VALIDACIÓN DE TIEMPO MEJORADA
-local function isExpired()
-    local t = os.date("*t")
-    -- Si es el día 22 y son más de las 3 AM, expira
-    if t.day >= 22 and t.hour >= HORA_EXPIRACION then return true end
-    -- Si aún es día 21 pero ya pasaron las 2 horas de sesión, el bucle lo sacará
-    return false
-end
+-- 1. FOV CIRCULAR (Líneas sin relleno en el medio)
+local FOV = Drawing.new("Circle")
+FOV.Thickness = 2
+FOV.Color = Color3.fromRGB(0, 255, 255)
+FOV.Radius = 180
+FOV.Filled = false
+FOV.Visible = true
+FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
-if isExpired() then
-    LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
-    return
-end
-
--- MODO VIDEO: PAREDES ATRAVESABLES Y PISO INVISIBLE
+-- 2. MODIFICACIÓN VISUAL DEL MAPA (Paredes atravesables)
 local function applyMapMod()
     for _, obj in pairs(workspace:GetDescendants()) do
         if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) then
             local isFloor = obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 15 and obj.Size.Z > 15 and obj.Size.Y < 2)
-            
             if isFloor then
-                obj.Transparency = 1
-                obj.CanCollide = true -- IMPORTANTE: No caerse
+                obj.Transparency = 0.8 -- Un poco visible para no perderte
+                obj.CanCollide = true 
             elseif obj.Parent:IsA("Model") and not obj.Parent:FindFirstChild("Humanoid") then
-                obj.Transparency = 0.7
-                obj.CanCollide = false -- ATRAVESAR PAREDES
+                obj.Transparency = 0.7 -- Paredes transparentes
+                obj.CanCollide = false -- Atravesar
             end
         end
     end
 end
 applyMapMod()
 
--- ANUNCIO RAINBOW
-local function showIntro()
-    local sg = Instance.new("ScreenGui", LocalPlayer.PlayerGui)
-    local txt = Instance.new("TextLabel", sg)
-    txt.Size = UDim2.new(1, 0, 0.1, 0)
-    txt.Position = UDim2.new(0, 0, 0.1, 0)
-    txt.BackgroundTransparency = 1
-    txt.Text = "LARDYLAN HUB - MODO VIDEO"
-    txt.TextSize = 45
-    txt.Font = Enum.Font.LuckiestGuy
-    
-    local c; c = RunService.RenderStepped:Connect(function()
-        txt.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-    end)
-    task.delay(5, function() c:Disconnect(); sg:Destroy() end)
-end
-showIntro()
-
--- FOV CIRCULAR
-local FOV = Drawing.new("Circle")
-FOV.Thickness = 2
-FOV.Color = Color3.fromRGB(0, 255, 255)
-FOV.Radius = 180
-FOV.Visible = true
-
--- HITBOXES Y ESP AZUL
+-- 3. ESP, ANTENAS AZULES Y HITBOXES
 local function applyHacks(plr)
     local function mod()
         if plr ~= LocalPlayer and plr.Character then
-            -- ESP
-            local h = Instance.new("Highlight", plr.Character)
+            -- ESP Cuerpo Azul
+            local h = plr.Character:FindFirstChild("LardylanESP") or Instance.new("Highlight", plr.Character)
+            h.Name = "LardylanESP"
             h.FillColor = Color3.fromRGB(0, 0, 255)
             h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             
@@ -79,17 +49,35 @@ local function applyHacks(plr)
             head.Size = Vector3.new(6, 6, 6)
             head.Transparency = 0.7
             head.CanCollide = false
+            
+            -- ANTENA (Palo azul gigante)
+            if not plr.Character:FindFirstChild("AntenaAzul") then
+                local ant = Instance.new("Part", plr.Character)
+                ant.Name = "AntenaAzul"
+                ant.Size = Vector3.new(0.5, 40, 0.5)
+                ant.Color = Color3.fromRGB(0, 0, 255)
+                ant.Material = Enum.Material.Neon
+                ant.CanCollide = false
+                local weld = Instance.new("Weld", ant)
+                weld.Part0 = head
+                weld.Part1 = ant
+                weld.C0 = CFrame.new(0, 20, 0)
+            end
         end
     end
-    plr.CharacterAdded:Connect(mod)
+    plr.CharacterAdded:Connect(function() task.wait(1); mod() end)
     mod()
 end
 
 for _, p in pairs(Players:GetPlayers()) do applyHacks(p) end
 Players.PlayerAdded:Connect(applyHacks)
 
--- AIMBOT
-local function getTarget()
+-- 4. BUCLE PRINCIPAL (Aimbot y Centrar FOV)
+RunService.RenderStepped:Connect(function()
+    -- Centrar FOV siempre
+    FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    
+    -- Aimbot Logic
     local target = nil
     local dist = FOV.Radius
     for _, v in pairs(Players:GetPlayers()) do
@@ -104,16 +92,14 @@ local function getTarget()
             end
         end
     end
-    return target
-end
-
-RunService.RenderStepped:Connect(function()
-    FOV.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local t = getTarget()
-    if t then Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Position) end
     
-    if os.time() - startTime >= DURACION_SESION or isExpired() then
-        LocalPlayer:Kick("TIEMPO AGOTADO")
+    if target then 
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Position) 
+    end
+
+    -- Kick por expiración
+    local t = os.date("*t")
+    if (t.day >= 22 and t.hour >= HORA_EXPIRACION) or (os.time() - startTime >= DURACION_SESION) then
+        LocalPlayer:Kick("SCRIPT EXPIRO")
     end
 end)
-
