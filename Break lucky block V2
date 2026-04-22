@@ -1,26 +1,25 @@
 -- ==========================================
--- CONFIGURACIÓN
+-- CONFIGURACIÓN LARDYLAN V3
 -- ==========================================
-local tiempoDeInicio = os.time()
-local tresHorasEnSegundos = 3 * 3600 -- 10,800 segundos
-local V_TXT = "LARDYLAN V2"
-local K_OK = "V2"
+local V_TXT = "LARDYLAN V3"
 local P_BASE = CFrame.new(-209, 10, -154)
+
+-- LLAVES CONFIGURADAS
+local K_3H = "KEY-FREE3HOURSGHTSV2"
+local K_6H = "KEY-FREE6HOURSFXSSV2"
+local K_PERMA = "KEY-FREEPERMANENTEXSFHTSV2"
 
 local I_BACON = "rbxassetid://15391215456" 
 local I_BG = "rbxassetid://124311897657957"
 
-if tiempoTranscurrido >= tresHorasEnSegundos or tablaFecha.hour >= 16 then
-            game.Players.LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
-            break
 -- ==========================================
 -- SCRIPT
 -- ==========================================
 local Plrs = game:GetService("Players")
 local LP = Plrs.LocalPlayer
 local CG = game:GetService("CoreGui")
-local RunService = game:GetService("RunService")
 
+-- Limpiar GUIs antiguas
 for _, v in pairs(CG:GetChildren()) do
     if v:IsA("ScreenGui") and v:FindFirstChild("D") then
         v:Destroy()
@@ -46,7 +45,7 @@ T.Font = Enum.Font.GothamBold
 local I = Instance.new("TextBox", K)
 I.Size = UDim2.new(0.8, 0, 0, 30)
 I.Position = UDim2.new(0.1, 0, 0.4, 0)
-I.PlaceholderText = "Key..."
+I.PlaceholderText = "Introduce tu Key..."
 I.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 I.TextColor3 = Color3.new(1, 1, 1)
 
@@ -56,6 +55,14 @@ B.Position = UDim2.new(0.1, 0, 0.7, 0)
 B.Text = "LOGUEAR"
 B.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
 B.TextColor3 = Color3.new(1, 1, 1)
+
+-- Función de Expulsión
+local function IniciarExpiracion(segundos)
+    task.spawn(function()
+        task.wait(segundos)
+        LP:Kick("ESTÉ SCRIPT YA EXPIRO")
+    end)
+end
 
 local function Main()
     K.Visible = false
@@ -114,29 +121,20 @@ local function Main()
         BT2.Text = on and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
         BT2.BackgroundColor3 = on and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
         
-        -- EQUIPAR PICO AUTOMÁTICAMENTE
         if on then
             local bp = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
-            if bp then
-                LP.Character.Humanoid:EquipTool(bp)
-            end
+            if bp then LP.Character.Humanoid:EquipTool(bp) end
         end
     end)
 
-    -- BUCLE DE AUTO CLICK Y ROMPER
     task.spawn(function()
-        while task.wait() do -- Velocidad máxima
+        while task.wait() do
             if on then
                 pcall(function()
                     local char = LP.Character
                     local tool = char and char:FindFirstChildOfClass("Tool")
-                    
-                    -- Click / Ataque
-                    if tool then
-                        tool:Activate()
-                    end
+                    if tool then tool:Activate() end
 
-                    -- Romper bloques cercanos
                     for _, o in pairs(workspace:GetDescendants()) do
                         if o.Name:lower():find("lucky") or o.Name:lower():find("block") then
                             if o:IsA("BasePart") and (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
@@ -152,6 +150,21 @@ local function Main()
     end)
 end
 
+-- LÓGICA DE LOGIN CON TIEMPOS
 B.MouseButton1Click:Connect(function()
-    if I.Text == K_OK then Main() else B.Text = "ERR" task.wait(1) B.Text = "LOGUEAR" end
+    local key = I.Text
+    if key == K_3H then
+        IniciarExpiracion(3 * 3600) -- Activa 3 horas
+        Main()
+    elseif key == K_6H then
+        IniciarExpiracion(6 * 3600) -- Activa 6 horas
+        Main()
+    elseif key == K_PERMA then
+        -- No se llama a IniciarExpiracion, dura para siempre
+        Main()
+    else
+        B.Text = "KEY INVÁLIDA"
+        task.wait(1)
+        B.Text = "LOGUEAR"
+    end
 end)
