@@ -1,0 +1,100 @@
+-- ==========================================
+-- CONFIGURACION
+-- ==========================================
+local VERSION_SCRIPT = "LARDYLAN V1"
+local KEY_CORRECTA = "V1"
+local TITULO_BOTON = "TELETRANSPORTARSE"
+local POS_BASE = CFrame.new(-209, 10, -154)
+
+-- ==========================================
+-- INTERFAZ (SIN NOMBRES ESPECIFICOS)
+-- ==========================================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+
+-- Limpiar instancias previas por clase para evitar errores de nombre
+for _, v in pairs(CoreGui:GetChildren()) do
+    if v:IsA("ScreenGui") and v:FindFirstChild("Main") then
+        v:Destroy()
+    end
+end
+
+local Gui = Instance.new("ScreenGui", CoreGui)
+Gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- 1. MENU DE KEY
+local FrameKey = Instance.new("Frame", Gui)
+FrameKey.Name = "Main"
+FrameKey.Size = UDim2.new(0, 280, 0, 160)
+FrameKey.Position = UDim2.new(0.5, -140, 0.4, -80)
+FrameKey.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+FrameKey.Active = true
+FrameKey.Draggable = true
+
+local T1 = Instance.new("TextLabel", FrameKey)
+T1.Size = UDim2.new(1, 0, 0, 35)
+T1.Text = VERSION_SCRIPT
+T1.BackgroundColor3 = Color3.fromRGB(80, 0, 255)
+T1.TextColor3 = Color3.new(1, 1, 1)
+T1.TextSize = 18
+T1.Font = Enum.Font.GothamBold
+
+local Input = Instance.new("TextBox", FrameKey)
+Input.Size = UDim2.new(0.8, 0, 0, 30)
+Input.Position = UDim2.new(0.1, 0, 0.4, 0)
+Input.PlaceholderText = "Ingresa Key..."
+Input.Text = ""
+Input.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Input.TextColor3 = Color3.new(1, 1, 1)
+
+local BtnLog = Instance.new("TextButton", FrameKey)
+BtnLog.Size = UDim2.new(0.8, 0, 0, 35)
+BtnLog.Position = UDim2.new(0.1, 0, 0.7, 0)
+BtnLog.Text = "LOGUEAR"
+BtnLog.BackgroundColor3 = Color3.fromRGB(0, 150, 255)
+BtnLog.TextColor3 = Color3.new(1, 1, 1)
+
+-- 2. BOTON DE TELEPORT
+local function ShowHub()
+    FrameKey.Visible = false
+    
+    local Main = Instance.new("Frame", Gui)
+    Main.Size = UDim2.new(0, 160, 0, 80)
+    Main.Position = UDim2.new(0.1, 0, 0.5, 0)
+    Main.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    Main.Active = true
+    Main.Draggable = true
+
+    local Banner = Instance.new("TextLabel", Main)
+    Banner.Size = UDim2.new(1, 0, 0, 20)
+    Banner.Text = VERSION_SCRIPT
+    Banner.BackgroundColor3 = Color3.fromRGB(80, 0, 255)
+    Banner.TextColor3 = Color3.new(1, 1, 1)
+
+    local BtnTP = Instance.new("TextButton", Main)
+    BtnTP.Size = UDim2.new(0.9, 0, 0, 40)
+    BtnTP.Position = UDim2.new(0.05, 0, 0.4, 0)
+    BtnTP.Text = TITULO_BOTON
+    BtnTP.BackgroundColor3 = Color3.fromRGB(255, 85, 0)
+    BtnTP.TextColor3 = Color3.new(1, 1, 1)
+    BtnTP.Font = Enum.Font.GothamBold
+
+    BtnTP.MouseButton1Click:Connect(function()
+        local char = LocalPlayer.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if root then
+            root.CFrame = POS_BASE
+        end
+    end)
+end
+
+BtnLog.MouseButton1Click:Connect(function()
+    if Input.Text == KEY_CORRECTA then
+        ShowHub()
+    else
+        BtnLog.Text = "ERROR"
+        task.wait(1)
+        BtnLog.Text = "LOGUEAR"
+    end
+end)
