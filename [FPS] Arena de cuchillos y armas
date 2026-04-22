@@ -1,22 +1,18 @@
--- CONFIGURACIÓN DE TIEMPO
-local HORA_EXPIRACION = 22 -- 10 PM
+local HORA_EXPIRACION = 03
 local MINUTO_EXPIRACION = 00
-local DURACION_SESION = 7200 
+local DURACION_SESION = 18000
 local startTime = os.time()
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
 local Camera = workspace.CurrentCamera
 local LocalPlayer = Players.LocalPlayer
 
--- VERIFICAR EXPIRACIÓN
 local function checkExpiration()
     local t = os.date("*t")
     if t.year >= 2026 and t.month >= 4 and t.day >= 21 then
-        if t.hour > HORA_EXPIRACION or (t.hour == HORA_EXPIRACION and t.min >= MINUTO_EXPIRACION) then
-            return true
-        end
+        if t.hour >= HORA_EXPIRACION and t.day == 22 then return true end
+        if t.hour >= HORA_EXPIRACION and t.day == 21 and HORA_EXPIRACION > 12 then return true end
     end
     return false
 end
@@ -26,524 +22,72 @@ if checkExpiration() then
     return
 end
 
--- 1. ANUNCIO LARDYLAN HUB
+local function modMap()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and not obj:IsDescendantOf(LocalPlayer.Character) and not obj.Parent:FindFirstChild("Humanoid") then
+            if obj.Name:lower():find("floor") or obj.Name:lower():find("piso") or (obj.Size.X > 20 and obj.Size.Z > 20) then
+                obj.Transparency = 1
+                obj.CanCollide = true 
+            else
+                obj.Transparency = 0.6
+                obj.CanCollide = false
+            end
+        end
+    end
+end
+modMap()
+
 local function showIntro()
     local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
     local label = Instance.new("TextLabel", screenGui)
     label.Size = UDim2.new(1, 0, 0.1, 0)
     label.Position = UDim2.new(0, 0, 0.1, 0)
     label.BackgroundTransparency = 1
-    label.Text = "LARDYLAN HUB - HITBOX & WALLBANG"
-    label.TextSize = 45
+    label.Text = "LARDYLAN HUB - VIDEO VERSION"
+    label.TextSize = 40
     label.Font = Enum.Font.LuckiestGuy
-    
     local conn = RunService.RenderStepped:Connect(function()
         label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
     end)
-
-    task.delay(5, function()
-        conn:Disconnect()
-        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
-        task.wait(1.1)
-        screenGui:Destroy()
-    end)
+    task.delay(5, function() conn:Disconnect(); screenGui:Destroy() end)
 end
 showIntro()
 
--- 2. FOV CIRCULAR
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Thickness = 2
 FOVCircle.Color = Color3.fromRGB(0, 255, 255)
-FOVCircle.Radius = 150
-FOVCircle.Filled = false
+FOVCircle.Radius = 180
 FOVCircle.Visible = true
 
--- 3. ESP, ANTENAS Y HITBOXES GIGANTES
 local function applyHacks(plr)
-    local function modCharacter()
+    local function modChar()
         if plr ~= LocalPlayer and plr.Character then
-            -- ESP Highlight
-            local highlight = plr.Character:FindFirstChild("LardylanESP") or Instance.new("Highlight", plr.Character)
-            highlight.Name = "LardylanESP"
-            highlight.FillColor = Color3.fromRGB(0, 0, 255)
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            
-            -- HITBOX GIGANTE (Cabeza)
+            local h = Instance.new("Highlight", plr.Character)
+            h.FillColor = Color3.fromRGB(0, 0, 255)
+            h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             local head = plr.Character:WaitForChild("Head")
-            head.Size = Vector3.new(5, 5, 5) -- Tamaño aumentado
-            head.Transparency = 0.5
+            head.Size = Vector3.new(6, 6, 6)
+            head.Transparency = 0.6
             head.CanCollide = false
-            
-            -- Antena Azul
-            local antenna = plr.Character:FindFirstChild("AntenaAzul") or Instance.new("Part", plr.Character)
-            antenna.Name = "AntenaAzul"
-            antenna.Size = Vector3.new(0.5, 30, 0.5)
-            antenna.Color = Color3.fromRGB(0, 0, 255)
-            antenna.Material = Enum.Material.Neon
-            antenna.CanCollide = false
-            
-            local weld = antenna:FindFirstChild("Weld") or Instance.new("Weld", antenna)
-            weld.Part0 = head
-            weld.Part1 = antenna
-            weld.C0 = CFrame.new(0, 15, 0)
         end
     end
-    plr.CharacterAdded:Connect(function() task.wait(1) modCharacter() end)
-    modCharacter()
+    plr.CharacterAdded:Connect(modChar)
+    modChar()
 end
-
 for _, p in pairs(Players:GetPlayers()) do applyHacks(p) end
 Players.PlayerAdded:Connect(applyHacks)
 
--- 4. BUCLE PRINCIPAL (AIMBOT + WALLBANG LOGIC)
 local function getTarget()
     local target = nil
-    local shortestDist = FOVCircle.Radius
-    for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
-            local head = v.Character.Head
-            local pos, onScreen = Camera:WorldToViewportPoint(head.Position)
-            if onScreen then
-                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
-                if dist < shortestDist then
-                    target = head
-                    shortestDist = dist
-                end
-            end
-        end
-    end
-    return target
-end
-
-RunService.RenderStepped:Connect(function()
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local targetHead = getTarget()
-    
-    if targetHead then
-        -- Apuntar a la Hitbox Gigante
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
-    end
-    
-    if os.time() - startTime >= DURACION_SESION or checkExpiration() then
-        LocalPlayer:Kick("SESION FINALIZADA / SCRIPT EXPIRO")
-    end
-end)
-    label.TextSize = 45
-    label.Font = Enum.Font.LuckiestGuy
-    
-    local conn = RunService.RenderStepped:Connect(function()
-        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-    end)
-
-    task.delay(5, function()
-        conn:Disconnect()
-        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
-        task.wait(1.1)
-        screenGui:Destroy()
-    end)
-end
-showIntro()
-
--- 2. FOV CIRCULAR
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Thickness = 2
-FOVCircle.Color = Color3.fromRGB(0, 255, 255)
-FOVCircle.Radius = 150
-FOVCircle.Filled = false
-FOVCircle.Visible = true
-
--- 3. ESP Y ANTENAS
-local function applyESP(plr)
-    local function createVisuals()
-        if plr ~= LocalPlayer and plr.Character then
-            local highlight = plr.Character:FindFirstChild("LardylanESP") or Instance.new("Highlight", plr.Character)
-            highlight.Name = "LardylanESP"
-            highlight.FillColor = Color3.fromRGB(0, 0, 255)
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            
-            local antenna = plr.Character:FindFirstChild("AntenaAzul") or Instance.new("Part", plr.Character)
-            antenna.Name = "AntenaAzul"
-            antenna.Size = Vector3.new(0.5, 30, 0.5)
-            antenna.Color = Color3.fromRGB(0, 0, 255)
-            antenna.Material = Enum.Material.Neon
-            antenna.CanCollide = false
-            
-            local weld = antenna:FindFirstChild("Weld") or Instance.new("Weld", antenna)
-            weld.Part0 = plr.Character:WaitForChild("Head")
-            weld.Part1 = antenna
-            weld.C0 = CFrame.new(0, 15, 0)
-        end
-    end
-    plr.CharacterAdded:Connect(function() task.wait(1) createVisuals() end)
-    createVisuals()
-end
-for _, p in pairs(Players:GetPlayers()) do applyESP(p) end
-Players.PlayerAdded:Connect(applyESP)
-
--- 4. WALLBANG LOGIC (Atravesar paredes)
--- Esta función modifica cómo el juego detecta los impactos
-local raycastParams = RaycastParams.new()
-raycastParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-RunService.Stepped:Connect(function()
-    local ignoreList = {Camera}
-    for _, v in pairs(Players:GetPlayers()) do
-        if v.Character then table.insert(ignoreList, v.Character) end
-    end
-    -- Añadimos las paredes del mapa a la lista de ignorados para el sistema de disparo
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("Part") and not obj:IsDescendantOf(LocalPlayer.Character) then
-            if obj.CanCollide == true then
-                -- Opcional: Aquí se podría aplicar transparencia o ignorar colisión de bala
-            end
-        end
-    end
-end)
-
--- 5. AIMBOT Y BUCLE
-local function getTarget()
-    local target = nil
-    local shortestDist = FOVCircle.Radius
-    for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
-            local head = v.Character.Head
-            local pos, onScreen = Camera:WorldToViewportPoint(head.Position)
-            if onScreen then
-                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
-                if dist < shortestDist then
-                    target = head
-                    shortestDist = dist
-                end
-            end
-        end
-    end
-    return target
-end
-
-RunService.RenderStepped:Connect(function()
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local targetHead = getTarget()
-    if targetHead then
-        -- El Aimbot ahora apunta directamente a la posición ignorando paredes
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
-    end
-    
-    if os.time() - startTime >= DURACION_SESION or checkExpiration() then
-        LocalPlayer:Kick("SESION FINALIZADA / SCRIPT EXPIRO")
-    end
-end)
-RenderStepped:Connect(function()
-    -- Actualizar posición FOV por si cambia resolución
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    
-    -- Ejecutar Aimbot
-    local head = getClosestPlayerInFOV()
-    if head then
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
-    end
-    
-    -- Contador de 2 horas
-    local elapsed = os.time() - startTime
-    if elapsed >= DURACION_SESION then
-        game.Players.LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
-    end
-end)
-char.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-    end
-end)
-
-speedBtn.Parent = mainFrame
-speedBtn.Text = "VELOCIDAD: OFF"
-speedBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
-speedBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
-speedBtn.BackgroundColor3 = Color3.fromRGB(0, 130, 0)
-speedBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", speedBtn)
-speedBtn.MouseButton1Click:Connect(function()
-    speedActive = not speedActive
-    local char = getChar()
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.WalkSpeed = speedActive and 100 or 16
-        speedBtn.Text = speedActive and "VELOCIDAD: ON" or "VELOCIDAD: OFF"
-    end
-end)
-
-invisBtn.Parent = mainFrame
-invisBtn.Text = "INVISIBILIDAD"
-invisBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
-invisBtn.Position = UDim2.new(0.05, 0, 0.80, 0)
-invisBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-invisBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", invisBtn)
-invisBtn.MouseButton1Click:Connect(function()
-    local char = getChar()
-    for _, obj in pairs(char:GetDescendants()) do
-        if obj:IsA("BasePart") or obj:IsA("Decal") then
-            obj.Transparency = (obj.Transparency == 0 and 1 or 0)
-        end
-    end
-end)
-
--- LISTA DE JUGADORES (CORREGIDA PARA DELTA)
-playerListFrame.Parent = mainFrame
-playerListFrame.Size = UDim2.new(1, 0, 1, 0) -- Tamaño completo
-playerListFrame.Position = UDim2.new(1.05, 0, 0, 0) -- Aparece al lado
-playerListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-playerListFrame.Visible = false
-playerListFrame.ScrollBarThickness = 5
-Instance.new("UICorner", playerListFrame)
-
-local listLayout = Instance.new("UIListLayout", playerListFrame)
-listLayout.Padding = UDim.new(0, 5)
-
-selectedLabel.MouseButton1Click:Connect(function()
-    playerListFrame.Visible = not playerListFrame.Visible
-    if playerListFrame.Visible then
-        for _, v in pairs(playerListFrame:GetChildren()) do 
-            if v:IsA("TextButton") then v:Destroy() end 
-        end
-        local players = game.Players:GetPlayers()
-        playerListFrame.CanvasSize = UDim2.new(0, 0, 0, #players * 35) -- AJUSTA EL TAMAÑO DE LA HOJA
-        
-        for _, p in pairs(players) do
-            if p ~= player then
-                local b = Instance.new("TextButton", playerListFrame)
-                b.Size = UDim2.new(0.9, 0, 0, 30)
-                b.Position = UDim2.new(0.05, 0, 0, 0)
-                b.Text = p.Name
-                b.BackgroundColor3 = Color3.fromRGB(60, 60, 60) -- Color más visible
-                b.TextColor3 = Color3.new(1, 1, 1)
-                b.Font = Enum.Font.SourceSansBold
-                Instance.new("UICorner", b)
-                
-                b.MouseButton1Click:Connect(function()
-                    targetPlayer = p
-                    selectedLabel.Text = "Listo: " .. p.Name
-                    playerListFrame.Visible = false
-                end)
-            end
-        end
-    end
-end)
-tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", tpPlayerBtn)
-tpPlayerBtn.MouseButton1Click:Connect(function()
-    local char = getChar()
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        char.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-    end
-end)
-
-speedBtn.Parent = mainFrame
-speedBtn.Text = "VELOCIDAD: OFF"
-speedBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
-speedBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
-speedBtn.BackgroundColor3 = Color3.fromRGB(0, 130, 0)
-speedBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", speedBtn)
-speedBtn.MouseButton1Click:Connect(function()
-    speedActive = not speedActive
-    local char = getChar()
-    local hum = char:FindFirstChildOfClass("Humanoid")
-    if hum then
-        hum.WalkSpeed = speedActive and 100 or 16
-        speedBtn.Text = speedActive and "VELOCIDAD: ON" or "VELOCIDAD: OFF"
-    end
-end)
-
-invisBtn.Parent = mainFrame
-invisBtn.Text = "INVISIBILIDAD"
-invisBtn.Size = UDim2.new(0.9, 0, 0.12, 0)
-invisBtn.Position = UDim2.new(0.05, 0, 0.80, 0)
-invisBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-invisBtn.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", invisBtn)
-invisBtn.MouseButton1Click:Connect(function()
-    local char = getChar()
-    for _, obj in pairs(char:GetDescendants()) do
-        if obj:IsA("BasePart") or obj:IsA("Decal") then
-            obj.Transparency = (obj.Transparency == 0 and 1 or 0)
-        end
-    end
-end)
-
-playerListFrame.Parent = mainFrame
-playerListFrame.Size = UDim2.new(1, 0, 0.8, 0)
-playerListFrame.Position = UDim2.new(1.05, 0, 0.1, 0)
-playerListFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-playerListFrame.Visible = false
-Instance.new("UICorner", playerListFrame)
-
-local listLayout = Instance.new("UIListLayout", playerListFrame)
-
-selectedLabel.MouseButton1Click:Connect(function()
-    playerListFrame.Visible = not playerListFrame.Visible
-    if playerListFrame.Visible then
-        for _, v in pairs(playerListFrame:GetChildren()) do 
-            if v:IsA("TextButton") then v:Destroy() end 
-        end
-        for _, p in pairs(game.Players:GetPlayers()) do
-            if p ~= player then
-                local b = Instance.new("TextButton", playerListFrame)
-                b.Size = UDim2.new(1, 0, 0, 30)
-                b.Text = p.Name
-                b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-                b.TextColor3 = Color3.new(1, 1, 1)
-                b.MouseButton1Click:Connect(function()
-                    targetPlayer = p
-                    selectedLabel.Text = p.Name
-                    playerListFrame.Visible = false
-                end)
-            end
-        end
-    end
-end)
-playerListFrame.Position = UDim2.new(1.1, 0, 0, 0)
-playerListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-playerListFrame.Visible = false
-playerListFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
-
-local function updatePlayerList()
-    playerListFrame:ClearAllChildren()
-    local layout = Instance.new("UIListLayout", playerListFrame)
-    local count = 0
-    for _, p in pairs(game.Players:GetPlayers()) do
-        if p ~= player then
-            count = count + 1
-            local btn = Instance.new("TextButton", playerListFrame)
-            btn.Size = UDim2.new(1, 0, 0, 30)
-            btn.Text = p.Name
-            btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-            btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.MouseButton1Click:Connect(function()
-                targetPlayer = p
-                selectedLabel.Text = "Destino: " .. p.Name
-                playerListFrame.Visible = false
-            end)
-        end
-    end
-    playerListFrame.CanvasSize = UDim2.new(0, 0, 0, count * 30)
-end
-
-selectedLabel.MouseButton1Click:Connect(function()
-    playerListFrame.Visible = not playerListFrame.Visible
-    if playerListFrame.Visible then updatePlayerList() end
-end)
-
--- BOTÓN 2: Teleport al Jugador (Perfecto para soltar la bomba)
-tpPlayerBtn.Parent = mainFrame
-tpPlayerBtn.Text = "TP AL JUGADOR (BOMBA)"
-tpPlayerBtn.Size = UDim2.new(0.9, 0, 0.25, 0)
-tpPlayerBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
-tpPlayerBtn.BackgroundColor3 = Color3.fromRGB(200, 0, 0) -- Rojo para la bomba
-tpPlayerBtn.TextColor3 = Color3.new(1, 1, 1)
-tpPlayerBtn.Font = Enum.Font.SourceSansBold
-tpPlayerBtn.TextSize = 11
-Instance.new("UICorner", tpPlayerBtn)
-
-tpPlayerBtn.MouseButton1Click:Connect(function()
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        player.Character.HumanoidRootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame
-    end
-end)
-local JUEGO_PERMITIDO_ID = 0 
-local FECHA_EXPIRACION = os.time({year = 2026, month = 4, day = 21, hour = 18, min = 0})
-local DURACION_SESION = 7200 
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
-local Camera = workspace.CurrentCamera
-local LocalPlayer = Players.LocalPlayer
-
-if game.PlaceId ~= JUEGO_PERMITIDO_ID and JUEGO_PERMITIDO_ID ~= 0 then
-    LocalPlayer:Kick("ESTE SCRIPT NO ES PARA ESTE JUEGO")
-    return
-end
-
-if os.time() > FECHA_EXPIRACION then
-    LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
-    return
-end
-
-local function showRainbowIntro()
-    local screenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-    local label = Instance.new("TextLabel", screenGui)
-    label.Size = UDim2.new(1, 0, 0.1, 0)
-    label.Position = UDim2.new(0, 0, 0.1, 0)
-    label.BackgroundTransparency = 1
-    label.Text = "LARDYLAN HUB"
-    label.TextScaled = true
-    label.Font = Enum.Font.LuckiestGuy
-    
-    local rainbowConn
-    rainbowConn = RunService.RenderStepped:Connect(function()
-        label.TextColor3 = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-    end)
-
-    task.delay(5, function()
-        rainbowConn:Disconnect()
-        TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
-        task.wait(1)
-        screenGui:Destroy()
-    end)
-end
-showRainbowIntro()
-
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Thickness = 2
-FOVCircle.Color = Color3.fromRGB(0, 255, 255)
-FOVCircle.Radius = 150
-FOVCircle.Filled = false
-FOVCircle.Visible = true
-
-local function applyESP(plr)
-    local function createVisuals()
-        if plr.Character then
-            local highlight = Instance.new("Highlight")
-            highlight.Name = "LardylanESP"
-            highlight.FillColor = Color3.fromRGB(0, 0, 255)
-            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-            highlight.FillTransparency = 0.4
-            highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            highlight.Parent = plr.Character
-            
-            local antenna = Instance.new("Part")
-            antenna.Size = Vector3.new(0.3, 25, 0.3)
-            antenna.Color = Color3.fromRGB(0, 0, 255)
-            antenna.CanCollide = false
-            antenna.Material = Enum.Material.Neon
-            antenna.Parent = plr.Character
-            
-            local weld = Instance.new("Weld")
-            weld.Part0 = plr.Character:WaitForChild("Head")
-            weld.Part1 = antenna
-            weld.C0 = CFrame.new(0, 12.5, 0)
-            weld.Parent = antenna
-        end
-    end
-    plr.CharacterAdded:Connect(createVisuals)
-    createVisuals()
-end
-
-for _, p in pairs(Players:GetPlayers()) do
-    if p ~= LocalPlayer then applyESP(p) end
-end
-Players.PlayerAdded:Connect(applyESP)
-
-local function getTarget()
-    local target = nil
-    local shortestDist = FOVCircle.Radius
-
+    local dist = FOVCircle.Radius
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild("Head") then
             local pos, onScreen = Camera:WorldToViewportPoint(v.Character.Head.Position)
             if onScreen then
-                local dist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
-                if dist < shortestDist then
+                local mDist = (Vector2.new(pos.X, pos.Y) - FOVCircle.Position).Magnitude
+                if mDist < dist then
                     target = v.Character.Head
-                    shortestDist = dist
+                    dist = mDist
                 end
             end
         end
@@ -551,15 +95,9 @@ local function getTarget()
     return target
 end
 
-local startTime = os.time()
-
 RunService.RenderStepped:Connect(function()
     FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-    local head = getTarget()
-    if head then
-        Camera.CFrame = CFrame.new(Camera.CFrame.Position, head.Position)
-    end
-    if os.time() - startTime >= DURACION_SESION then
-        LocalPlayer:Kick("SESION FINALIZADA: 2 HORAS CUMPLIDAS")
-    end
+    local t = getTarget()
+    if t then Camera.CFrame = CFrame.new(Camera.CFrame.Position, t.Position) end
+    if os.time() - startTime >= DURACION_SESION then LocalPlayer:Kick("SESION FINALIZADA") end
 end)
