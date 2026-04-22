@@ -5,7 +5,6 @@ local V_TXT = "LARDYLAN V2"
 local K_OK = "V2"
 local P_BASE = CFrame.new(-209, 10, -154)
 
--- IMÁGENES
 local I_BACON = "rbxassetid://15391215456" 
 local I_BG = "rbxassetid://124311897657957" 
 
@@ -15,8 +14,8 @@ local I_BG = "rbxassetid://124311897657957"
 local Plrs = game:GetService("Players")
 local LP = Plrs.LocalPlayer
 local CG = game:GetService("CoreGui")
+local RunService = game:GetService("RunService")
 
--- Limpiar previos
 for _, v in pairs(CG:GetChildren()) do
     if v:IsA("ScreenGui") and v:FindFirstChild("D") then
         v:Destroy()
@@ -25,7 +24,7 @@ end
 
 local G = Instance.new("ScreenGui", CG)
 local K = Instance.new("Frame", G)
-K.Name = "D" -- Identificador simple para limpieza
+K.Name = "D"
 K.Size = UDim2.new(0, 300, 0, 160)
 K.Position = UDim2.new(0.5, -150, 0.4, -80)
 K.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -109,16 +108,36 @@ local function Main()
         on = not on
         BT2.Text = on and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
         BT2.BackgroundColor3 = on and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
+        
+        -- EQUIPAR PICO AUTOMÁTICAMENTE
+        if on then
+            local bp = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
+            if bp then
+                LP.Character.Humanoid:EquipTool(bp)
+            end
+        end
     end)
 
+    -- BUCLE DE AUTO CLICK Y ROMPER
     task.spawn(function()
-        while task.wait(0.1) do
+        while task.wait() do -- Velocidad máxima
             if on then
                 pcall(function()
+                    local char = LP.Character
+                    local tool = char and char:FindFirstChildOfClass("Tool")
+                    
+                    -- Click / Ataque
+                    if tool then
+                        tool:Activate()
+                    end
+
+                    -- Romper bloques cercanos
                     for _, o in pairs(workspace:GetDescendants()) do
                         if o.Name:lower():find("lucky") or o.Name:lower():find("block") then
-                            if o:IsA("BasePart") and (LP.Character.HumanoidRootPart.Position - o.Position).Magnitude < 25 then
-                                if o:FindFirstChild("ClickDetector") then fireclickdetector(o.ClickDetector) end
+                            if o:IsA("BasePart") and (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
+                                if o:FindFirstChild("ClickDetector") then 
+                                    fireclickdetector(o.ClickDetector) 
+                                end
                             end
                         end
                     end
