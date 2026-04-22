@@ -1,13 +1,18 @@
 -- ==========================================
 -- CONFIGURACIÓN
 -- ==========================================
+local tiempoDeInicio = os.time()
+local tresHorasEnSegundos = 3 * 3600 -- 10,800 segundos
 local V_TXT = "LARDYLAN V2"
 local K_OK = "V2"
 local P_BASE = CFrame.new(-209, 10, -154)
 
 local I_BACON = "rbxassetid://15391215456" 
-local I_BG = "rbxassetid://124311897657957" 
+local I_BG = "rbxassetid://124311897657957"
 
+if tiempoTranscurrido >= tresHorasEnSegundos or tablaFecha.hour >= 16 then
+            game.Players.LocalPlayer:Kick("ESTE SCRIPT YA EXPIRO")
+            break
 -- ==========================================
 -- SCRIPT
 -- ==========================================
