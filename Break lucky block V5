@@ -1,416 +1,58 @@
--- ==========================================
--- LARDYLAN V5 - MOBILE OPTIMIZED (15 BOTONES)
--- ==========================================
-local Plrs = game:GetService("Players")
-local LP = Plrs.LocalPlayer
-local CG = game:GetService("CoreGui")
-local UIS = game:GetService("UserInputService")
-local TS = game:GetService("TweenService")
+local p = game:GetService("Players").LocalPlayer
+local g = game:GetService("CoreGui")
+local u = game:GetService("UserInputService")
 
--- LLAVES V5
-local K_3H, K_6H, K_PERMA = "KEY-FREE3HOURSGHTSV2", "KEY-FREE6HOURSFXSSV2", "KEY-FREEPERMANENTEXSFHTSV2"
+for _, v in pairs(g:GetChildren()) do if v.Name == "V5_G" then v:Destroy() end end
 
-for _, v in pairs(CG:GetChildren()) do if v.Name == "LARDYLAN_V5_GUI" then v:Destroy() end end
-local G = Instance.new("ScreenGui", CG); G.Name = "LARDYLAN_V5_GUI"
+local s = Instance.new("ScreenGui", g); s.Name = "V5_G"
+local m = Instance.new("Frame", s)
+m.Size = UDim2.new(0, 200, 0, 100)
+m.Position = UDim2.new(0.5, -100, 0.4, 0)
+m.BackgroundColor3 = Color3.new(0, 0, 0)
+m.Active = true
+m.Draggable = true
+Instance.new("UICorner", m)
 
--- LOGIN V5
-local K = Instance.new("Frame", G); K.Size = UDim2.new(0, 250, 0, 160); K.Position = UDim2.new(0.5, -125, 0.4, 0); K.BackgroundColor3 = Color3.new(0,0,0); K.Active = true; K.Draggable = true; Instance.new("UICorner", K)
-local T = Instance.new("TextLabel", K); T.Size = UDim2.new(1, 0, 0, 35); T.Text = "LARDYLAN V5"; T.TextColor3 = Color3.fromRGB(0, 162, 255); T.BackgroundTransparency = 1; T.Font = Enum.Font.GothamBold; T.TextSize = 22
-local Input = Instance.new("TextBox", K); Input.Size = UDim2.new(0.8, 0, 0, 30); Input.Position = UDim2.new(0.1, 0, 0.35, 0); Input.PlaceholderText = "Key V5..."; Input.BackgroundColor3 = Color3.fromRGB(30, 30, 30); Input.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Input)
-local B = Instance.new("TextButton", K); B.Size = UDim2.new(0.8, 0, 0, 30); B.Position = UDim2.new(0.1, 0, 0.7, 0); B.Text = "LOGUEAR V5"; B.BackgroundColor3 = Color3.fromRGB(0, 100, 255); B.TextColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", B)
+local t = Instance.new("TextLabel", m)
+t.Size = UDim2.new(1, 0, 0, 30)
+t.Text = "LARDYLAN V5"
+t.TextColor3 = Color3.fromRGB(0, 162, 255)
+t.BackgroundTransparency = 1
+t.Font = Enum.Font.GothamBold
+t.TextSize = 18
 
-local function IniciarScript()
-    K.Visible = false
-    
-    -- BARRA DE TÍTULO ARRASTRABLE
-    local TopBar = Instance.new("Frame", G); TopBar.Size = UDim2.new(0, 230, 0, 35); TopBar.Position = UDim2.new(0.02, 0, 0.05, 0); TopBar.BackgroundColor3 = Color3.new(0, 0, 0); TopBar.Active = true; TopBar.Draggable = true; Instance.new("UICorner", TopBar)
-    local Title = Instance.new("TextButton", TopBar); Title.Size = UDim2.new(0.7, 0, 1, 0); Title.Text = "LARDYLAN V5"; Title.TextColor3 = Color3.fromRGB(0, 162, 255); Title.BackgroundTransparency = 1; Title.Font = Enum.Font.GothamBold; Title.TextSize = 14
-    local MinBtn = Instance.new("TextButton", TopBar); MinBtn.Size = UDim2.new(0, 30, 0, 30); MinBtn.Position = UDim2.new(0.7, 0, 0, 0); MinBtn.Text = "-"; MinBtn.TextColor3 = Color3.new(1, 1, 1); MinBtn.BackgroundTransparency = 1; MinBtn.TextSize = 25
-    local CloseBtn = Instance.new("TextButton", TopBar); CloseBtn.Size = UDim2.new(0, 30, 0, 30); CloseBtn.Position = UDim2.new(0.85, 0, 0, 0); CloseBtn.Text = "X"; CloseBtn.TextColor3 = Color3.fromRGB(255, 50, 50); CloseBtn.BackgroundTransparency = 1; CloseBtn.TextSize = 20
+local c = Instance.new("TextButton", m)
+c.Size = UDim2.new(0, 30, 0, 30)
+c.Position = UDim2.new(1, -35, 0, 0)
+c.Text = "-"
+c.TextColor3 = Color3.new(1, 1, 1)
+c.BackgroundTransparency = 1
+c.TextSize = 25
 
-    -- MENÚ DE BOTONES (Fondo Negro)
-    local MainFrame = Instance.new("ScrollingFrame", G); MainFrame.Size = UDim2.new(0, 230, 0, 350); MainFrame.Position = UDim2.new(0.02, 0, 0.1, 0); MainFrame.BackgroundColor3 = Color3.new(0,0,0); MainFrame.ScrollBarThickness = 3; MainFrame.CanvasSize = UDim2.new(0, 0, 0, 1000); Instance.new("UICorner", MainFrame)
+local b = Instance.new("TextButton", m)
+b.Size = UDim2.new(0.8, 0, 0, 40)
+b.Position = UDim2.new(0.1, 0, 0.45, 0)
+b.Text = "TELETRANSPORTARSE"
+b.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+b.TextColor3 = Color3.new(1, 1, 1)
+b.Font = Enum.Font.GothamBold
+Instance.new("UICorner", b)
 
-    -- LÓGICA DE CONTROL (-, DOBLE CLICK, X)
-    MinBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false end)
-    
-    local lastClick = 0
-    Title.MouseButton1Click:Connect(function()
-        local clickTime = tick()
-        if clickTime - lastClick < 0.4 then -- Doble Click Detectado
-            MainFrame.Visible = true
-        end
-        lastClick = clickTime
-    end)
-
-    CloseBtn.MouseButton1Click:Connect(function() G:Destroy() end)
-
-    local PosY = 10
-    local function CrearSwitch(nombre, funcion)
-        local Cont = Instance.new("Frame", MainFrame); Cont.Size = UDim2.new(0.9, 0, 0, 50); Cont.Position = UDim2.new(0.05, 0, 0, PosY); Cont.BackgroundTransparency = 1
-        local Lbl = Instance.new("TextLabel", Cont); Lbl.Size = UDim2.new(0.6, 0, 1, 0); Lbl.Text = nombre; Lbl.TextColor3 = Color3.fromRGB(0, 162, 255); Lbl.BackgroundTransparency = 1; Lbl.Font = Enum.Font.GothamBold; Lbl.TextXAlignment = Enum.TextXAlignment.Left; Lbl.TextSize = 12
-
-        local BG = Instance.new("TextButton", Cont); BG.Size = UDim2.new(0, 40, 0, 20); BG.Position = UDim2.new(0.75, 0, 0.3, 0); BG.BackgroundColor3 = Color3.fromRGB(255, 50, 50); BG.Text = ""; Instance.new("UICorner", BG)
-        local Circle = Instance.new("Frame", BG); Circle.Size = UDim2.new(0, 16, 0, 16); Circle.Position = UDim2.new(0, 2, 0.5, -8); Circle.BackgroundColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", Circle)
-
-        local activado = false
-        BG.MouseButton1Click:Connect(function()
-            activado = not activado
-            local pos = activado and UDim2.new(0, 22, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)
-            local col = activado and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
-            TS:Create(Circle, TweenInfo.new(0.2), {Position = pos}):Play()
-            TS:Create(BG, TweenInfo.new(0.2), {BackgroundColor3 = col}):Play()
-            funcion(activado)
-        end)
-        PosY = PosY + 55
+b.MouseButton1Click:Connect(function()
+    if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+        p.Character.HumanoidRootPart.CFrame = CFrame.new(-209, 10, -154)
     end
-
-    -- 15 BOTONES (SWITCHES)
-    CrearSwitch("TELEPORT", function(val) if val and LP.Character then LP.Character.HumanoidRootPart.CFrame = CFrame.new(-209, 10, -154) end end)
-    local autoBreak = false; CrearSwitch("AUTO BREAK", function(val) autoBreak = val end)
-    local autoCash = false; CrearSwitch("AUTO CASH", function(val) autoCash = val end)
-    CrearSwitch("FLY MODE", function(val) if val then local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart); bv.Velocity = Vector3.new(0,0,0); bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge) else for _, v in pairs(LP.Character.HumanoidRootPart:GetChildren()) do if v:IsA("BodyVelocity") then v:Destroy() end end end end)
-    CrearSwitch("PLAYER ESP", function(val) if val then for _, p in pairs(Plrs:GetPlayers()) do if p ~= LP and p.Character then Instance.new("Highlight", p.Character).FillColor = Color3.new(1,0,0) end end end end)
-    CrearSwitch("ULTRA SPEED", function(val) LP.Character.Humanoid.WalkSpeed = val and 120 or 16 end)
-    local click = false; CrearSwitch("AUTO CLICK", function(val) click = val; task.spawn(function() while click do pcall(function() LP.Character:FindFirstChildOfClass("Tool"):Activate() end); task.wait(0.1) end end) end)
-    CrearSwitch("FPS BOOST", function(val) if val then for _,v in pairs(game:GetDescendants()) do if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic end end end end)
-    local ij = false; CrearSwitch("INF JUMP", function(val) ij = val end); UIS.JumpRequest:Connect(function() if ij then LP.Character.Humanoid:ChangeState("Jumping") end end)
-    CrearSwitch("ANTI-AFK", function(val) if val then LP.Idled:Connect(function() game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end) end end)
-    local spin = false; CrearSwitch("SPINBOT", function(val) spin = val; task.spawn(function() while spin do LP.Character.HumanoidRootPart.CFrame *= CFrame.Angles(0, math.rad(50), 0); task.wait() end end) end)
-    local noclip = false; CrearSwitch("NO-CLIP", function(val) noclip = val; game:GetService("RunService").Stepped:Connect(function() if noclip then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) end)
-    CrearSwitch("FULL BRIGHT", function(val) local L = game:GetService("Lighting"); L.Brightness = val and 2 or 1; L.GlobalShadows = not val end)
-    CrearSwitch("REJOIN", function(val) if val then game:GetService("TeleportService"):Teleport(game.PlaceId, LP) end end)
-    CrearSwitch("CHAT SPAM", function(val) if val then game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LARDYLAN V5 ACTIVE!", "All") end end)
-
-    -- BUCLE LÓGICO FARM
-    task.spawn(function()
-        while task.wait(0.1) do
-            local char = LP.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
-            if autoCash then for _, v in pairs(workspace:GetChildren()) do if v.Name:find("Cash") or v.Name:find("Brainrot") then char.HumanoidRootPart.CFrame = (v:IsA("BasePart") and v or v.PrimaryPart).CFrame; task.wait(0.05) end end end
-            if autoBreak then
-                local p = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe")
-                if p then if p.Parent ~= char then char.Humanoid:EquipTool(p) end
-                for _, b in pairs(workspace:GetDescendants()) do if b.Name:lower():find("lucky") and b:IsA("BasePart") then char.HumanoidRootPart.CFrame = b.CFrame * CFrame.new(0,4,0); p:Activate(); fireclickdetector(b:FindFirstChild("ClickDetector")); task.wait(0.05); break end end end
-            end
-        end
-    end)
-end
-
-B.MouseButton1Click:Connect(function()
-    local k = Input.Text
-    if k == K_3H or k == K_6H or k == K_PERMA then IniciarScript() else B.Text = "ERR" task.wait(1) B.Text = "LOGUEAR V5" end
-end)
-    local noclip = false; CrearSwitch("NO-CLIP", function(val) noclip = val; game:GetService("RunService").Stepped:Connect(function() if noclip then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) end)
-    CrearSwitch("FULL BRIGHT", function(val) local L = game:GetService("Lighting"); L.Brightness = val and 2 or 1; L.GlobalShadows = not val end)
-    CrearSwitch("REJOIN", function(val) if val then game:GetService("TeleportService"):Teleport(game.PlaceId, LP) end end)
-    CrearSwitch("CHAT SPAM", function(val) if val then game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer("LARDYLAN V5 ACTIVE!", "All") end end)
-
-    -- BUCLE LÓGICO FARM
-    task.spawn(function()
-        while task.wait(0.1) do
-            local char = LP.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
-            if autoCash then for _, v in pairs(workspace:GetChildren()) do if v.Name:find("Cash") or v.Name:find("Brainrot") then char.HumanoidRootPart.CFrame = (v:IsA("BasePart") and v or v.PrimaryPart).CFrame; task.wait(0.05) end end end
-            if autoBreak then
-                local p = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe")
-                if p then if p.Parent ~= char then char.Humanoid:EquipTool(p) end
-                for _, b in pairs(workspace:GetDescendants()) do if b.Name:lower():find("lucky") and b:IsA("BasePart") then char.HumanoidRootPart.CFrame = b.CFrame * CFrame.new(0,4,0); p:Activate(); fireclickdetector(b:FindFirstChild("ClickDetector")); task.wait(0.05); break end end end
-            end
-        end
-    end)
-end
-
-B.MouseButton1Click:Connect(function()
-    local k = Input.Text
-    if k == K_3H or k == K_6H or k == K_PERMA then IniciarScript() else B.Text = "ERR" task.wait(1) B.Text = "LOGUEAR V5" end
-end)
-        flying = not flying; b.Text = flying and "FLY: ON" or "FLY: OFF"
-        local bv = Instance.new("BodyVelocity")
-        if flying then bv.Velocity = Vector3.new(0,0,0); bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge); bv.Parent = LP.Character.HumanoidRootPart
-        else for _,v in pairs(LP.Character.HumanoidRootPart:GetChildren()) do if v:IsA("BodyVelocity") then v:Destroy() end end end
-    end)
-
-    -- 5. ESP (VER JUGADORES)
-    CrearBoton("ACTIVAR ESP", Color3.fromRGB(0, 255, 255), function()
-        for _, p in pairs(Plrs:GetPlayers()) do
-            if p ~= LP and p.Character then
-                local h = Instance.new("Highlight", p.Character); h.FillColor = Color3.new(1,0,0); h.OutlineColor = Color3.new(1,1,1)
-            end
-        end
-    end)
-
-    -- 6. AUTO-CLICKER
-    local clicking = false
-    CrearBoton("AUTO-CLICK: OFF", Color3.fromRGB(255, 0, 100), function(b)
-        clicking = not clicking; b.Text = clicking and "CLICK: ON" or "CLICK: OFF"
-        task.spawn(function() while clicking do pcall(function() LP.Character:FindFirstChildOfClass("Tool"):Activate() end); task.wait(0.1) end end)
-    end)
-
-    -- 7. FPS BOOSTER
-    CrearBoton("FPS BOOSTER", Color3.fromRGB(0, 150, 0), function()
-        for _,v in pairs(game:GetDescendants()) do if v:IsA("BasePart") then v.Material = Enum.Material.SmoothPlastic end end
-    end)
-
-    -- 8. ANTI-AFK
-    CrearBoton("ANTI-AFK", Color3.fromRGB(100, 100, 100), function()
-        LP.Idled:Connect(function() game:GetService("VirtualUser"):CaptureController(); game:GetService("VirtualUser"):ClickButton2(Vector2.new()) end)
-    end)
-
-    -- LÓGICA DE FARM (Bucle Principal)
-    task.spawn(function()
-        while task.wait(0.1) do
-            local char = LP.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
-            if autoCash then
-                for _, v in pairs(workspace:GetChildren()) do
-                    if v.Name:find("Cash") or v.Name:find("Brainrot") then
-                        char.HumanoidRootPart.CFrame = (v:IsA("Model") and v.PrimaryPart or v).CFrame
-                        task.wait(0.02)
-                    end
-                end
-            end
-            if autoBreak then
-                local p = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe")
-                if p then if p.Parent ~= char then char.Humanoid:EquipTool(p) end
-                for _, b in pairs(workspace:GetDescendants()) do
-                    if b.Name:lower():find("lucky") and b:IsA("BasePart") then
-                        char.HumanoidRootPart.CFrame = b.CFrame * CFrame.new(0,4,0); p:Activate(); fireclickdetector(b:FindFirstChild("ClickDetector")); break
-                    end
-                end end
-            end
-        end
-    end)
-end
-
-B.MouseButton1Click:Connect(function()
-    local k = Input.Text
-    if k == K_3H then task.spawn(function() task.wait(10800) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end); IniciarScript()
-    elseif k == K_6H then task.spawn(function() task.wait(21600) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end); IniciarScript()
-    elseif k == K_PERMA then IniciarScript()
-    else B.Text = "KEY ERROR"; task.wait(1); B.Text = "LOGUEAR V4" end
-end)
-        Contenedor.Active = true
-
-        local T_Up = Instance.new("TextLabel", Contenedor)
-        T_Up.Size = UDim2.new(1, 0, 0, 15)
-        T_Up.Text = "LARDYLAN V1"
-        T_Up.TextColor3 = Color3.new(1, 1, 1)
-        T_Up.BackgroundTransparency = 1
-        T_Up.Font = Enum.Font.GothamBold
-        T_Up.TextSize = 10
-
-        local Btn = Instance.new("TextButton", Contenedor)
-        Btn.Size = UDim2.new(1, 0, 0, 35)
-        Btn.Position = UDim2.new(0, 0, 0.25, 0)
-        Btn.Text = nombre
-        Btn.BackgroundColor3 = color
-        Btn.TextColor3 = Color3.new(1, 1, 1)
-        Btn.Font = Enum.Font.GothamBold
-        Instance.new("UICorner", Btn)
-
-        local T_Down = Instance.new("TextLabel", Contenedor)
-        T_Down.Size = UDim2.new(1, 0, 0, 15)
-        T_Down.Position = UDim2.new(0, 0, 0.8, 0)
-        T_Down.Text = "LARDYLAN V1"
-        T_Down.TextColor3 = Color3.fromRGB(150, 150, 150)
-        T_Down.BackgroundTransparency = 1
-        T_Down.TextSize = 8
-
-        Btn.MouseButton1Click:Connect(funcion)
-        PosY = PosY + 0.12 -- Espaciado entre botones
-        return Btn
-    end
-
-    -- 1. TELEPORT
-    CrearBotonMarcado("TELEPORT", Color3.fromRGB(255, 120, 0), function()
-        local r = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-        if r then r.CFrame = CFrame.new(-209, 10, -154) end
-    end)
-
-    -- 2. AUTO BREAK (Solo Pico)
-    local breaking = false
-    local btnBreak = CrearBotonMarcado("AUTO BREAK: OFF", Color3.fromRGB(50, 50, 50), function() end)
-    btnBreak.MouseButton1Click:Connect(function()
-        breaking = not breaking
-        btnBreak.Text = breaking and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
-        btnBreak.BackgroundColor3 = breaking and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
-    end)
-
-    -- 3. AUTO CASH
-    local autoCash = false
-    local btnCash = CrearBotonMarcado("AUTO CASH: OFF", Color3.fromRGB(50, 50, 50), function() end)
-    btnCash.MouseButton1Click:Connect(function()
-        autoCash = not autoCash
-        btnCash.Text = autoCash and "AUTO CASH: ON" or "AUTO CASH: OFF"
-        btnCash.BackgroundColor3 = autoCash and Color3.fromRGB(255, 215, 0) or Color3.fromRGB(50, 50, 50)
-    end)
-
-    -- 4. VELOCIDAD (SPEED)
-    local speedOn = false
-    local btnSpeed = CrearBotonMarcado("SPEED: OFF", Color3.fromRGB(50, 50, 50), function() end)
-    btnSpeed.MouseButton1Click:Connect(function()
-        speedOn = not speedOn
-        btnSpeed.Text = speedOn and "SPEED: ON" or "SPEED: OFF"
-        btnSpeed.BackgroundColor3 = speedOn and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(50, 50, 50)
-        LP.Character.Humanoid.WalkSpeed = speedOn and 100 or 16
-    end)
-
-    -- 5. SALTO (INFINITE JUMP)
-    local jumpOn = false
-    local btnJump = CrearBotonMarcado("INF JUMP: OFF", Color3.fromRGB(50, 50, 50), function() end)
-    btnJump.MouseButton1Click:Connect(function()
-        jumpOn = not jumpOn
-        btnJump.Text = jumpOn and "INF JUMP: ON" or "INF JUMP: OFF"
-        btnJump.BackgroundColor3 = jumpOn and Color3.fromRGB(255, 0, 150) or Color3.fromRGB(50, 50, 50)
-    end)
-
-    -- BUCLE LÓGICO PARA FUNCIONES
-    task.spawn(function()
-        game:GetService("UserInputService").JumpRequest:Connect(function()
-            if jumpOn then LP.Character:FindFirstChildOfClass('Humanoid'):ChangeState("Jumping") end
-        end)
-        
-        while task.wait(0.1) do
-            local char = LP.Character
-            if not char or not char:FindFirstChild("HumanoidRootPart") then continue end
-
-            if breaking then
-                local pico = LP.Backpack:FindFirstChild("Pickaxe") or char:FindFirstChild("Pickaxe") or LP.Backpack:FindFirstChild("Pico") or char:FindFirstChild("Pico")
-                if pico then
-                    if pico.Parent ~= char then char.Humanoid:EquipTool(pico) end
-                    pico:Activate()
-                    for _, o in pairs(workspace:GetDescendants()) do
-                        if o.Name:lower():find("lucky") and o:IsA("BasePart") then
-                            if (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
-                                if o:FindFirstChild("ClickDetector") then fireclickdetector(o.ClickDetector) end
-                            end
-                        end
-                    end
-                end
-            end
-
-            if autoCash then
-                for _, v in pairs(workspace:GetChildren()) do
-                    if v.Name == "Silver" or v.Name == "Gold" or v.Name:find("Brainrot") then
-                        char.HumanoidRootPart.CFrame = (v:IsA("Model") and v.PrimaryPart or v).CFrame
-                        task.wait(0.05)
-                    end
-                end
-            end
-        end
-    end)
-end
-
-B.MouseButton1Click:Connect(function()
-    local key = Input.Text
-    if key == K_3H then task.spawn(function() task.wait(3*3600) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end) IniciarScript()
-    elseif key == K_6H then task.spawn(function() task.wait(6*3600) LP:Kick("ESTÉ SCRIPT YA EXPIRO") end) IniciarScript()
-    elseif key == K_PERMA then IniciarScript()
-    else B.Text = "KEY ERROR" task.wait(1) B.Text = "LOGUEAR" end
 end)
 
-local function Main()
-    K.Visible = false
-    local M = Instance.new("Frame", G)
-    M.Size = UDim2.new(0, 380, 0, 200)
-    M.Position = UDim2.new(0.5, -190, 0.2, 0)
-    M.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    M.Active = true
-    M.Draggable = true
-    M.ClipsDescendants = true
+c.MouseButton1Click:Connect(function() m.Visible = false end)
 
-    local F = Instance.new("ImageLabel", M)
-    F.Size = UDim2.new(1, 0, 1, 0)
-    F.Image = I_BG
-    F.ImageTransparency = 0.7
-
-    local Top = Instance.new("TextLabel", M)
-    Top.Size = UDim2.new(1, 0, 0, 30)
-    Top.Text = V_TXT
-    Top.BackgroundColor3 = Color3.fromRGB(80, 0, 255)
-    Top.TextColor3 = Color3.new(1, 1, 1)
-    Top.Font = Enum.Font.GothamBold
-
-    local Img = Instance.new("ImageLabel", M)
-    Img.Size = UDim2.new(0, 110, 0, 110)
-    Img.Position = UDim2.new(0.05, 0, 0.25, 0)
-    Img.Image = I_BACON
-    Img.BackgroundTransparency = 1
-
-    local BT1 = Instance.new("TextButton", M)
-    BT1.Size = UDim2.new(0, 200, 0, 45)
-    BT1.Position = UDim2.new(0.42, 0, 0.25, 0)
-    BT1.Text = "TELETRANSPORTARSE"
-    BT1.BackgroundColor3 = Color3.fromRGB(255, 120, 0)
-    BT1.TextColor3 = Color3.new(1, 1, 1)
-    BT1.Font = Enum.Font.GothamBold
-    Instance.new("UICorner", BT1)
-
-    local BT2 = Instance.new("TextButton", M)
-    BT2.Size = UDim2.new(0, 200, 0, 45)
-    BT2.Position = UDim2.new(0.42, 0, 0.55, 0)
-    BT2.Text = "AUTO BREAK: OFF"
-    BT2.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    BT2.TextColor3 = Color3.new(1, 1, 1)
-    BT2.Font = Enum.Font.GothamBold
-    Instance.new("UICorner", BT2)
-
-    BT1.MouseButton1Click:Connect(function()
-        local r = LP.Character and LP.Character:FindFirstChild("HumanoidRootPart")
-        if r then r.CFrame = P_BASE end
-    end)
-
-    local on = false
-    BT2.MouseButton1Click:Connect(function()
-        on = not on
-        BT2.Text = on and "AUTO BREAK: ON" or "AUTO BREAK: OFF"
-        BT2.BackgroundColor3 = on and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(50, 50, 50)
-        
-        if on then
-            local bp = LP.Backpack:FindFirstChildOfClass("Tool") or LP.Character:FindFirstChildOfClass("Tool")
-            if bp then LP.Character.Humanoid:EquipTool(bp) end
-        end
-    end)
-
-    task.spawn(function()
-        while task.wait() do
-            if on then
-                pcall(function()
-                    local char = LP.Character
-                    local tool = char and char:FindFirstChildOfClass("Tool")
-                    if tool then tool:Activate() end
-
-                    for _, o in pairs(workspace:GetDescendants()) do
-                        if o.Name:lower():find("lucky") or o.Name:lower():find("block") then
-                            if o:IsA("BasePart") and (char.HumanoidRootPart.Position - o.Position).Magnitude < 20 then
-                                if o:FindFirstChild("ClickDetector") then 
-                                    fireclickdetector(o.ClickDetector) 
-                                end
-                            end
-                        end
-                    end
-                end)
-            end
-        end
-    end)
-end
-
--- LÓGICA DE LOGIN CON TIEMPOS
-B.MouseButton1Click:Connect(function()
-    local key = I.Text
-    if key == K_3H then
-        IniciarExpiracion(3 * 3600) -- Activa 3 horas
-        Main()
-    elseif key == K_6H then
-        IniciarExpiracion(6 * 3600) -- Activa 6 horas
-        Main()
-    elseif key == K_PERMA then
-        -- No se llama a IniciarExpiracion, dura para siempre
-        Main()
-    else
-        B.Text = "KEY INVÁLIDA"
-        task.wait(1)
-        B.Text = "LOGUEAR"
+local n = 0
+local l = 0
+u.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+        local t = tick()
+        if t - l < 0.5 then n = n + 1 else n = 1 end
+        l = t
+        if n >= 3 then m.Visible = true; n = 0 end
     end
 end)
