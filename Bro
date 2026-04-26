@@ -1,0 +1,262 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Zap-Zaporium/Zap-is-Me/refs/heads/main/Zaporium.lua"))()
+
+-- Services
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local hrp = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+
+local brainrotsFolder = Workspace:WaitForChild("Brainrots")
+local basesFolder = Workspace:WaitForChild("Bases")
+
+local safeZoneCFrame = CFrame.new(-56.61, 18.80, -150.61)
+
+-- Target rarities
+local targetRarities = {
+    ["Mythic"] = false,
+    ["Secret"] = false,
+    ["God"] = false,
+    ["OG"] = false
+}
+
+local isProcessing = false
+local recentlyProcessed = {}
+
+local autoCollectCashEnabled = false
+
+-- ====================== BRAINROT AUTO FARM FUNCTIONS ======================
+
+local function triggerPickup(brainrot)
+    if not brainrot then return false end
+    
+    local mesh = brainrot:FindFirstChild("Mesh")
+    local prompt = mesh and mesh:FindFirstChild("PickupPrompt")
+    if not prompt then
+        prompt = brainrot:FindFirstChild("PickupPrompt", true)
+    end
+    
+    if not prompt or not prompt:IsA("ProximityPrompt") then
+        return false
+    end
+    
+    print("🔄 Triggering:", brainrot.Name)
+    
+    prompt:InputHoldBegin()
+    task.wait(math.max(prompt.HoldDuration + 0.2, 0.5))
+    prompt:InputHoldEnd()
+    
+    task.wait(0.15)
+    return true
+end
+
+local function teleportToBrainrot(brainrot)
+    if isProcessing then return end
+    isProcessing = true
+    
+    if recentlyProcessed[brainrot] and tick() - recentlyProcessed[brainrot] < 3 then
+        isProcessing = false
+        return
+    end
+    recentlyProcessed[brainrot] = tick()
+    
+    print("🚀 Targeting:", brainrot.Name)
+    
+    local targetPos = brainrot:GetPivot().Position
+    hrp.CFrame = CFrame.new(targetPos.X, 5.9, targetPos.Z)
+    
+    task.wait(0.5)
+    
+    local success = triggerPickup(brainrot)
+    
+    task.wait(0.55)
+    
+    if brainrot.Parent then
+        print("🔁 Retrying once...")
+        triggerPickup(brainrot)
+        task.wait(0.4)
+    end
+    
+    hrp.CFrame = safeZoneCFrame
+    print("🏠 Safezone -", brainrot.Name)
+    
+    isProcessing = false
+end
+
+local function checkForTargetRarities()
+    for _, brainrot in ipairs(brainrotsFolder:GetDescendants()) do
+        local charRarity = brainrot:FindFirstChild("CharRarity", true)
+        if charRarity and charRarity:IsA("TextLabel") 
+           and targetRarities[charRarity.Text] 
+           and not isProcessing then
+            
+            teleportToBrainrot(brainrot)
+            return
+        end
+    end
+end
+
+-- ====================== COLLECT CASH FUNCTION ======================
+
+local function getRootPart()
+    local char = player.Character or player.CharacterAdded:Wait()
+    return char:WaitForChild("HumanoidRootPart")
+end
+
+local function autoCollectMyBase(myBase)
+    local root = getRootPart()
+    local floor1 = myBase:FindFirstChild("Floor1")
+    if not floor1 then return warn("No Floor1") end
+    
+    local platforms = floor1:FindFirstChild("Platforms")
+    if not platforms then return warn("No Platforms folder") end
+
+    print("🔥 Auto-collecting cash on your base:", myBase.Name)
+
+    for _, platform in ipairs(platforms:GetChildren()) do
+        if platform:IsA("Model") or platform:IsA("Folder") then
+            local collectFolder = platform:FindFirstChild("Collect")
+            if collectFolder then
+                
+                local mainCollect = collectFolder:GetChildren()[2]
+                if mainCollect and (mainCollect:IsA("BasePart") or mainCollect:IsA("Model")) then
+                    firetouchinterest(root, mainCollect, 0)
+                    task.wait(0.03)
+                end
+
+                local touchInterest = collectFolder:FindFirstChild("TouchInterest")
+                if touchInterest then
+                    firetouchinterest(root, touchInterest.Parent, 0)
+                    task.wait(0.03)
+                end
+            end
+        end
+    end
+
+    print("✅ Cash collection cycle finished for base", myBase.Name)
+end
+
+local function startAutoCollectCash()
+    task.spawn(function()
+        while autoCollectCashEnabled do
+            local collected = false
+            
+            for _, base in pairs(basesFolder:GetChildren()) do
+                local baseDisplay = base:FindFirstChild("BaseDisplay", true)
+                if baseDisplay then
+                    local textLabel = baseDisplay:FindFirstChild("TextLabel", true)
+                    if textLabel and textLabel:IsA("TextLabel") then
+                        if string.find(textLabel.Text, "Your Base") or textLabel.Text == "Your Base" then
+                            autoCollectMyBase(base)
+                            collected = true
+                            break
+                        end
+                    end
+                end
+            end
+            
+            if not collected then
+                warn("Could not find your base for cash collection")
+            end
+            
+            task.wait(1)  -- Loop every 1 second
+        end
+    end)
+end
+
+-- ====================== GUI ======================
+
+local Window = library:CreateWindow("Break LuckyBlock")
+
+-- Collect Cash Toggle
+Window:AddToggle({
+    text = "Collect Cash",
+    state = false,
+    flag = "collectCash",
+    callback = function(v)
+        autoCollectCashEnabled = v
+        if v then
+            startAutoCollectCash()
+        end
+    end
+})
+
+-- Rarity Toggles
+Window:AddToggle({
+    text = "Auto Mythic",
+    state = false,
+    flag = "autoMythic",
+    callback = function(v)
+        targetRarities["Mythic"] = v
+    end
+})
+
+Window:AddToggle({
+    text = "Auto Secret",
+    state = false,
+    flag = "autoSecret",
+    callback = function(v)
+        targetRarities["Secret"] = v
+    end
+})
+
+Window:AddToggle({
+    text = "Auto God",
+    state = false,
+    flag = "autoGod",
+    callback = function(v)
+        targetRarities["God"] = v
+    end
+})
+
+Window:AddToggle({
+    text = "Auto OG",
+    state = false,
+    flag = "autoOG",
+    callback = function(v)
+        targetRarities["OG"] = v
+    end
+})
+
+-- Etiqueta de Copyright
+Window:AddLabel({text = "COPYRIGHT ©️: LARDYLAN"})
+
+library:Init()
+
+-- ====================== AUTO FARM CONNECTIONS ======================
+
+checkForTargetRarities()
+
+brainrotsFolder.DescendantAdded:Connect(function(newDescendant)
+    task.wait(0.5)
+    local charRarity = newDescendant:FindFirstChild("CharRarity", true)
+    if charRarity and charRarity:IsA("TextLabel") 
+       and targetRarities[charRarity.Text] 
+       and not isProcessing then
+        teleportToBrainrot(newDescendant)
+    end
+end)
+
+ProximityPromptService.PromptShown:Connect(function(prompt)
+    if isProcessing then return end
+    local brainrot = prompt:FindFirstAncestorWhichIsA("Model")
+    if brainrot and brainrotsFolder:IsAncestorOf(brainrot) then
+        local charRarity = brainrot:FindFirstChild("CharRarity", true)
+        if charRarity and targetRarities[charRarity.Text] then
+            task.wait(0.1)
+            teleportToBrainrot(brainrot)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        task.wait(6)
+        if not isProcessing then
+            checkForTargetRarities()
+        end
+    end
+end)
