@@ -1,0 +1,64 @@
+-- Versión Mejorada: Auto-Collect Base (Brainrot Generator)
+local Player = game.Players.LocalPlayer
+local Character = Player.Character or Player.CharacterAdded:Wait()
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+-- Variables de Estado
+local farmEnabled = false
+
+-- --- LÓGICA DE FARM DE BASE ---
+-- Función para recolectar el dinero generado por los Brainrots
+local function collectMoney()
+    -- Buscamos en la carpeta del mapa donde suelen estar las bases
+    -- La mayoría de estos juegos guardan las bases en 'Tycoons' o 'Bases'
+    local folderNames = {"Tycoons", "Bases", "Plots", "PlayerBases"}
+    
+    for _, folderName in pairs(folderNames) do
+        local container = workspace:FindFirstChild(folderName)
+        if container then
+            for _, tycoon in pairs(container:GetChildren()) do
+                -- Verificamos si la base pertenece al jugador
+                if tycoon:FindFirstChild("Owner") and tycoon.Owner.Value == Player.Name then
+                    -- Buscamos el recolector (Essential/Collector/CashOut)
+                    for _, obj in pairs(tycoon:GetDescendants()) do
+                        if obj:IsA("TouchTransmitter") and (obj.Parent.Name:lower():find("collect") or obj.Parent.Name:lower():find("cash")) then
+                            -- Simulamos el toque del recolector sin mover al personaje
+                            firetouchinterest(Character:WaitForChild("HumanoidRootPart"), obj.Parent, 0)
+                            task.wait()
+                            firetouchinterest(Character:WaitForChild("HumanoidRootPart"), obj.Parent, 1)
+                        elseif obj:IsA("ProximityPrompt") then
+                            -- Si usa E para recoger, lo activa automáticamente
+                            task.spawn(function()
+                                fireproximityprompt(obj)
+                            end)
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- --- INTEGRACIÓN EN EL BOTÓN ---
+-- (Código de la GUI anterior con este cambio en el botón FarmBtn)
+local FarmBtn = Instance.new("TextButton")
+FarmBtn.Text = "Farm Dinero: OFF"
+-- ... (estilo del botón igual al anterior) ...
+
+FarmBtn.MouseButton1Click:Connect(function()
+	farmEnabled = not farmEnabled
+	FarmBtn.Text = "Farm Dinero: " .. (farmEnabled and "ON" or "OFF")
+	FarmBtn.BackgroundColor3 = farmEnabled and Color3.fromRGB(255, 200, 0) or Color3.fromRGB(60, 60, 60)
+end)
+
+-- Bucle de ejecución rápida para que el dinero suba sin parar
+task.spawn(function()
+    while true do
+        if farmEnabled then
+            pcall(collectMoney) -- Usamos pcall para evitar que el script se rompa si algo falta
+        end
+        task.wait(0.5) -- Se ejecuta cada medio segundo para máxima eficiencia
+    end
+end)
