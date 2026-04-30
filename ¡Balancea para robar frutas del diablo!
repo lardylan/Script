@@ -1,0 +1,164 @@
+-- MOD MENU CONFIGURACIÓN GENERAL
+local KEY_CORRECTA = "LRYETI"
+local FECHA_EXPIRACION = "5/5/26"
+
+-- 1. CREACIÓN DE LA INTERFAZ (UI)
+local screenGui = script.Parent
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "ModMenu"
+mainFrame.Size = UDim2.new(0, 250, 0, 350)
+mainFrame.Position = UDim2.new(0.5, -125, 0.5, -175)
+mainFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Fondo Negro
+mainFrame.BorderSizePixel = 2
+mainFrame.Parent = screenGui
+
+-- Estilo Galaxy para los bordes/detalles
+local uiGradient = Instance.new("UIGradient")
+uiGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(75, 0, 130)), -- Índigo
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(138, 43, 226)), -- Violeta
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 191, 255)) -- DeepSkyBlue
+}
+uiGradient.Parent = mainFrame
+
+-- Títulos
+local title = Instance.new("TextLabel")
+title.Text = "MOD MENU"
+title.Size = UDim2.new(1, 0, 0, 40)
+title.TextColor3 = Color3.new(1, 1, 1)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold
+title.TextSize = 20
+title.Parent = mainFrame
+
+-- Copyright
+local copyright = Instance.new("TextLabel")
+copyright.Text = "COPYRIGHT: LARDYLAN"
+copyright.Size = UDim2.new(1, 0, 0, 20)
+copyright.Position = UDim2.new(0, 0, 0, 40)
+copyright.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+copyright.BackgroundTransparency = 1
+copyright.TextSize = 12
+copyright.Parent = mainFrame
+
+-- 2. SISTEMA DE KEY (Sencillo para pruebas)
+local keyInput = Instance.new("TextBox")
+keyInput.PlaceholderText = "INGRESA KEY AMI..."
+keyInput.Size = UDim2.new(0.8, 0, 0, 30)
+keyInput.Position = UDim2.new(0.1, 0, 0.25, 0)
+keyInput.Parent = mainFrame
+
+local btnActivar = Instance.new("TextButton")
+btnActivar.Text = "ACTIVAR"
+btnActivar.Size = UDim2.new(0.8, 0, 0, 30)
+btnActivar.Position = UDim2.new(0.1, 0, 0.35, 0)
+btnActivar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+btnActivar.TextColor3 = Color3.new(1, 1, 1)
+btnActivar.Parent = mainFrame
+
+-- Contenedor de funciones (oculto hasta poner la key)
+local functionsFrame = Instance.new("Frame")
+functionsFrame.Size = UDim2.new(1, 0, 0.5, 0)
+functionsFrame.Position = UDim2.new(0, 0, 0.45, 0)
+functionsFrame.BackgroundTransparency = 1
+functionsFrame.Visible = false
+functionsFrame.Parent = mainFrame
+
+-- 3. FUNCIÓN SWITCH PERSONALIZADA
+local function crearSwitch(nombre, posicionY, callback)
+    local label = Instance.new("TextLabel")
+    label.Text = nombre
+    label.Size = UDim2.new(0.6, 0, 0, 30)
+    label.Position = UDim2.new(0.05, 0, posicionY, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = functionsFrame
+
+    local bgSwitch = Instance.new("Frame")
+    bgSwitch.Size = UDim2.new(0, 50, 0, 25)
+    bgSwitch.Position = UDim2.new(0.7, 0, posicionY, 2)
+    bgSwitch.BackgroundColor3 = Color3.new(1, 0, 0) -- Rojo apagado
+    bgSwitch.Parent = functionsFrame
+
+    local circulo = Instance.new("TextButton")
+    circulo.Text = "⚪"
+    circulo.Size = UDim2.new(0, 25, 0, 25)
+    circulo.Position = UDim2.new(0, 0, 0, 0)
+    circulo.BackgroundColor3 = Color3.fromRGB(150, 0, 255) -- Color Galaxy/Púrpura
+    circulo.Parent = bgSwitch
+
+    local activado = false
+    circulo.MouseButton1Click:Connect(function()
+        activado = not activado
+        if activado then
+            circulo:TweenPosition(UDim2.new(0.5, 0, 0, 0), "Out", "Quad", 0.2)
+            bgSwitch.BackgroundColor3 = Color3.new(0, 1, 0) -- Verde encendido
+        else
+            circulo:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.2)
+            bgSwitch.BackgroundColor3 = Color3.new(1, 0, 0) -- Rojo apagado
+        end
+        callback(activado)
+    end)
+end
+
+-- 4. LÓGICA DE LAS FUNCIONES
+-- NOCLIP
+local noclipConnection
+crearSwitch("NOCLIPIT", 0, function(estado)
+    local char = game.Players.LocalPlayer.Character
+    if estado then
+        noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+            for _, part in pairs(char:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
+        end)
+    else
+        if noclipConnection then noclipConnection:Disconnect() end
+        for _, part in pairs(char:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = true end
+        end
+    end
+end)
+
+-- ZONA VIP (Bypass)
+crearSwitch("ENTRAR ZONA VIP", 0.2, function(estado)
+    -- Esta función desactiva las barreras que tengan el nombre "VIP" o "Barrier"
+    for _, obj in pairs(game.Workspace:GetDescendants()) do
+        if obj.Name:find("VIP") or obj.Name:find("Barrier") then
+            if obj:IsA("BasePart") then
+                obj.CanCollide = not estado
+                obj.Transparency = estado and 0.8 or 0
+            end
+        end
+    end
+end)
+
+-- 5. PIE DE PÁGINA (Fecha y Hora)
+local footer = Instance.new("TextLabel")
+footer.Size = UDim2.new(1, 0, 0, 40)
+footer.Position = UDim2.new(0, 0, 0.85, 0)
+footer.TextColor3 = Color3.new(1, 1, 1)
+footer.BackgroundTransparency = 1
+footer.TextSize = 10
+footer.Parent = mainFrame
+
+-- Actualización de tiempo real
+spawn(function()
+    while wait(1) do
+        local tiempo = os.date("%H:%M:%S")
+        footer.Text = "EXPIRE: " .. FECHA_EXPIRACION .. "\nTIME: " .. tiempo
+    end
+end)
+
+-- Validación de Key
+btnActivar.MouseButton1Click:Connect(function()
+    if keyInput.Text == KEY_CORRECTA then
+        keyInput.Visible = false
+        btnActivar.Visible = false
+        functionsFrame.Visible = true
+    else
+        keyInput.Text = ""
+        keyInput.PlaceholderText = "KEY INCORRECTA"
+    end
+end)
