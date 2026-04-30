@@ -1,164 +1,209 @@
--- MOD MENU CONFIGURACIÓN GENERAL
+-- CONFIGURACIÓN DE USUARIOS
+local OWNER_NAME = "XxREGALITOxX34"
 local KEY_CORRECTA = "LRYETI"
-local FECHA_EXPIRACION = "5/5/26"
+local Player = game.Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local noclipActive = false
+local floatActive = false
+local hasOwnerAccess = (Player.Name == OWNER_NAME)
 
--- 1. CREACIÓN DE LA INTERFAZ (UI)
-local screenGui = script.Parent
-local mainFrame = Instance.new("Frame")
-mainFrame.Name = "ModMenu"
-mainFrame.Size = UDim2.new(0, 250, 0, 350)
-mainFrame.Position = UDim2.new(0.5, -125, 0.5, -175)
-mainFrame.BackgroundColor3 = Color3.new(0, 0, 0) -- Fondo Negro
-mainFrame.BorderSizePixel = 2
-mainFrame.Parent = screenGui
+-- 1. CREACIÓN DE LA UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LardyCompact"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = Player:WaitForChild("PlayerGui")
 
--- Estilo Galaxy para los bordes/detalles
-local uiGradient = Instance.new("UIGradient")
-uiGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(75, 0, 130)), -- Índigo
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(138, 43, 226)), -- Violeta
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 191, 255)) -- DeepSkyBlue
-}
-uiGradient.Parent = mainFrame
+-- BOTÓN FLOTANTE (MINIMIZADO)
+local OpenBtn = Instance.new("TextButton")
+OpenBtn.Size = UDim2.new(0, 50, 0, 50)
+OpenBtn.Position = UDim2.new(0, 20, 0.5, 0)
+OpenBtn.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+OpenBtn.Text = "MOD"
+OpenBtn.TextColor3 = Color3.new(1, 1, 1)
+OpenBtn.Visible = false
+OpenBtn.Draggable = true
+OpenBtn.Parent = ScreenGui
 
--- Títulos
-local title = Instance.new("TextLabel")
-title.Text = "MOD MENU"
-title.Size = UDim2.new(1, 0, 0, 40)
-title.TextColor3 = Color3.new(1, 1, 1)
-title.BackgroundTransparency = 1
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.Parent = mainFrame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 220, 0, 360) -- Tamaño Pequeño
+MainFrame.Position = UDim2.new(0.5, -110, 0.5, -180)
+MainFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+MainFrame.BorderSizePixel = 0
+MainFrame.Draggable = true
+MainFrame.Active = true
+MainFrame.Parent = ScreenGui
 
--- Copyright
-local copyright = Instance.new("TextLabel")
-copyright.Text = "COPYRIGHT: LARDYLAN"
-copyright.Size = UDim2.new(1, 0, 0, 20)
-copyright.Position = UDim2.new(0, 0, 0, 40)
-copyright.TextColor3 = Color3.new(0.7, 0.7, 0.7)
-copyright.BackgroundTransparency = 1
-copyright.TextSize = 12
-copyright.Parent = mainFrame
+-- Estilo Galaxy
+local Stroke = Instance.new("UIStroke")
+Stroke.Thickness = 2
+Stroke.Color = Color3.fromRGB(150, 0, 255)
+Stroke.Parent = MainFrame
 
--- 2. SISTEMA DE KEY (Sencillo para pruebas)
-local keyInput = Instance.new("TextBox")
-keyInput.PlaceholderText = "INGRESA KEY AMI..."
-keyInput.Size = UDim2.new(0.8, 0, 0, 30)
-keyInput.Position = UDim2.new(0.1, 0, 0.25, 0)
-keyInput.Parent = mainFrame
+-- Barra Superior (X y -)
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 30)
+TopBar.BackgroundTransparency = 1
+TopBar.Parent = MainFrame
 
-local btnActivar = Instance.new("TextButton")
-btnActivar.Text = "ACTIVAR"
-btnActivar.Size = UDim2.new(0.8, 0, 0, 30)
-btnActivar.Position = UDim2.new(0.1, 0, 0.35, 0)
-btnActivar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-btnActivar.TextColor3 = Color3.new(1, 1, 1)
-btnActivar.Parent = mainFrame
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Text = "X"
+CloseBtn.Size = UDim2.new(0, 30, 1, 0)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.TextColor3 = Color3.new(1, 0, 0)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Parent = TopBar
 
--- Contenedor de funciones (oculto hasta poner la key)
-local functionsFrame = Instance.new("Frame")
-functionsFrame.Size = UDim2.new(1, 0, 0.5, 0)
-functionsFrame.Position = UDim2.new(0, 0, 0.45, 0)
-functionsFrame.BackgroundTransparency = 1
-functionsFrame.Visible = false
-functionsFrame.Parent = mainFrame
+local MinBtn = Instance.new("TextButton")
+MinBtn.Text = "-"
+MinBtn.Size = UDim2.new(0, 30, 1, 0)
+MinBtn.Position = UDim2.new(1, -60, 0, 0)
+MinBtn.TextColor3 = Color3.new(1, 1, 1)
+MinBtn.BackgroundTransparency = 1
+MinBtn.Parent = TopBar
 
--- 3. FUNCIÓN SWITCH PERSONALIZADA
-local function crearSwitch(nombre, posicionY, callback)
-    local label = Instance.new("TextLabel")
-    label.Text = nombre
-    label.Size = UDim2.new(0.6, 0, 0, 30)
-    label.Position = UDim2.new(0.05, 0, posicionY, 0)
-    label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.new(1, 1, 1)
-    label.TextXAlignment = Enum.TextXAlignment.Left
-    label.Parent = functionsFrame
+-- TÍTULO
+local Title = Instance.new("TextLabel")
+Title.Text = "MOD MENU"
+Title.Size = UDim2.new(0.6, 0, 1, 0)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.Parent = TopBar
 
-    local bgSwitch = Instance.new("Frame")
-    bgSwitch.Size = UDim2.new(0, 50, 0, 25)
-    bgSwitch.Position = UDim2.new(0.7, 0, posicionY, 2)
-    bgSwitch.BackgroundColor3 = Color3.new(1, 0, 0) -- Rojo apagado
-    bgSwitch.Parent = functionsFrame
+-- CONTENEDORES
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(1, 0, 0.8, 0)
+KeyFrame.Position = UDim2.new(0, 0, 0.15, 0)
+KeyFrame.BackgroundTransparency = 1
+KeyFrame.Parent = MainFrame
 
-    local circulo = Instance.new("TextButton")
-    circulo.Text = "⚪"
-    circulo.Size = UDim2.new(0, 25, 0, 25)
-    circulo.Position = UDim2.new(0, 0, 0, 0)
-    circulo.BackgroundColor3 = Color3.fromRGB(150, 0, 255) -- Color Galaxy/Púrpura
-    circulo.Parent = bgSwitch
+local ModFrame = Instance.new("ScrollingFrame")
+ModFrame.Size = UDim2.new(1, 0, 0.85, 0)
+ModFrame.Position = UDim2.new(0, 0, 0.12, 0)
+ModFrame.BackgroundTransparency = 1
+ModFrame.Visible = false
+ModFrame.ScrollBarThickness = 2
+ModFrame.Parent = MainFrame
 
-    local activado = false
-    circulo.MouseButton1Click:Connect(function()
-        activado = not activado
-        if activado then
-            circulo:TweenPosition(UDim2.new(0.5, 0, 0, 0), "Out", "Quad", 0.2)
-            bgSwitch.BackgroundColor3 = Color3.new(0, 1, 0) -- Verde encendido
-        else
-            circulo:TweenPosition(UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.2)
-            bgSwitch.BackgroundColor3 = Color3.new(1, 0, 0) -- Rojo apagado
-        end
-        callback(activado)
-    end)
+-- FUNCIÓN CREAR SWITCH
+local function createSwitch(name, posY, parent, isLocked, callback)
+	local container = Instance.new("Frame")
+	container.Size = UDim2.new(0.9, 0, 0, 35)
+	container.Position = UDim2.new(0.05, 0, 0, posY)
+	container.BackgroundTransparency = 1
+	container.Parent = parent
+
+	local label = Instance.new("TextLabel")
+	label.Text = (isLocked and "🔒 " or "") .. name
+	label.Size = UDim2.new(0.6, 0, 1, 0)
+	label.TextColor3 = isLocked and Color3.new(0.5, 0.5, 0.5) or Color3.new(1, 1, 1)
+	label.BackgroundTransparency = 1
+	label.TextXAlignment = Enum.TextXAlignment.Left
+	label.Parent = container
+
+	local bg = Instance.new("Frame")
+	bg.Size = UDim2.new(0, 40, 0, 20)
+	bg.Position = UDim2.new(0.75, 0, 0.2, 0)
+	bg.BackgroundColor3 = Color3.new(1, 0, 0)
+	bg.Parent = container
+
+	local dot = Instance.new("TextButton")
+	dot.Text = "⚪"
+	dot.Size = UDim2.new(0, 20, 0, 20)
+	dot.BackgroundColor3 = Color3.fromRGB(150, 0, 255)
+	dot.Parent = bg
+
+	local active = false
+	dot.MouseButton1Click:Connect(function()
+		if isLocked and not hasOwnerAccess then 
+			label.Text = "LOCK ⛓️ X"
+			wait(1)
+			label.Text = "🔒 " .. name
+			return 
+		end
+		active = not active
+		dot:TweenPosition(active and UDim2.new(0.5, 0, 0, 0) or UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.1)
+		bg.BackgroundColor3 = active and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+		callback(active)
+	end)
+	
+	return label, dot
 end
 
--- 4. LÓGICA DE LAS FUNCIONES
--- NOCLIP
-local noclipConnection
-crearSwitch("NOCLIPIT", 0, function(estado)
-    local char = game.Players.LocalPlayer.Character
-    if estado then
-        noclipConnection = game:GetService("RunService").Stepped:Connect(function()
-            for _, part in pairs(char:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
-        end)
-    else
-        if noclipConnection then noclipConnection:Disconnect() end
-        for _, part in pairs(char:GetDescendants()) do
-            if part:IsA("BasePart") then part.CanCollide = true end
-        end
-    end
+-- LÓGICA DE FUNCIONES
+createSwitch("NOCLPIT", 10, ModFrame, false, function(s) noclipActive = s end)
+createSwitch("PASAR VIP", 50, ModFrame, false, function(s)
+	for _, v in pairs(workspace:GetDescendants()) do
+		if v.Name:lower():find("vip") and v:IsA("BasePart") then
+			v.CanCollide = not s
+		end
+	end
 end)
 
--- ZONA VIP (Bypass)
-crearSwitch("ENTRAR ZONA VIP", 0.2, function(estado)
-    -- Esta función desactiva las barreras que tengan el nombre "VIP" o "Barrier"
-    for _, obj in pairs(game.Workspace:GetDescendants()) do
-        if obj.Name:find("VIP") or obj.Name:find("Barrier") then
-            if obj:IsA("BasePart") then
-                obj.CanCollide = not estado
-                obj.Transparency = estado and 0.8 or 0
-            end
-        end
-    end
+local ownerLabel, floatDot = createSwitch("PISO FLOTANTE", 100, ModFrame, true, function(s) floatActive = s end)
+
+-- SECCIÓN OWNER ADMIN
+local AdminBox = Instance.new("TextBox")
+AdminBox.PlaceholderText = "Nombre Jugador..."
+AdminBox.Size = UDim2.new(0.8, 0, 0, 30)
+AdminBox.Position = UDim2.new(0.1, 0, 0, 180)
+AdminBox.Visible = hasOwnerAccess
+AdminBox.Parent = ModFrame
+
+local AdminBtn = Instance.new("TextButton")
+AdminBtn.Text = "DAR OWNER / ADMIN"
+AdminBtn.Size = UDim2.new(0.8, 0, 0, 30)
+AdminBtn.Position = UDim2.new(0.1, 0, 0, 215)
+AdminBtn.Visible = hasOwnerAccess
+AdminBtn.Parent = ModFrame
+
+-- LÓGICA DE PISO FLOTANTE
+local floatPart = Instance.new("Part")
+floatPart.Size = Vector3.new(6, 0.5, 6)
+floatPart.Anchored = true
+floatPart.Transparency = 1
+floatPart.Parent = workspace
+
+RunService.RenderStepped:Connect(function()
+	if noclipActive then
+		for _, v in pairs(Player.Character:GetDescendants()) do
+			if v:IsA("BasePart") then v.CanCollide = false end
+		end
+	end
+	if floatActive and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
+		floatPart.CFrame = Player.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.5, 0)
+		floatPart.Transparency = 0.5
+	else
+		floatPart.Transparency = 1
+		floatPart.CFrame = CFrame.new(0, -999, 0)
+	end
 end)
 
--- 5. PIE DE PÁGINA (Fecha y Hora)
-local footer = Instance.new("TextLabel")
-footer.Size = UDim2.new(1, 0, 0, 40)
-footer.Position = UDim2.new(0, 0, 0.85, 0)
-footer.TextColor3 = Color3.new(1, 1, 1)
-footer.BackgroundTransparency = 1
-footer.TextSize = 10
-footer.Parent = mainFrame
+-- SISTEMA DE KEY Y MINIMIZAR
+MinBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false OpenBtn.Visible = true end)
+OpenBtn.MouseButton1Click:Connect(function() MainFrame.Visible = true OpenBtn.Visible = false end)
+CloseBtn.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
--- Actualización de tiempo real
-spawn(function()
-    while wait(1) do
-        local tiempo = os.date("%H:%M:%S")
-        footer.Text = "EXPIRE: " .. FECHA_EXPIRACION .. "\nTIME: " .. tiempo
-    end
+local KeyIn = Instance.new("TextBox")
+KeyIn.PlaceholderText = "KEY LRYETI"
+KeyIn.Size = UDim2.new(0.8, 0, 0, 30)
+KeyIn.Position = UDim2.new(0.1, 0, 0.3, 0)
+KeyIn.Parent = KeyFrame
+
+local EntrarBtn = Instance.new("TextButton")
+EntrarBtn.Text = "ENTRAR"
+EntrarBtn.Size = UDim2.new(0.8, 0, 0, 30)
+EntrarBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
+EntrarBtn.Parent = KeyFrame
+
+EntrarBtn.MouseButton1Click:Connect(function()
+	if KeyIn.Text == KEY_CORRECTA then
+		KeyFrame.Visible = false
+		ModFrame.Visible = true
+	end
 end)
 
--- Validación de Key
-btnActivar.MouseButton1Click:Connect(function()
-    if keyInput.Text == KEY_CORRECTA then
-        keyInput.Visible = false
-        btnActivar.Visible = false
-        functionsFrame.Visible = true
-    else
-        keyInput.Text = ""
-        keyInput.PlaceholderText = "KEY INCORRECTA"
-    end
+AdminBtn.MouseButton1Click:Connect(function()
+    -- Lógica para dar permiso a otro (Simulado para este script local)
+    print("Permiso otorgado a: " .. AdminBox.Text)
 end)
