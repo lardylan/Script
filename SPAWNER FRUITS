@@ -1,0 +1,192 @@
+-- [[ CONFIGURACIÓN DE LARDYLAN ]]
+local CORRECT_KEY = "KEY-BLOXFRUITSSPAWNER"
+local KEY_LINK = "https://link-center.net"
+local EXPIRES_DATE = "08/05/26"
+local SPAWN_COOLDOWN = 7200 -- 2 horas
+local IS_PRIVATE_SERVER = game.PrivateServerId ~= "" or game.PrivateServerOwnerId ~= 0
+
+local Player = game.Players.LocalPlayer
+local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+
+-- Función para estilo visual
+local function applyStyle(obj, radius)
+    local corner = Instance.new("UICorner", obj)
+    corner.CornerRadius = UDim.new(0, radius or 8)
+end
+
+-- [[ 1. PANEL DE KEY (INICIO) ]]
+local KeyFrame = Instance.new("Frame", ScreenGui)
+KeyFrame.Size = UDim2.new(0, 360, 0, 180)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -90)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+applyStyle(KeyFrame)
+
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.PlaceholderText = "Enter Key Here"
+KeyInput.Size = UDim2.new(0.9, 0, 0, 45)
+KeyInput.Position = UDim2.new(0.05, 0, 0.3, 0)
+KeyInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+KeyInput.TextColor3 = Color3.new(1, 1, 1)
+
+local SubmitBtn = Instance.new("TextButton", KeyFrame)
+SubmitBtn.Text = "Submit"
+SubmitBtn.Size = UDim2.new(0.4, 0, 0, 40)
+SubmitBtn.Position = UDim2.new(0.55, 0, 0.65, 0)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+SubmitBtn.TextColor3 = Color3.new(1, 1, 1)
+
+-- [[ 2. PANTALLA NEGRA DE CARGA ]]
+local function startLoading()
+    KeyFrame.Visible = false
+    local LoadingFrame = Instance.new("Frame", ScreenGui)
+    LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
+    LoadingFrame.BackgroundColor3 = Color3.new(0, 0, 0)
+    
+    local StatusText = Instance.new("TextLabel", LoadingFrame)
+    StatusText.Size = UDim2.new(1, 0, 0, 50)
+    StatusText.Position = UDim2.new(0, 0, 0.35, 0)
+    StatusText.TextColor3 = Color3.new(1, 1, 1)
+    StatusText.BackgroundTransparency = 1
+    StatusText.Font = Enum.Font.GothamBold
+    StatusText.TextSize = 22
+
+    local PercentText = Instance.new("TextLabel", LoadingFrame)
+    PercentText.Size = UDim2.new(1, 0, 0, 50)
+    PercentText.Position = UDim2.new(0, 0, 0.42, 0)
+    PercentText.TextColor3 = Color3.fromRGB(0, 255, 0)
+    PercentText.BackgroundTransparency = 1
+    PercentText.TextSize = 35
+
+    local BarBack = Instance.new("Frame", LoadingFrame)
+    BarBack.Size = UDim2.new(0.6, 0, 0, 10)
+    BarBack.Position = UDim2.new(0.2, 0, 0.55, 0)
+    BarBack.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    
+    local BarFill = Instance.new("Frame", BarBack)
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    BarFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Barrita blanca
+
+    local Copyright = Instance.new("TextLabel", LoadingFrame)
+    Copyright.Text = "COPYRIGHT: LARDYLAN"
+    Copyright.Size = UDim2.new(1, 0, 0, 30)
+    Copyright.Position = UDim2.new(0, 0, 0.62, 0)
+    Copyright.TextColor3 = Color3.fromRGB(150, 150, 150)
+    Copyright.BackgroundTransparency = 1
+
+    -- Bucle de mensajes
+    task.spawn(function()
+        while LoadingFrame.Parent do
+            StatusText.Text = "ESPERA ASTA QUE LA BARRITE SE LLENE"
+            task.wait(2.5)
+            StatusText.Text = "SUSCRIBE, AND LIKE THE CHANNEL : LARDYLAN"
+            task.wait(2.5)
+        end
+    end)
+
+    -- Lógica de Carga Diferenciada
+    local target = IS_PRIVATE_SERVER and 100 or 98.8
+    for i = 0, target, 0.4 do
+        PercentText.Text = string.format("%.1f%%", i)
+        BarFill.Size = UDim2.new(i/100, 0, 1, 0)
+        task.wait(0.05)
+    end
+
+    if IS_PRIVATE_SERVER then
+        task.wait(1)
+        LoadingFrame:Destroy()
+        showSpawnerPanel()
+    end
+end
+
+-- [[ 3. PANEL SPAWNER FRUITS ]]
+function showSpawnerPanel()
+    local MainFrame = Instance.new("Frame", ScreenGui)
+    MainFrame.Size = UDim2.new(0, 400, 0, 260)
+    MainFrame.Position = UDim2.new(0.5, -200, 0.5, -130)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    applyStyle(MainFrame, 12)
+
+    local ErrorLabel = Instance.new("TextLabel", MainFrame)
+    ErrorLabel.Size = UDim2.new(1, 0, 0, 30)
+    ErrorLabel.Position = UDim2.new(0, 0, -0.12, 0)
+    ErrorLabel.TextColor3 = Color3.new(1, 0, 0)
+    ErrorLabel.BackgroundTransparency = 1
+    ErrorLabel.Text = ""
+
+    local Title = Instance.new("TextLabel", MainFrame)
+    Title.Text = "SPAWNER FRUITS"
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+    Title.BackgroundTransparency = 1
+    Title.Font = Enum.Font.GothamBlack
+    Title.TextSize = 26
+
+    local FruitInput = Instance.new("TextBox", MainFrame)
+    FruitInput.PlaceholderText = "Escribe: Buddha"
+    FruitInput.Size = UDim2.new(0.8, 0, 0, 45)
+    FruitInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+    applyStyle(FruitInput)
+
+    local SpawnBtn = Instance.new("TextButton", MainFrame)
+    SpawnBtn.Text = "Spawn"
+    SpawnBtn.Size = UDim2.new(0.5, 0, 0, 45)
+    SpawnBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+    SpawnBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    applyStyle(SpawnBtn)
+
+    local TimerLabel = Instance.new("TextLabel", MainFrame)
+    TimerLabel.Size = UDim2.new(0, 120, 0, 45)
+    TimerLabel.Position = UDim2.new(0.65, 0, 0.6, 0)
+    TimerLabel.Text = "READY"
+    TimerLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    TimerLabel.BackgroundTransparency = 1
+
+    local Expire = Instance.new("TextLabel", MainFrame)
+    Expire.Text = "Expira: " .. EXPIRES_DATE
+    Expire.Size = UDim2.new(1, 0, 0, 20)
+    Expire.Position = UDim2.new(0, 0, 0.9, 0)
+    Expire.TextColor3 = Color3.new(0.6, 0.6, 0.6)
+    Expire.BackgroundTransparency = 1
+
+    -- Lógica de Spawn y Cooldown
+    local onCooldown = false
+    SpawnBtn.MouseButton1Click:Connect(function()
+        if onCooldown then
+            ErrorLabel.Text = "SPAWN INVALID HOURS 2 HOURS"
+            task.wait(3)
+            ErrorLabel.Text = ""
+            return
+        end
+
+        if FruitInput.Text:lower() == "buddha" then
+            print("Entregando Fruta Real (Simulación en Server Privado)")
+            onCooldown = true
+            SpawnBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            
+            local remaining = SPAWN_COOLDOWN
+            while remaining > 0 do
+                local h = math.floor(remaining / 3600)
+                local m = math.floor((remaining % 3600) / 60)
+                local s = remaining % 60
+                TimerLabel.Text = string.format("%02d:%02d:%02d", h, m, s)
+                task.wait(1)
+                remaining = remaining - 1
+            end
+            onCooldown = false
+            TimerLabel.Text = "READY"
+            SpawnBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+        end
+    end)
+end
+
+-- Iniciar al presionar Submit
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CORRECT_KEY then
+        startLoading()
+    else
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "KEY INCORRECTA"
+    end
+end)
