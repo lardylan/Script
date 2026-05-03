@@ -1,13 +1,13 @@
 -- [[ CONFIGURACIÓN DE LARDYLAN ]]
 local CORRECT_KEY = "KEY-BLOXFRUITSSPAWNER"
-local KEY_LINK = "https://link-center.net"
+local KEY_LINK = "https://link-hub.net/5159847/3xoB11DUrBkN" -- URL ACTUALIZADA
 local EXPIRES_DATE = "08/05/26"
-local SPAWN_COOLDOWN = 7200 -- 2 horas
+local SPAWN_COOLDOWN = 7200 
 local IS_PRIVATE_SERVER = game.PrivateServerId ~= "" or game.PrivateServerOwnerId ~= 0
 
 local Player = game.Players.LocalPlayer
 local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
-ScreenGui.IgnoreGuiInset = true
+ScreenGui.Name = "LardyLan_Spawner"
 ScreenGui.ResetOnSpawn = false
 
 -- Función para estilo visual
@@ -16,12 +16,20 @@ local function applyStyle(obj, radius)
     corner.CornerRadius = UDim.new(0, radius or 8)
 end
 
--- [[ 1. PANEL DE KEY (INICIO) ]]
+-- [[ 1. PANEL DE KEY SYSTEM ]]
 local KeyFrame = Instance.new("Frame", ScreenGui)
 KeyFrame.Size = UDim2.new(0, 360, 0, 180)
 KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -90)
 KeyFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 applyStyle(KeyFrame)
+
+local KeyTitle = Instance.new("TextLabel", KeyFrame)
+KeyTitle.Text = "Key System"
+KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+KeyTitle.TextColor3 = Color3.new(1, 1, 1)
+KeyTitle.Font = Enum.Font.SourceSansBold
+KeyTitle.TextSize = 22
 
 local KeyInput = Instance.new("TextBox", KeyFrame)
 KeyInput.PlaceholderText = "Enter Key Here"
@@ -30,14 +38,31 @@ KeyInput.Position = UDim2.new(0.05, 0, 0.3, 0)
 KeyInput.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 KeyInput.TextColor3 = Color3.new(1, 1, 1)
 
+local GetKeyBtn = Instance.new("TextButton", KeyFrame)
+GetKeyBtn.Text = "Get Key"
+GetKeyBtn.Size = UDim2.new(0.4, 0, 0, 40)
+GetKeyBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+GetKeyBtn.TextColor3 = Color3.new(1, 1, 1)
+applyStyle(GetKeyBtn)
+
 local SubmitBtn = Instance.new("TextButton", KeyFrame)
 SubmitBtn.Text = "Submit"
 SubmitBtn.Size = UDim2.new(0.4, 0, 0, 40)
 SubmitBtn.Position = UDim2.new(0.55, 0, 0.65, 0)
 SubmitBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 SubmitBtn.TextColor3 = Color3.new(1, 1, 1)
+applyStyle(SubmitBtn)
 
--- [[ 2. PANTALLA NEGRA DE CARGA ]]
+-- Lógica del botón Get Key (Copiar link)
+GetKeyBtn.MouseButton1Click:Connect(function()
+    setclipboard(KEY_LINK)
+    GetKeyBtn.Text = "Link Copiado!"
+    task.wait(2)
+    GetKeyBtn.Text = "Get Key"
+end)
+
+-- [[ 2. PANTALLA NEGRA DE CARGA (LARDYLAN) ]]
 local function startLoading()
     KeyFrame.Visible = false
     local LoadingFrame = Instance.new("Frame", ScreenGui)
@@ -66,7 +91,7 @@ local function startLoading()
     
     local BarFill = Instance.new("Frame", BarBack)
     BarFill.Size = UDim2.new(0, 0, 1, 0)
-    BarFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) -- Barrita blanca
+    BarFill.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
 
     local Copyright = Instance.new("TextLabel", LoadingFrame)
     Copyright.Text = "COPYRIGHT: LARDYLAN"
@@ -75,7 +100,7 @@ local function startLoading()
     Copyright.TextColor3 = Color3.fromRGB(150, 150, 150)
     Copyright.BackgroundTransparency = 1
 
-    -- Bucle de mensajes
+    -- Bucle de mensajes solicitado
     task.spawn(function()
         while LoadingFrame.Parent do
             StatusText.Text = "ESPERA ASTA QUE LA BARRITE SE LLENE"
@@ -85,7 +110,7 @@ local function startLoading()
         end
     end)
 
-    -- Lógica de Carga Diferenciada
+    -- Lógica de carga condicionada al servidor
     local target = IS_PRIVATE_SERVER and 100 or 98.8
     for i = 0, target, 0.4 do
         PercentText.Text = string.format("%.1f%%", i)
@@ -100,7 +125,7 @@ local function startLoading()
     end
 end
 
--- [[ 3. PANEL SPAWNER FRUITS ]]
+-- [[ 3. PANEL SPAWNER FRUITS (FINAL) ]]
 function showSpawnerPanel()
     local MainFrame = Instance.new("Frame", ScreenGui)
     MainFrame.Size = UDim2.new(0, 400, 0, 260)
@@ -150,7 +175,6 @@ function showSpawnerPanel()
     Expire.TextColor3 = Color3.new(0.6, 0.6, 0.6)
     Expire.BackgroundTransparency = 1
 
-    -- Lógica de Spawn y Cooldown
     local onCooldown = false
     SpawnBtn.MouseButton1Click:Connect(function()
         if onCooldown then
@@ -161,9 +185,9 @@ function showSpawnerPanel()
         end
 
         if FruitInput.Text:lower() == "buddha" then
-            print("Entregando Fruta Real (Simulación en Server Privado)")
             onCooldown = true
             SpawnBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            -- Lógica para dar la fruta aquí
             
             local remaining = SPAWN_COOLDOWN
             while remaining > 0 do
@@ -181,7 +205,6 @@ function showSpawnerPanel()
     end)
 end
 
--- Iniciar al presionar Submit
 SubmitBtn.MouseButton1Click:Connect(function()
     if KeyInput.Text == CORRECT_KEY then
         startLoading()
