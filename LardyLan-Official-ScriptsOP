@@ -1,0 +1,126 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/lardylan/Script/refs/heads/main/Local%20library"))()
+
+-- [[ CONFIGURACIÓN OFICIAL LARDYLAN ]]
+local CORRECT_KEY = "KEY-BLOXFRUITSSPAWNER"
+local KEY_LINK = "https://link-hub.net/5159847/3xoB11DUrBkN" 
+local EXPIRES_DATE = "08/05/26"
+local SPAWN_COOLDOWN = 7200 
+
+-- [[ DETECCIÓN POR DISTANCIA DE MAPA ]]
+local function checkMapDistance()
+    local char = game.Players.LocalPlayer.Character
+    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        -- Las coordenadas del Sea 2 en Blox Fruits están en un rango específico
+        -- Si la posición absoluta es mayor a 1000, detecta que no es el Sea 1
+        local mag = hrp.Position.Magnitude
+        if mag > 1500 and mag < 50000 then -- Rango estimado para Sea 2
+            return true
+        end
+    end
+    return false
+end
+
+local IS_SEA_2 = checkMapDistance()
+local Player = game.Players.LocalPlayer
+local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "LardyLan_Distance_V3"
+ScreenGui.ResetOnSpawn = false
+
+-- Estilos
+local function style(obj, r)
+    local c = Instance.new("UICorner", obj); c.CornerRadius = UDim.new(0, r or 8)
+end
+
+-- [[ 1. PANEL DE KEY SYSTEM ]]
+local KeyFrame = Instance.new("Frame", ScreenGui)
+KeyFrame.Size = UDim2.new(0, 360, 0, 180); KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -90); KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20); style(KeyFrame)
+
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.PlaceholderText = "Enter Key Here"; KeyInput.Size = UDim2.new(0.9, 0, 0, 45); KeyInput.Position = UDim2.new(0.05, 0, 0.3, 0); KeyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40); KeyInput.TextColor3 = Color3.new(1, 1, 1); style(KeyInput)
+
+local GetKeyBtn = Instance.new("TextButton", KeyFrame)
+GetKeyBtn.Text = "Get Key"; GetKeyBtn.Size = UDim2.new(0.4, 0, 0, 40); GetKeyBtn.Position = UDim2.new(0.05, 0, 0.65, 0); GetKeyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60); GetKeyBtn.TextColor3 = Color3.new(1, 1, 1); style(GetKeyBtn)
+
+local SubmitBtn = Instance.new("TextButton", KeyFrame)
+SubmitBtn.Text = "Submit"; SubmitBtn.Size = UDim2.new(0.4, 0, 0, 40); SubmitBtn.Position = UDim2.new(0.55, 0, 0.65, 0); SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200); SubmitBtn.TextColor3 = Color3.new(1, 1, 1); style(SubmitBtn)
+
+GetKeyBtn.MouseButton1Click:Connect(function()
+    setclipboard(KEY_LINK)
+    GetKeyBtn.Text = "Link Copiado!"
+    task.wait(2); GetKeyBtn.Text = "Get Key"
+end)
+
+-- [[ 2. PANTALLA DE CARGA ]]
+local function startLoading()
+    KeyFrame.Visible = false
+    local LoadUI = Instance.new("Frame", ScreenGui)
+    LoadUI.Size = UDim2.new(1, 0, 1, 0); LoadUI.BackgroundColor3 = Color3.new(0, 0, 0)
+    
+    local Status = Instance.new("TextLabel", LoadUI)
+    Status.Size = UDim2.new(1, 0, 0, 50); Status.Position = UDim2.new(0, 0, 0.35, 0); Status.TextColor3 = Color3.new(1, 1, 1); Status.BackgroundTransparency = 1; Status.Font = "GothamBold"; Status.TextSize = 20
+
+    local Pct = Instance.new("TextLabel", LoadUI)
+    Pct.Size = UDim2.new(1, 0, 0, 50); Pct.Position = UDim2.new(0, 0, 0.42, 0); Pct.TextColor3 = Color3.fromRGB(0, 255, 0); Pct.BackgroundTransparency = 1; Pct.TextSize = 35
+
+    local BarBack = Instance.new("Frame", LoadUI)
+    BarBack.Size = UDim2.new(0.6, 0, 0, 12); BarBack.Position = UDim2.new(0.2, 0, 0.55, 0); BarBack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    
+    local BarFill = Instance.new("Frame", BarBack)
+    BarFill.Size = UDim2.new(0, 0, 1, 0); BarFill.BackgroundColor3 = Color3.new(1, 1, 1)
+
+    task.spawn(function()
+        while LoadUI.Parent do
+            Status.Text = "ESPERA ASTA QUE LA BARRITE SE LLENE"; task.wait(2.5)
+            Status.Text = "SUSCRIBE, AND LIKE THE CHANNEL : LARDYLAN"; task.wait(2.5)
+        end
+    end)
+
+    -- Si reconoce la distancia del Sea 2 carga al 100, si no a 99.5
+    local target = IS_SEA_2 and 100 or 99.5
+    for i = 0, target, 0.5 do
+        Pct.Text = string.format("%.1f%%", i)
+        BarFill.Size = UDim2.new(i/100, 0, 1, 0)
+        task.wait(0.05)
+    end
+
+    if IS_SEA_2 then
+        task.wait(0.5); LoadUI:Destroy(); showSpawner()
+    end
+end
+
+-- [[ 3. PANEL SPAWNER ]]
+function showSpawner()
+    local Spawner = Instance.new("Frame", ScreenGui)
+    Spawner.Size = UDim2.new(0, 400, 0, 260); Spawner.Position = UDim2.new(0.5, -200, 0.5, -130); Spawner.BackgroundColor3 = Color3.fromRGB(10, 10, 10); style(Spawner, 12)
+
+    local Title = Instance.new("TextLabel", Spawner)
+    Title.Text = "SPAWNER FRUITS (SEA 2)"; Title.Size = UDim2.new(1, 0, 0, 50); Title.TextColor3 = Color3.fromRGB(0, 255, 150); Title.BackgroundTransparency = 1; Title.TextSize = 22
+
+    local Input = Instance.new("TextBox", Spawner)
+    Input.PlaceholderText = "Escribe: Buddha"; Input.Size = UDim2.new(0.8, 0, 0, 45); Input.Position = UDim2.new(0.1, 0, 0.35, 0); style(Input)
+
+    local SpawnBtn = Instance.new("TextButton", Spawner)
+    SpawnBtn.Text = "Spawn"; SpawnBtn.Size = UDim2.new(0.5, 0, 0, 45); SpawnBtn.Position = UDim2.new(0.1, 0, 0.6, 0); SpawnBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255); style(SpawnBtn)
+
+    local TimerL = Instance.new("TextLabel", Spawner)
+    TimerL.Size = UDim2.new(0, 120, 0, 45); TimerL.Position = UDim2.new(0.65, 0, 0.6, 0); TimerL.Text = "READY"; TimerL.TextColor3 = Color3.fromRGB(0, 255, 0); TimerL.BackgroundTransparency = 1
+
+    local onCD = false
+    SpawnBtn.MouseButton1Click:Connect(function()
+        if onCD then return end
+        if Input.Text:lower() == "buddha" then
+            onCD = true; SpawnBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            local t = SPAWN_COOLDOWN
+            while t > 0 do
+                TimerL.Text = string.format("%02d:%02d:%02d", math.floor(t/3600), math.floor((t%3600)/60), t%60)
+                task.wait(1); t = t - 1
+            end
+            onCD = false; TimerL.Text = "READY"; SpawnBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 255)
+        end
+    end)
+end
+
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CORRECT_KEY then startLoading() end
+end)
