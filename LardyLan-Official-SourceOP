@@ -1,0 +1,206 @@
+-- [[ CONFIGURACIÓN FINAL: LARDYLAN ]]
+local CORRECT_KEY = "KEY-BLOXFRUITSSPAWNER"
+local KEY_LINK = "https://link-hub.net/5159847/3xoB11DUrBkN" -- ENLACE DE COPIADO
+local EXPIRES_DATE = "08/05/26"
+local SPAWN_COOLDOWN = 7200 -- 2 Horas
+
+-- IDs de SEA (Mundo)
+local gameId = game.PlaceId
+local IS_SEA_2 = (gameId == 444224522) 
+
+local Player = game.Players.LocalPlayer
+local ScreenGui = Instance.new("ScreenGui", Player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "LardyLan_Official_Script"
+ScreenGui.ResetOnSpawn = false
+
+-- Función de Estilo
+local function style(obj, r)
+    local c = Instance.new("UICorner", obj)
+    c.CornerRadius = UDim.new(0, r or 8)
+end
+
+-- [[ 1. INTERFAZ DE KEY SYSTEM ]]
+local KeyFrame = Instance.new("Frame", ScreenGui)
+KeyFrame.Size = UDim2.new(0, 360, 0, 180)
+KeyFrame.Position = UDim2.new(0.5, -180, 0.5, -90)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+style(KeyFrame, 10)
+
+local KeyInput = Instance.new("TextBox", KeyFrame)
+KeyInput.PlaceholderText = "Enter Key Here"
+KeyInput.Size = UDim2.new(0.9, 0, 0, 45)
+KeyInput.Position = UDim2.new(0.05, 0, 0.3, 0)
+KeyInput.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyInput.TextColor3 = Color3.new(1, 1, 1)
+style(KeyInput)
+
+local GetKeyBtn = Instance.new("TextButton", KeyFrame)
+GetKeyBtn.Text = "Get Key"
+GetKeyBtn.Size = UDim2.new(0.4, 0, 0, 40)
+GetKeyBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+GetKeyBtn.TextColor3 = Color3.new(1, 1, 1)
+style(GetKeyBtn)
+
+local SubmitBtn = Instance.new("TextButton", KeyFrame)
+SubmitBtn.Text = "Submit"
+SubmitBtn.Size = UDim2.new(0.4, 0, 0, 40)
+SubmitBtn.Position = UDim2.new(0.55, 0, 0.65, 0)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 100, 200)
+SubmitBtn.TextColor3 = Color3.new(1, 1, 1)
+style(SubmitBtn)
+
+-- Lógica para copiar link de Link-hub
+GetKeyBtn.MouseButton1Click:Connect(function()
+    setclipboard(KEY_LINK)
+    GetKeyBtn.Text = "Link Copiado!"
+    task.wait(2)
+    GetKeyBtn.Text = "Get Key"
+end)
+
+-- [[ 2. PANTALLA NEGRA Y CARGA ]]
+local function startLoading()
+    KeyFrame.Visible = false
+    local LoadUI = Instance.new("Frame", ScreenGui)
+    LoadUI.Size = UDim2.new(1, 0, 1, 0)
+    LoadUI.BackgroundColor3 = Color3.new(0, 0, 0)
+    
+    local MsgText = Instance.new("TextLabel", LoadUI)
+    MsgText.Size = UDim2.new(1, 0, 0, 50)
+    MsgText.Position = UDim2.new(0, 0, 0.35, 0)
+    MsgText.TextColor3 = Color3.new(1, 1, 1)
+    MsgText.BackgroundTransparency = 1
+    MsgText.Font = Enum.Font.GothamBold
+    MsgText.TextSize = 20
+
+    local PctText = Instance.new("TextLabel", LoadUI)
+    PctText.Size = UDim2.new(1, 0, 0, 50)
+    PctText.Position = UDim2.new(0, 0, 0.42, 0)
+    PctText.TextColor3 = Color3.fromRGB(0, 255, 0)
+    PctText.BackgroundTransparency = 1
+    PctText.TextSize = 35
+
+    local BarBack = Instance.new("Frame", LoadUI)
+    BarBack.Size = UDim2.new(0.6, 0, 0, 10)
+    BarBack.Position = UDim2.new(0.2, 0, 0.55, 0)
+    BarBack.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    
+    local BarFill = Instance.new("Frame", BarBack)
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    BarFill.BackgroundColor3 = Color3.new(1, 1, 1) -- BARRITA BLANCA
+
+    local CopyText = Instance.new("TextLabel", LoadUI)
+    CopyText.Text = "COPYRIGHT: LARDYLAN"
+    CopyText.Size = UDim2.new(1, 0, 0, 30)
+    CopyText.Position = UDim2.new(0, 0, 0.65, 0)
+    CopyText.TextColor3 = Color3.fromRGB(100, 100, 100)
+    CopyText.BackgroundTransparency = 1
+
+    -- Bucle de Mensajes
+    task.spawn(function()
+        while LoadUI.Parent do
+            MsgText.Text = "ESPERA ASTA QUE LA BARRITE SE LLENE"
+            task.wait(2.5)
+            MsgText.Text = "SUSCRIBE, AND LIKE THE CHANNEL : LARDYLAN"
+            task.wait(2.5)
+        end
+    end)
+
+    -- Carga condicionada al SEA
+    local target = IS_SEA_2 and 100 or 99.9
+    for i = 0, target, 0.5 do
+        PctText.Text = string.format("%.1f%%", i)
+        BarFill.Size = UDim2.new(i/100, 0, 1, 0)
+        task.wait(0.06)
+    end
+
+    if IS_SEA_2 then
+        task.wait(0.5)
+        LoadUI:Destroy()
+        showSpawner()
+    end
+end
+
+-- [[ 3. PANEL DE SPAWNER ]]
+function showSpawner()
+    local SpawnerUI = Instance.new("Frame", ScreenGui)
+    SpawnerUI.Size = UDim2.new(0, 400, 0, 260)
+    SpawnerUI.Position = UDim2.new(0.5, -200, 0.5, -130)
+    SpawnerUI.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    style(SpawnerUI, 12)
+
+    local ErrLabel = Instance.new("TextLabel", SpawnerUI)
+    ErrLabel.Size = UDim2.new(1, 0, 0, 30)
+    ErrLabel.Position = UDim2.new(0, 0, -0.15, 0)
+    ErrLabel.TextColor3 = Color3.new(1, 0, 0)
+    ErrLabel.BackgroundTransparency = 1
+    ErrLabel.Text = ""
+
+    local Title = Instance.new("TextLabel", SpawnerUI)
+    Title.Text = "SPAWNER FRUITS"
+    Title.Size = UDim2.new(1, 0, 0, 50)
+    Title.TextColor3 = Color3.fromRGB(0, 255, 0)
+    Title.BackgroundTransparency = 1
+    Title.TextSize = 25
+
+    local FruitIn = Instance.new("TextBox", SpawnerUI)
+    FruitIn.PlaceholderText = "Escribe: Buddha"
+    FruitIn.Size = UDim2.new(0.8, 0, 0, 45)
+    FruitIn.Position = UDim2.new(0.1, 0, 0.35, 0)
+    style(FruitIn)
+
+    local SpawnB = Instance.new("TextButton", SpawnerUI)
+    SpawnB.Text = "Spawn"
+    SpawnB.Size = UDim2.new(0.5, 0, 0, 45)
+    SpawnB.Position = UDim2.new(0.1, 0, 0.6, 0)
+    SpawnB.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+    style(SpawnB)
+
+    local TimerL = Instance.new("TextLabel", SpawnerUI)
+    TimerL.Size = UDim2.new(0, 120, 0, 45)
+    TimerL.Position = UDim2.new(0.65, 0, 0.6, 0)
+    TimerL.Text = "READY"
+    TimerL.TextColor3 = Color3.fromRGB(0, 255, 0)
+    TimerL.BackgroundTransparency = 1
+
+    -- Sensor Proximidad
+    local function near()
+        if not Player.Character then return false end
+        for _, p in pairs(game.Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                if (Player.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude < 15 then 
+                    return true 
+                end
+            end
+        end
+        return false
+    end
+
+    local cd = false
+    SpawnB.MouseButton1Click:Connect(function()
+        if near() then
+            ErrLabel.Text = "ERROR AL SPAWN (JUGADOR CERCA)"
+            task.wait(3); ErrLabel.Text = ""
+            return
+        end
+        if cd then
+            ErrLabel.Text = "SPAWN INVALID HOURS 2 HOURS"
+            task.wait(3); ErrLabel.Text = ""
+            return
+        end
+        if FruitIn.Text:lower() == "buddha" then
+            cd = true
+            SpawnB.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            local t = SPAWN_COOLDOWN
+            while t > 0 do
+                TimerL.Text = string.format("%02d:%02d:%02d", math.floor(t/3600), math.floor((t%3600)/60), t%60)
+                task.wait(1); t = t - 1
+            end
+            cd = false; TimerL.Text = "READY"; SpawnB.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+        end
+    end)
+end
+
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == CORRECT_KEY then startLoading() end
+end)
