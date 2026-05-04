@@ -1,0 +1,128 @@
+--[[
+    LARDYLAN HUB - Script de Cumpleaños
+    Juego: [❗] Agarra el cuchillo
+]]
+
+local LardylanHub = Instance.new("ScreenGui")
+local KeySystem = Instance.new("Frame")
+local MenuPrincipal = Instance.new("Frame")
+
+-- 1. SISTEMA DE SEGURIDAD (KEY Y EXPIRACIÓN)
+local fechaExpiracion = os.time({year = 2026, month = 5, day = 15})
+local fechaActual = os.time()
+
+if fechaActual > fechaExpiracion then
+    game.Players.LocalPlayer:Kick("ESTE SCRIPT HA EXPIRADO, ESPERA QUE LARDYLAN SAQUE OTRO V2")
+    return
+end
+
+-- Configuración de la Interfaz
+LardylanHub.Name = "LardylanHub"
+LardylanHub.Parent = game.CoreGui
+
+-- [BLOQUE DE LA KEY]
+KeySystem.Name = "KeySystem"
+KeySystem.Parent = LardylanHub
+KeySystem.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+KeySystem.Size = UDim2.new(0, 400, 0, 200)
+KeySystem.Position = UDim2.new(0.5, -200, 0.5, -100)
+-- (Aquí va el diseño moderno tipo el de tu foto)
+
+local KeyInput = Instance.new("TextBox", KeySystem)
+KeyInput.PlaceholderText = "Enter Key Here"
+KeyInput.Size = UDim2.new(0, 300, 0, 50)
+KeyInput.Position = UDim2.new(0.5, -150, 0.4, -25)
+
+local SubmitBtn = Instance.new("TextButton", KeySystem)
+SubmitBtn.Text = "Submit"
+SubmitBtn.Size = UDim2.new(0, 100, 0, 40)
+SubmitBtn.Position = UDim2.new(0.5, -50, 0.7, 0)
+
+SubmitBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "KNIFE" then
+        KeySystem.Visible = false
+        MenuPrincipal.Visible = true
+    else
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "KEY INCORRECTA"
+    end
+end)
+
+-- 2. MENÚ PRINCIPAL (LARDYLAN HUB)
+MenuPrincipal.Name = "LardylanHubMain"
+MenuPrincipal.Parent = LardylanHub
+MenuPrincipal.Visible = false
+MenuPrincipal.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MenuPrincipal.Size = UDim2.new(0, 350, 0, 450)
+MenuPrincipal.Position = UDim2.new(0.5, -175, 0.5, -225)
+
+local Title = Instance.new("TextLabel", MenuPrincipal)
+Title.Text = "LARDYLAN HUB"
+Title.Size = UDim2.new(1, 0, 0, 50)
+
+-- Función para los Switches (⚪)
+local function createSwitch(name, posY, callback)
+    local label = Instance.new("TextLabel", MenuPrincipal)
+    label.Text = name
+    label.Position = UDim2.new(0.1, 0, 0, posY)
+    
+    local btn = Instance.new("TextButton", MenuPrincipal)
+    btn.Text = "⚪"
+    btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0) -- Rojo apagado
+    btn.Position = UDim2.new(0.7, 0, 0, posY)
+    btn.Size = UDim2.new(0, 50, 0, 30)
+    
+    local estado = false
+    btn.MouseButton1Click:Connect(function()
+        estado = not estado
+        if estado then
+            btn.BackgroundColor3 = Color3.fromRGB(0, 255, 0) -- Verde encendido
+            btn.Text = "      ⚪" -- Se mueve a la derecha
+        else
+            btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            btn.Text = "⚪      " -- Se mueve a la izquierda
+        end
+        callback(estado)
+    end)
+end
+
+-- 3. FUNCIONES: HITGH (Hitbox) Y SPEED
+createSwitch("HITGH", 100, function(v)
+    _G.HitboxEnabled = v
+    spawn(function()
+        while _G.HitboxEnabled do
+            for _, player in pairs(game.Players:GetPlayers()) do
+                if player ~= game.Players.LocalPlayer and player.Character then
+                    local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.Size = Vector3.new(15, 15, 15) -- El "cuadro gigante"
+                        hrp.Transparency = 0.7
+                        hrp.BrickColor = BrickColor.new("Black") -- Cuadro Negro
+                        hrp.CanCollide = false
+                    end
+                end
+            end
+            task.wait(1)
+        end
+    end)
+end)
+
+createSwitch("SPEED", 160, function(v)
+    if v then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 100
+    else
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+    end
+end)
+
+-- Hora en tiempo real y Fecha de Expiración
+local TimeLabel = Instance.new("TextLabel", MenuPrincipal)
+TimeLabel.Position = UDim2.new(0, 0, 0.9, 0)
+TimeLabel.Size = UDim2.new(1, 0, 0, 20)
+
+spawn(function()
+    while true do
+        TimeLabel.Text = "Hora: " .. os.date("%X") .. " | Expira: 15/05/2026"
+        task.wait(1)
+    end
+end)
