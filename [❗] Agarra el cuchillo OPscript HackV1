@@ -1,0 +1,162 @@
+--[[
+    LARDYLAN HUB V1.3 - MEGA HITBOX EDITION
+    Key: KNIFE | Expira: 15/05/2026
+]]
+
+local LardylanHub = Instance.new("ScreenGui")
+LardylanHub.Name = "LardylanHub"
+LardylanHub.Parent = game.CoreGui
+
+-- FUNCIÓN PARA MOVER CON EL DEDO (DRAGGABLE)
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    frame.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+end
+
+-- BOTÓN FLOTANTE
+local FloatingBtn = Instance.new("TextButton", LardylanHub)
+FloatingBtn.Size = UDim2.new(0, 50, 0, 50)
+FloatingBtn.Position = UDim2.new(0, 10, 0.5, 0)
+FloatingBtn.Text = "🔪"
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+FloatingBtn.TextColor3 = Color3.new(1,1,1)
+FloatingBtn.Visible = false
+Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
+makeDraggable(FloatingBtn)
+
+-- 1. SISTEMA DE KEY (MODERNO)
+local KeySystem = Instance.new("Frame", LardylanHub)
+KeySystem.Size = UDim2.new(0, 400, 0, 200)
+KeySystem.Position = UDim2.new(0.5, -200, 0.5, -100)
+KeySystem.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", KeySystem)
+makeDraggable(KeySystem)
+
+local CloseKey = Instance.new("TextButton", KeySystem)
+CloseKey.Text = "X"
+CloseKey.Size = UDim2.new(0, 30, 0, 30)
+CloseKey.Position = UDim2.new(1, -35, 0, 5)
+CloseKey.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+CloseKey.MouseButton1Click:Connect(function() LardylanHub:Destroy() end)
+
+local KeyInput = Instance.new("TextBox", KeySystem)
+KeyInput.PlaceholderText = "KEY: KNIFE"
+KeyInput.Size = UDim2.new(0, 280, 0, 40)
+KeyInput.Position = UDim2.new(0.5, -140, 0.4, 0)
+Instance.new("UICorner", KeyInput)
+
+local Submit = Instance.new("TextButton", KeySystem)
+Submit.Text = "SUBMIT"
+Submit.Size = UDim2.new(0, 120, 0, 40)
+Submit.Position = UDim2.new(0.5, -60, 0.75, 0)
+Instance.new("UICorner", Submit)
+
+-- 2. MENÚ PRINCIPAL (LARDYLAN HUB)
+local MenuPrincipal = Instance.new("Frame", LardylanHub)
+MenuPrincipal.Size = UDim2.new(0, 220, 0, 280)
+MenuPrincipal.Position = UDim2.new(0.5, -110, 0.5, -140)
+MenuPrincipal.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MenuPrincipal.Visible = false
+Instance.new("UICorner", MenuPrincipal)
+makeDraggable(MenuPrincipal)
+
+local MiniMenu = Instance.new("TextButton", MenuPrincipal)
+MiniMenu.Text = "-"
+MiniMenu.Size = UDim2.new(0, 25, 0, 25)
+MiniMenu.Position = UDim2.new(1, -30, 0, 5)
+MiniMenu.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+MiniMenu.MouseButton1Click:Connect(function() MenuPrincipal.Visible = false FloatingBtn.Visible = true end)
+
+FloatingBtn.MouseButton1Click:Connect(function() FloatingBtn.Visible = false MenuPrincipal.Visible = true end)
+
+Submit.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "KNIFE" then KeySystem.Visible = false MenuPrincipal.Visible = true end
+end)
+
+-- FUNCIÓN SWITCH ( ● )
+local function createSwitch(name, posY, callback)
+    local txt = Instance.new("TextLabel", MenuPrincipal)
+    txt.Text = name
+    txt.Size = UDim2.new(0, 80, 0, 30)
+    txt.Position = UDim2.new(0.1, 0, 0, posY)
+    txt.TextColor3 = Color3.new(1,1,1)
+    txt.BackgroundTransparency = 1
+
+    local bg = Instance.new("Frame", MenuPrincipal)
+    bg.Size = UDim2.new(0, 45, 0, 22)
+    bg.Position = UDim2.new(0.6, 0, 0, posY + 4)
+    bg.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+
+    local btn = Instance.new("TextButton", bg)
+    btn.Text = "●"
+    btn.Size = UDim2.new(0, 22, 0, 22)
+    btn.Position = UDim2.new(0, 0, 0, 0)
+    btn.BackgroundTransparency = 1
+    btn.TextColor3 = Color3.new(1,1,1)
+
+    local on = false
+    btn.MouseButton1Click:Connect(function()
+        on = not on
+        bg.BackgroundColor3 = on and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+        btn:TweenPosition(on and UDim2.new(0.5, 0, 0, 0) or UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.2)
+        callback(on)
+    end)
+end
+
+-- FUNCIÓN SUPER HITBOX (CUADRO GIGANTE)
+createSwitch("HITGH", 60, function(v)
+    _G.MegaHit = v
+    spawn(function()
+        while _G.MegaHit do
+            for _, p in pairs(game.Players:GetPlayers()) do
+                if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local part = p.Character.HumanoidRootPart
+                    part.Size = Vector3.new(30, 30, 30) -- ¡Aquí está tu CUADRO GIGANTE!
+                    part.Transparency = 0.7
+                    part.BrickColor = BrickColor.new("Really black")
+                    part.CanCollide = false
+                end
+            end
+            task.wait(0.5)
+        end
+    end)
+end)
+
+createSwitch("SPEED", 120, function(v)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v and 100 or 16
+end)
+
+-- RELOJ Y FECHA
+local Timer = Instance.new("TextLabel", MenuPrincipal)
+Timer.Size = UDim2.new(1, 0, 0, 40)
+Timer.Position = UDim2.new(0, 0, 0.8, 0)
+Timer.TextColor3 = Color3.fromRGB(180, 180, 180)
+spawn(function()
+    while true do
+        Timer.Text = os.date("%X") .. "\nEXP: 15/05/2026"
+        task.wait(1)
+    end
+end)
