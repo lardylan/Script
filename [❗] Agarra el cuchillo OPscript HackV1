@@ -1,13 +1,13 @@
 --[[
-    LARDYLAN HUB V3 - EDICIÓN CUMPLEAÑOS
-    Key: KNIFE | Expira: 15/05/2026
+    LARDYLAN HUB V1 - EDICIÓN CUMPLEAÑOS (OPTIMIZADO)
 ]]
 
 local LardylanHub = Instance.new("ScreenGui")
 LardylanHub.Name = "LardylanHub"
 LardylanHub.Parent = game.CoreGui
+LardylanHub.ResetOnSpawn = false
 
--- FUNCIÓN PARA MOVER CUALQUIER COSA CON EL DEDO (DRAGGABLE)
+-- FUNCIÓN DRAGGABLE (MEJORADA)
 local function makeDraggable(frame)
     local dragging, dragInput, dragStart, startPos
     frame.InputBegan:Connect(function(input)
@@ -15,6 +15,9 @@ local function makeDraggable(frame)
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
         end
     end)
     frame.InputChanged:Connect(function(input)
@@ -28,110 +31,71 @@ local function makeDraggable(frame)
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-    frame.InputEnded:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = false
-        end
-    end)
 end
 
--- 1. BOTÓN FLOTANTE (⚪) NEGRO Y MOVIBLE
+-- 1. BOTÓN FLOTANTE (RESPUESTA RÁPIDA)
 local FloatingBtn = Instance.new("TextButton", LardylanHub)
 FloatingBtn.Name = "FloatingBtn"
-FloatingBtn.Size = UDim2.new(0, 60, 0, 60)
-FloatingBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
-FloatingBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Color Negro
+FloatingBtn.Size = UDim2.new(0, 50, 0, 50)
+FloatingBtn.Position = UDim2.new(0.05, 0, 0.4, 0)
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 FloatingBtn.Text = "⚪"
 FloatingBtn.TextColor3 = Color3.new(1, 1, 1)
-FloatingBtn.TextSize = 30
+FloatingBtn.TextSize = 25
 FloatingBtn.Visible = false
 Instance.new("UICorner", FloatingBtn).CornerRadius = UDim.new(1, 0)
 makeDraggable(FloatingBtn)
 
--- 2. MENÚ DE KEY (DISEÑO DE LA FOTO)
+-- 2. MENÚ DE KEY (MÁS PEQUEÑO)
 local KeySystem = Instance.new("Frame", LardylanHub)
-KeySystem.Size = UDim2.new(0, 450, 0, 250)
-KeySystem.Position = UDim2.new(0.5, -225, 0.5, -125)
-KeySystem.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-KeySystem.BorderSizePixel = 4
-KeySystem.BorderColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", KeySystem).CornerRadius = UDim.new(0, 15)
+KeySystem.Size = UDim2.new(0, 350, 0, 200)
+KeySystem.Position = UDim2.new(0.5, -175, 0.5, -100)
+KeySystem.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+Instance.new("UICorner", KeySystem).CornerRadius = UDim.new(0, 10)
 makeDraggable(KeySystem)
 
--- Botones (X) y (-) en la Key
-local CloseKey = Instance.new("TextButton", KeySystem)
-CloseKey.Text = "X"
-CloseKey.Size = UDim2.new(0, 35, 0, 35)
-CloseKey.Position = UDim2.new(1, -45, 0, 10)
-CloseKey.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-CloseKey.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", CloseKey)
-
-local MiniKey = Instance.new("TextButton", KeySystem)
-MiniKey.Text = "-"
-MiniKey.Size = UDim2.new(0, 35, 0, 35)
-MiniKey.Position = UDim2.new(1, -90, 0, 10)
-MiniKey.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-MiniKey.TextColor3 = Color3.new(1, 1, 1)
-Instance.new("UICorner", MiniKey)
-
 local KeyInput = Instance.new("TextBox", KeySystem)
-KeyInput.PlaceholderText = "PON TU KEY🗿"
-KeyInput.Size = UDim2.new(0, 380, 0, 50)
-KeyInput.Position = UDim2.new(0.5, -190, 0.45, -25)
-KeyInput.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+KeyInput.PlaceholderText = "KEY: KNIFE"
+KeyInput.Size = UDim2.new(0, 280, 0, 40)
+KeyInput.Position = UDim2.new(0.5, -140, 0.4, -20)
+KeyInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 KeyInput.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", KeyInput)
 
 local Submit = Instance.new("TextButton", KeySystem)
-Submit.Text = "Submit"
-Submit.Size = UDim2.new(0, 180, 0, 50)
-Submit.Position = UDim2.new(0.5, -90, 0.75, 5)
+Submit.Text = "SUBMIT"
+Submit.Size = UDim2.new(0, 120, 0, 35)
+Submit.Position = UDim2.new(0.5, -60, 0.7, 5)
 Submit.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 Submit.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", Submit)
 
--- 3. MOD MENÚ (LARDYLAN HUB CHIQUITO)
+-- 3. MOD MENÚ (TAMAÑO REDUCIDO "CHIQUITO")
 local MenuPrincipal = Instance.new("Frame", LardylanHub)
-MenuPrincipal.Size = UDim2.new(0, 250, 0, 320)
-MenuPrincipal.Position = UDim2.new(0.5, -125, 0.5, -160)
-MenuPrincipal.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MenuPrincipal.BorderSizePixel = 2
-MenuPrincipal.BorderColor3 = Color3.new(1, 1, 1)
+MenuPrincipal.Size = UDim2.new(0, 200, 0, 260) -- Tamaño reducido
+MenuPrincipal.Position = UDim2.new(0.5, -100, 0.5, -130)
+MenuPrincipal.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MenuPrincipal.Visible = false
 Instance.new("UICorner", MenuPrincipal)
 makeDraggable(MenuPrincipal)
 
 local HubTitle = Instance.new("TextLabel", MenuPrincipal)
 HubTitle.Text = "LARDYLAN HUB"
-HubTitle.Size = UDim2.new(1, 0, 0, 40)
+HubTitle.Size = UDim2.new(1, 0, 0, 35)
 HubTitle.TextColor3 = Color3.new(1, 1, 1)
 HubTitle.BackgroundTransparency = 1
 HubTitle.Font = Enum.Font.GothamBold
+HubTitle.TextSize = 14
 
--- Botones (X) y (-) en el Mod Menú
 local CloseMenu = Instance.new("TextButton", MenuPrincipal)
 CloseMenu.Text = "X"
-CloseMenu.Size = UDim2.new(0, 30, 0, 30)
-CloseMenu.Position = UDim2.new(1, -35, 0, 5)
-CloseMenu.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+CloseMenu.Size = UDim2.new(0, 25, 0, 25)
+CloseMenu.Position = UDim2.new(1, -30, 0, 5)
+CloseMenu.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 Instance.new("UICorner", CloseMenu)
 
-local MiniMenu = Instance.new("TextButton", MenuPrincipal)
-MiniMenu.Text = "-"
-MiniMenu.Size = UDim2.new(0, 30, 0, 30)
-MiniMenu.Position = UDim2.new(1, -70, 0, 5)
-MiniMenu.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-Instance.new("UICorner", MiniMenu)
-
--- LÓGICA DE LOS BOTONES
-CloseKey.MouseButton1Click:Connect(function() LardylanHub:Destroy() end)
-CloseMenu.MouseButton1Click:Connect(function() LardylanHub:Destroy() end)
-
-MiniKey.MouseButton1Click:Connect(function() KeySystem.Visible = false FloatingBtn.Visible = true end)
-MiniMenu.MouseButton1Click:Connect(function() MenuPrincipal.Visible = false FloatingBtn.Visible = true end)
-
-FloatingBtn.MouseButton1Click:Connect(function()
+-- LÓGICA DE APERTURA INSTANTÁNEA
+FloatingBtn.Activated:Connect(function()
     FloatingBtn.Visible = false
     if _G.IsAuth then MenuPrincipal.Visible = true else KeySystem.Visible = true end
 end)
@@ -144,46 +108,52 @@ Submit.MouseButton1Click:Connect(function()
     end
 end)
 
--- FUNCIÓN SWITCH (●) ESTILO SLIDE
+CloseMenu.MouseButton1Click:Connect(function()
+    MenuPrincipal.Visible = false
+    FloatingBtn.Visible = true
+end)
+
+-- FUNCIÓN SWITCH MEJORADA (MÁS PEQUEÑA Y RESPONSIVA)
 local function createSwitch(name, posY, callback)
-    local bg = Instance.new("Frame", MenuPrincipal)
-    bg.Size = UDim2.new(0, 50, 0, 25)
-    bg.Position = UDim2.new(0.7, 0, 0, posY)
-    bg.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+    local bg = Instance.new("TextButton", MenuPrincipal) -- Usamos TextButton para que sea clickeable en todo el cuadro
+    bg.Text = ""
+    bg.Size = UDim2.new(0, 40, 0, 20)
+    bg.Position = UDim2.new(0.7, -10, 0, posY)
+    bg.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
     Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
     
-    local dot = Instance.new("TextButton", bg)
-    dot.Text = "●"
-    dot.Size = UDim2.new(0, 25, 0, 25)
-    dot.Position = UDim2.new(0, 0, 0, 0)
-    dot.BackgroundTransparency = 1
-    dot.TextColor3 = Color3.new(1, 1, 1)
+    local dot = Instance.new("Frame", bg)
+    dot.Size = UDim2.new(0, 16, 0, 16)
+    dot.Position = UDim2.new(0, 2, 0.5, -8)
+    dot.BackgroundColor3 = Color3.new(1, 1, 1)
+    Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
 
     local txt = Instance.new("TextLabel", MenuPrincipal)
     txt.Text = name
+    txt.Size = UDim2.new(0, 100, 0, 20)
     txt.Position = UDim2.new(0.1, 0, 0, posY)
     txt.TextColor3 = Color3.new(1, 1, 1)
     txt.BackgroundTransparency = 1
+    txt.TextXAlignment = Enum.TextXAlignment.Left
 
     local on = false
-    dot.MouseButton1Click:Connect(function()
+    bg.MouseButton1Click:Connect(function()
         on = not on
-        bg.BackgroundColor3 = on and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
-        dot:TweenPosition(on and UDim2.new(0.5, 0, 0, 0) or UDim2.new(0, 0, 0, 0), "Out", "Quad", 0.2)
+        bg.BackgroundColor3 = on and Color3.fromRGB(0, 180, 0) or Color3.fromRGB(180, 0, 0)
+        dot:TweenPosition(on and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8), "Out", "Quad", 0.15, true)
         callback(on)
     end)
 end
 
--- FUNCIONES HITGH (CUADRO GIGANTE) Y SPEED
-createSwitch("HITGH", 70, function(v)
+-- OPCIONES
+createSwitch("HITBOX", 60, function(v)
     _G.BigHit = v
-    spawn(function()
+    task.spawn(function()
         while _G.BigHit do
             for _, p in pairs(game.Players:GetPlayers()) do
                 if p ~= game.Players.LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    p.Character.HumanoidRootPart.Size = Vector3.new(45, 45, 45) -- CUADRO GIGANTE
+                    p.Character.HumanoidRootPart.Size = Vector3.new(20, 20, 20)
                     p.Character.HumanoidRootPart.Transparency = 0.7
-                    p.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really black")
                 end
             end
             task.wait(0.5)
@@ -191,20 +161,15 @@ createSwitch("HITGH", 70, function(v)
     end)
 end)
 
-createSwitch("SPEED", 130, function(v)
-    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v and 120 or 16
+createSwitch("SPEED", 100, function(v)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = v and 80 or 16
 end)
 
--- TIEMPO REAL Y FECHA DE EXPIRACIÓN
+-- FECHA EN EL PIE
 local Footer = Instance.new("TextLabel", MenuPrincipal)
-Footer.Size = UDim2.new(1, 0, 0, 50)
-Footer.Position = UDim2.new(0, 0, 0.85, 0)
-Footer.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+Footer.Size = UDim2.new(1, 0, 0, 30)
+Footer.Position = UDim2.new(0, 0, 1, -35)
+Footer.Text = "EXPIRE: 15/05/2026"
+Footer.TextColor3 = Color3.fromRGB(150, 150, 150)
+Footer.TextSize = 10
 Footer.BackgroundTransparency = 1
-
-spawn(function()
-    while true do
-        Footer.Text = os.date("%X") .. "\nEXPIRE: 15/05/2026"
-        task.wait(1)
-    end
-end)
