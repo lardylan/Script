@@ -1,114 +1,146 @@
 -- SERVICIOS
 local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
--- CREACIÓN DE LA BASE (PANTALLA NEGRA)
+-- CREACIÓN DEL GUI PRINCIPAL
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomScriptSystem"
+screenGui.Name = "SistemaTotalKorbloxHeadless"
+screenGui.IgnoreGuiInset = true
+screenGui.ResetOnSpawn = false
 screenGui.Parent = CoreGui
 
+-- 1. PANTALLA DE CARGA (NEGRO ABSOLUTO)
 local blackFrame = Instance.new("Frame")
 blackFrame.Size = UDim2.new(1, 0, 1, 0)
 blackFrame.BackgroundColor3 = Color3.new(0, 0, 0)
-blackFrame.ZIndex = 10
+blackFrame.BorderSizePixel = 0
+blackFrame.ZIndex = 100
 blackFrame.Parent = screenGui
 
--- BARRA DE CARGA
-local loadingText = Instance.new("TextLabel")
-loadingText.Size = UDim2.new(0, 200, 0, 50)
-loadingText.Position = UDim2.new(0.5, -100, 0.7, 0)
-loadingText.BackgroundTransparency = 1
-loadingText.TextColor3 = Color3.new(1, 1, 1)
-loadingText.Text = "Cargando: 0.0% (1/20)"
-loadingText.ZIndex = 11
-loadingText.Parent = blackFrame
+local loadText = Instance.new("TextLabel")
+loadText.Size = UDim2.new(0, 300, 0, 50)
+loadText.Position = UDim2.new(0.5, -150, 0.5, -50)
+loadText.BackgroundTransparency = 1
+loadText.TextColor3 = Color3.new(1, 1, 1)
+loadText.Font = Enum.Font.Code
+loadText.TextSize = 25
+loadText.Text = "CARGANDO: 00.0% [1/20]"
+loadText.ZIndex = 101
+loadText.Parent = blackFrame
 
--- LÓGICA DE CARGA (20 minutos aprox según tu pedido)
-task.spawn(function()
-    for i = 1, 20 do
-        for percent = 0, 100, 0.5 do
-            loadingText.Text = string.format("Cargando: %.1f%% (%d/20)", percent, i)
-            task.wait(0.6) -- Ajustado para durar el tiempo solicitado
-        end
-    end
-    blackFrame:Destroy() -- Desaparece al terminar
-end)
+local ballBar = Instance.new("TextLabel")
+ballBar.Size = UDim2.new(0, 300, 0, 50)
+ballBar.Position = UDim2.new(0.5, -150, 0.5, 10)
+ballBar.BackgroundTransparency = 1
+ballBar.TextColor3 = Color3.new(1, 1, 1)
+ballBar.TextSize = 40
+ballBar.Text = "----⚪----"
+ballBar.ZIndex = 101
+ballBar.Parent = blackFrame
 
--- PANEL PRINCIPAL (MOVIBLE)
+-- 2. MENÚ DE BOTONES (OCULTO AL INICIO)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 150, 0, 120)
-mainFrame.Position = UDim2.new(0.1, 0, 0.4, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Size = UDim2.new(0, 160, 0, 130)
+mainFrame.Position = UDim2.new(0.5, -80, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+mainFrame.BorderSizePixel = 2
+mainFrame.Visible = false -- Se vuelve visible tras los 20 min
 mainFrame.Active = true
-mainFrame.Draggable = true -- Permite moverlo con el dedo/mouse
+mainFrame.Draggable = true -- Se mueve con el dedo
 mainFrame.Parent = screenGui
 
-local layout = Instance.new("UIListLayout")
-layout.Parent = mainFrame
-layout.Padding = UDim.new(0, 2)
+-- Botón Cerrar (X) arriba del cuadro
+local closeX = Instance.new("TextButton")
+closeX.Size = UDim2.new(0, 25, 0, 25)
+closeX.Position = UDim2.new(1, -25, 0, -30)
+closeX.Text = "X"
+closeX.BackgroundColor3 = Color3.new(0.7, 0, 0)
+closeX.TextColor3 = Color3.new(1, 1, 1)
+closeX.Parent = mainFrame
 
--- BOTÓN CERRAR (X)
-local closeBtn = Instance.new("TextButton")
-closeBtn.Size = UDim2.new(0, 30, 0, 30)
-closeBtn.Position = UDim2.new(1, -30, 0, -30)
-closeBtn.Text = "X"
-closeBtn.BackgroundColor3 = Color3.new(1, 0, 0)
-closeBtn.Parent = mainFrame
+-- Botones Juntos (KORBLOX y HEADLESS)
+local korbloxBtn = Instance.new("TextButton")
+korbloxBtn.Size = UDim2.new(1, -10, 0, 45)
+korbloxBtn.Position = UDim2.new(0, 5, 0, 10)
+korbloxBtn.Text = "KORBLOX"
+korbloxBtn.BackgroundColor3 = Color3.fromRGB(0, 102, 204)
+korbloxBtn.TextColor3 = Color3.new(1, 1, 1)
+korbloxBtn.Parent = mainFrame
 
--- SISTEMA DE CONFIRMACIÓN AL SALIR
-closeBtn.MouseButton1Click:Connect(function()
+local headlessBtn = Instance.new("TextButton")
+headlessBtn.Size = UDim2.new(1, -10, 0, 45)
+headlessBtn.Position = UDim2.new(0, 5, 0, 57) -- Pegado abajo del otro
+headlessBtn.Text = "HEADLESS"
+headlessBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+headlessBtn.TextColor3 = Color3.new(1, 1, 1)
+headlessBtn.Parent = mainFrame
+
+-- 3. CUADRO DE CONFIRMACIÓN (EXIT)
+local function createConfirmMenu()
     local confirmFrame = Instance.new("Frame")
-    confirmFrame.Size = UDim2.new(0, 200, 0, 100)
-    confirmFrame.Position = UDim2.new(0.5, -100, 0.5, -50)
-    confirmFrame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+    confirmFrame.Size = UDim2.new(0, 200, 0, 120)
+    confirmFrame.Position = UDim2.new(0.5, -100, 0.5, -60)
+    confirmFrame.BackgroundColor3 = Color3.new(0,0,0)
+    confirmFrame.BorderSizePixel = 2
     confirmFrame.Parent = screenGui
 
-    local txt = Instance.new("TextLabel")
-    txt.Size = UDim2.new(1, 0, 0.6, 0)
-    txt.Text = "ARE YOU SURE YOU WANT TO EXIT THE SCRIPT?"
-    txt.TextColor3 = Color3.new(1,1,1)
-    txt.TextWrapped = true
-    txt.Parent = confirmFrame
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0.5, 0)
+    title.Text = "ARE YOU SURE YOU WANT TO EXIT THE SCRIPT?"
+    title.TextColor3 = Color3.new(1,1,1)
+    title.TextWrapped = true
+    title.BackgroundTransparency = 1
+    title.Parent = confirmFrame
 
-    local yes = Instance.new("TextButton")
-    yes.Size = UDim2.new(0.5, 0, 0.4, 0)
-    yes.Position = UDim2.new(0, 0, 0.6, 0)
-    yes.Text = "YES"
-    yes.BackgroundColor3 = Color3.new(0.5, 0, 0)
-    yes.Parent = confirmFrame
-    yes.MouseButton1Click:Connect(function() screenGui:Destroy() end)
+    local yesBtn = Instance.new("TextButton")
+    yesBtn.Size = UDim2.new(0.4, 0, 0.3, 0)
+    yesBtn.Position = UDim2.new(0.05, 0, 0.6, 0)
+    yesBtn.Text = "YES"
+    yesBtn.BackgroundColor3 = Color3.new(0.6, 0, 0)
+    yesBtn.Parent = confirmFrame
+    yesBtn.MouseButton1Click:Connect(function() screenGui:Destroy() end)
 
-    local no = Instance.new("TextButton")
-    no.Size = UDim2.new(0.5, 0, 0.4, 0)
-    no.Position = UDim2.new(0.5, 0, 0.6, 0)
-    no.Text = "NO"
-    no.BackgroundColor3 = Color3.new(0, 0.5, 0)
-    no.Parent = confirmFrame
-    no.MouseButton1Click:Connect(function() confirmFrame:Destroy() end)
-end)
-
--- BOTONES KORBLOX Y HEADLESS
-local function createBtn(name, color)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(1, 0, 0, 40)
-    btn.Text = name
-    btn.BackgroundColor3 = color
-    btn.TextColor3 = Color3.new(1,1,1)
-    btn.Parent = mainFrame
-    return btn
+    local noBtn = Instance.new("TextButton")
+    noBtn.Size = UDim2.new(0.4, 0, 0.3, 0)
+    noBtn.Position = UDim2.new(0.55, 0, 0.6, 0)
+    noBtn.Text = "NO"
+    noBtn.BackgroundColor3 = Color3.new(0, 0.6, 0)
+    noBtn.Parent = confirmFrame
+    noBtn.MouseButton1Click:Connect(function() confirmFrame:Destroy() end)
 end
 
-local korbloxBtn = createBtn("KORBLOX", Color3.fromRGB(0, 100, 200))
-local headlessBtn = createBtn("HEADLESS", Color3.fromRGB(50, 50, 50))
+closeX.MouseButton1Click:Connect(createConfirmMenu)
 
--- FUNCIONES COSMÉTICAS
+-- 4. LÓGICA DE CARGA (20 MINUTOS)
+task.spawn(function()
+    local totalCycles = 20
+    for cycle = 1, totalCycles do
+        for sec = 0, 60 do
+            local percent = (sec / 60) * 100
+            loadText.Text = string.format("CARGANDO: %04.1f%% [%d/%d]", percent, cycle, totalCycles)
+            
+            local pos = math.floor((sec / 60) * 10)
+            ballBar.Text = string.rep("-", pos) .. "⚪" .. string.rep("-", 10 - pos)
+            task.wait(1)
+        end
+    end
+    blackFrame:Destroy() -- Quita el negro
+    mainFrame.Visible = true -- Muestra el menú
+end)
+
+-- 5. FUNCIONES DE KORBLOX Y HEADLESS (VISIBLES)
 korbloxBtn.MouseButton1Click:Connect(function()
     local char = player.Character
-    if char and char:FindFirstChild("RightLeg") then
-        char.RightLeg:Destroy() -- Ejemplo simple de remover pierna
-        -- Nota: La malla específica de Korblox requiere cargar el ID del asset
+    if char then
+        -- Simulación visual de pierna Korblox (Remover pierna derecha)
+        if char:FindFirstChild("RightUpperLeg") then
+            char.RightUpperLeg:Destroy()
+            char.RightLowerLeg:Destroy()
+            char.RightFoot:Destroy()
+        elseif char:FindFirstChild("Right Leg") then
+            char["Right Leg"]:Destroy()
+        end
     end
 end)
 
@@ -116,6 +148,8 @@ headlessBtn.MouseButton1Click:Connect(function()
     local char = player.Character
     if char and char:FindFirstChild("Head") then
         char.Head.Transparency = 1
-        if char.Head:FindFirstChild("face") then char.Head.face.Transparency = 1 end
+        if char.Head:FindFirstChild("face") then
+            char.Head.face.Transparency = 1
+        end
     end
 end)
