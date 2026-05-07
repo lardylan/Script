@@ -1,0 +1,194 @@
+--[[ 
+    LARDYLAN HUB - MODERN UI 
+    Instrucciones: Pega esto en tu ejecutor favorito.
+]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local KeyMain = Instance.new("Frame")
+local MenuMain = Instance.new("Frame")
+local GokuImage = "rbxassetid://13410523214" -- ID de imagen de Goku (ajustar si es necesario)
+
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "LardylanHub"
+
+-- --- FUNCIONES DE UTILIDAD ---
+local function makeDraggable(frame, handle)
+    local dragging, dragInput, dragStart, startPos
+    handle.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+    handle.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    game:GetService("UserInputService").InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+end
+
+-- --- SISTEMA DE LLAVES (KEY SYSTEM) ---
+KeyMain.Name = "KeyMain"
+KeyMain.Parent = ScreenGui
+KeyMain.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+KeyMain.Position = UDim2.new(0.5, -150, 0.5, -100)
+KeyMain.Size = UDim2.new(0, 300, 0, 200)
+KeyMain.ClipsDescendants = true
+
+local KeyBG = Instance.new("ImageLabel", KeyMain)
+KeyBG.Size = UDim2.new(1, 0, 1, 0)
+KeyBG.Image = GokuImage
+KeyBG.ImageTransparency = 0.6
+KeyBG.ScaleType = Enum.ScaleType.Crop
+
+local KeyTitle = Instance.new("TextLabel", KeyMain)
+KeyTitle.Text = "KEY SYSTEM"
+KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Font = Enum.Font.GothamBold
+KeyTitle.TextSize = 20
+
+local GetKeyBtn = Instance.new("TextButton", KeyMain)
+GetKeyBtn.Text = "GET KEY"
+GetKeyBtn.Position = UDim2.new(0.1, 0, 0.6, 0)
+GetKeyBtn.Size = UDim2.new(0.35, 0, 0, 40)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 255)
+
+local EnterKeyBtn = Instance.new("TextButton", KeyMain)
+EnterKeyBtn.Text = "ENTER KEY"
+EnterKeyBtn.Position = UDim2.new(0.55, 0, 0.6, 0)
+EnterKeyBtn.Size = UDim2.new(0.35, 0, 0, 40)
+EnterKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+
+local KeyInput = Instance.new("TextBox", KeyMain)
+KeyInput.PlaceholderText = "Escribe la llave aquí..."
+KeyInput.Position = UDim2.new(0.1, 0, 0.35, 0)
+KeyInput.Size = UDim2.new(0.8, 0, 0, 35)
+
+local CopyNotif = Instance.new("TextLabel", KeyMain)
+CopyNotif.Text = "LINK COPIED 🔗"
+CopyNotif.Position = UDim2.new(0.6, 0, 0, 5)
+CopyNotif.Size = UDim2.new(0.4, 0, 0, 20)
+CopyNotif.BackgroundTransparency = 1
+CopyNotif.TextColor3 = Color3.fromRGB(255, 255, 0)
+CopyNotif.TextTransparency = 1
+
+-- --- LÓGICA DE KEY ---
+GetKeyBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://whatsapp.com/channel/0029VbCx5BNJZg3zocmccO1U")
+    CopyNotif.TextTransparency = 0
+    task.wait(2)
+    CopyNotif.TextTransparency = 1
+end)
+
+EnterKeyBtn.MouseButton1Click:Connect(function()
+    if KeyInput.Text == "KEY-AVATARCOPIED" then
+        KeyMain.Visible = false
+        MenuMain.Visible = true
+    else
+        KeyInput.Text = ""
+        KeyInput.PlaceholderText = "LLAVE INCORRECTA"
+    end
+end)
+
+-- --- MOD MENU (LARDYLAN HUB) ---
+MenuMain.Name = "MenuMain"
+MenuMain.Parent = ScreenGui
+MenuMain.Visible = false
+MenuMain.Size = UDim2.new(0, 400, 0, 250)
+MenuMain.Position = UDim2.new(0.5, -200, 0.5, -125)
+MenuMain.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+
+local MenuBG = Instance.new("ImageLabel", MenuMain)
+MenuBG.Size = UDim2.new(1, 0, 1, 0)
+MenuBG.Image = GokuImage
+MenuBG.ImageTransparency = 0.5
+MenuBG.ScaleType = Enum.ScaleType.Crop
+
+local MenuTitle = Instance.new("TextLabel", MenuMain)
+MenuTitle.Text = "LARDYLAN HUB | MODERN"
+MenuTitle.Size = UDim2.new(1, 0, 0, 30)
+MenuTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MenuTitle.BackgroundTransparency = 0.5
+MenuTitle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+-- Botón Flotante
+local FloatingBtn = Instance.new("ImageButton", ScreenGui)
+FloatingBtn.Size = UDim2.new(0, 50, 0, 50)
+FloatingBtn.Position = UDim2.new(0.1, 0, 0.1, 0)
+FloatingBtn.Image = GokuImage
+FloatingBtn.Visible = false
+makeDraggable(FloatingBtn, FloatingBtn)
+
+FloatingBtn.MouseButton1Click:Connect(function()
+    MenuMain.Visible = true
+    FloatingBtn.Visible = false
+end)
+
+-- Botones Minimizar y Cerrar
+local MinBtn = Instance.new("TextButton", MenuMain)
+MinBtn.Text = "-"
+MinBtn.Position = UDim2.new(0.85, 0, 0, 0)
+MinBtn.Size = UDim2.new(0, 30, 0, 30)
+MinBtn.BackgroundTransparency = 1
+MinBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+MinBtn.MouseButton1Click:Connect(function()
+    MenuMain.Visible = false
+    FloatingBtn.Visible = true
+end)
+
+-- Apartado de Copiar Avatar
+local UserInput = Instance.new("TextBox", MenuMain)
+UserInput.PlaceholderText = "Nombre del usuario..."
+UserInput.Position = UDim2.new(0.3, 0, 0.2, 0)
+UserInput.Size = UDim2.new(0.6, 0, 0, 35)
+
+local CopyAvatarBtn = Instance.new("TextButton", MenuMain)
+CopyAvatarBtn.Text = "COPIED AVATAR"
+CopyAvatarBtn.Position = UDim2.new(0.3, 0, 0.4, 0)
+CopyAvatarBtn.Size = UDim2.new(0.6, 0, 0, 40)
+CopyAvatarBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 200)
+
+-- Lógica Copiar Avatar (Visual/Ropa)
+CopyAvatarBtn.MouseButton1Click:Connect(function()
+    local targetUser = UserInput.Text
+    local targetPlayer = game.Players:FindFirstChild(targetUser)
+    if targetPlayer then
+        game.Players.LocalPlayer.CharacterAppearanceId = targetPlayer.CharacterAppearanceId
+        game.Players.LocalPlayer:LoadCharacter()
+    end
+end)
+
+-- --- SECCIÓN CRÉDITOS ---
+local CreditsFrame = Instance.new("Frame", MenuMain)
+CreditsFrame.Size = UDim2.new(0.7, 0, 0.7, 0)
+CreditsFrame.Position = UDim2.new(0.25, 0, 0.2, 0)
+CreditsFrame.BackgroundTransparency = 1
+CreditsFrame.Visible = false
+
+local CreditsText = Instance.new("TextLabel", CreditsFrame)
+CreditsText.Text = "CREDITS: LARDYLAN\nEXPIRED: 99.999.999\nCANAL: YouTube.com/@lardylan"
+CreditsText.Size = UDim2.new(1, 0, 1, 0)
+CreditsText.TextColor3 = Color3.fromRGB(255, 255, 255)
+CreditsText.BackgroundTransparency = 1
+CreditsText.TextWrapped = true
+
+local CreditsBtn = Instance.new("TextButton", MenuMain)
+CreditsBtn.Text = "CREDITS"
+CreditsBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+CreditsBtn.Size = UDim2.new(0.2, 0, 0, 30)
+
+CreditsBtn.MouseButton1Click:Connect(function()
+    CreditsFrame.Visible = not CreditsFrame.Visible
+end)
+
+makeDraggable(MenuMain, MenuTitle)
