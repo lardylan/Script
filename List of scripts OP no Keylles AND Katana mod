@@ -1,0 +1,95 @@
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local TopBar = Instance.new("Frame")
+local SearchBar = Instance.new("TextBox")
+local ToggleBtn = Instance.new("TextButton")
+local ContentFrame = Instance.new("ScrollingFrame")
+local UIListLayout = Instance.new("UIListLayout")
+
+-- Lista de Scripts Famosos (Keyless)
+local ScriptsList = {
+    {Name = "Infinite Yield (Admin)", Source = "https://githubusercontent.com"},
+    {Name = "VG Hub (Multi-Game)", Source = "https://githubusercontent.com"}, -- Ejemplo de link
+    {Name = "Solaris Hub", Source = "https://solarishub.dev"},
+    {Name = "Nameless Admin", Source = "https://githubusercontent.com"},
+    {Name = "Dex Explorer", Source = "https://githubusercontent.com"}
+}
+
+-- Configuración de la UI
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+MainFrame.Size = UDim2.new(0, 300, 0, 350)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -175)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+TopBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+TopBar.Parent = MainFrame
+
+SearchBar.Size = UDim2.new(0.7, 0, 0.7, 0)
+SearchBar.Position = UDim2.new(0.05, 0, 0.15, 0)
+SearchBar.PlaceholderText = "Buscar script..."
+SearchBar.Text = ""
+SearchBar.Parent = TopBar
+
+ToggleBtn.Size = UDim2.new(0.15, 0, 0.7, 0)
+ToggleBtn.Position = UDim2.new(0.8, 0, 0.15, 0)
+ToggleBtn.Text = ">"
+ToggleBtn.Parent = TopBar
+
+ContentFrame.Size = UDim2.new(1, 0, 0.85, 0)
+ContentFrame.Position = UDim2.new(0, 0, 0.15, 0)
+ContentFrame.CanvasSize = UDim2.new(0, 0, 2, 0)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Parent = MainFrame
+
+UIListLayout.Parent = ContentFrame
+UIListLayout.Padding = Height = UDim.new(0, 5)
+
+-- Función para crear botones de script
+local function CreateScriptButton(data)
+    local btn = Instance.new("TextButton")
+    btn.Name = data.Name
+    btn.Size = UDim2.new(0.9, 0, 0, 40)
+    btn.Text = data.Name
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.Parent = ContentFrame
+    
+    btn.MouseButton1Click:Connect(function()
+        print("Ejecutando: " .. data.Name)
+        loadstring(game:HttpGet(data.Source))() -- Ejecuta el script directamente
+    end)
+    return btn
+end
+
+-- Cargar lista inicial
+for _, data in pairs(ScriptsList) do
+    CreateScriptButton(data)
+end
+
+-- Lógica del Buscador
+SearchBar:GetPropertyChangedSignal("Text"):Connect(function()
+    local query = SearchBar.Text:lower()
+    for _, child in pairs(ContentFrame:GetChildren()) do
+        if child:IsA("TextButton") then
+            child.Visible = child.Name:lower():find(query) ~= nil
+        end
+    end
+end)
+
+-- Lógica del Botón Ocultar (Loop > / <)
+local isOpen = true
+ToggleBtn.MouseButton1Click:Connect(function()
+    isOpen = not isOpen
+    if not isOpen then
+        ContentFrame.Visible = false
+        MainFrame:TweenSize(UDim2.new(0, 300, 0, 45), "Out", "Quad", 0.3)
+        ToggleBtn.Text = "<"
+    else
+        MainFrame:TweenSize(UDim2.new(0, 300, 0, 350), "Out", "Quad", 0.3)
+        ContentFrame.Visible = true
+        ToggleBtn.Text = ">"
+    end
+end)
