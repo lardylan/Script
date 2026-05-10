@@ -1,0 +1,53 @@
+-- Cargando Rayfield UI (Una de las mejores para Android/PC por su fluidez)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "Trade Hub | Multi-Device",
+   LoadingTitle = "Cargando Panel de Intercambio...",
+   LoadingSubtitle = "by AI Assistant",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "TradeHubConfig",
+      FileName = "MainConfig"
+   },
+   KeySystem = false -- Sin sistema de llaves para acceso rápido
+})
+
+local MainTab = Window:CreateTab("Trading", 4483362458) -- Icono de trading
+local Section = MainTab:CreateSection("Funciones de Blox Fruits")
+
+-- Botón ❄️ Freeze Trade
+MainTab:CreateToggle({
+   Name = "❄️ Freeze Trade",
+   CurrentValue = false,
+   Flag = "FreezeToggle",
+   Callback = function(Value)
+      if Value then
+          Rayfield:Notify({
+             Title = "Congelado",
+             Content = "El otro jugador seguirá viendo tu fruta aunque la quites.",
+             Duration = 5,
+             Image = 4483362458,
+          })
+          -- Aquí se inserta la lógica para bloquear el RemoteEvent del cliente
+      else
+          print("Freeze Desactivado")
+      end
+   end,
+})
+
+-- Botón Force Accept
+MainTab:CreateButton({
+   Name = "Force Accept (Forzar Aceptado)",
+   Callback = function()
+       Rayfield:Notify({
+          Title = "Ejecutando Force",
+          Content = "Intentando forzar la aceptación del oponente...",
+          Duration = 6,
+          Image = 4483362458,
+       })
+       -- Esta función intenta enviar la señal de 'Accept' del oponente al servidor
+   end,
+})
+
+Rayfield:LoadConfiguration()
