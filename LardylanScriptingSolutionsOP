@@ -1,72 +1,54 @@
+-- AIMBOT LARDYLAN OP - UNIVERSAL VERSION
 local player = game.Players.LocalPlayer
+local camera = workspace.CurrentCamera
 local coreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
-local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
--- CONTENEDOR PRINCIPAL
-local sg = Instance.new("ScreenGui", coreGui)
-sg.Name = "LardylanMenu"
+-- CONFIGURACIÓN DE FUNCIONES
+local Settings = {
+    Aimbot = false,
+    ESP = false,
+    Antennas = false,
+    FOV = 100,
+    SpinSpeed = 1
+}
 
--- --- 1. BOTÓN FLOTANTE (MINI) ---
+-- --- INTERFAZ (BOTÓN FLOTANTE Y PANEL) ---
+local sg = Instance.new("ScreenGui", coreGui)
 local floatingBtn = Instance.new("Frame", sg)
 floatingBtn.Size = UDim2.new(0, 60, 0, 60)
 floatingBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
 floatingBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-floatingBtn.BorderSizePixel = 0
-floatingBtn.Active = true
 Instance.new("UICorner", floatingBtn).CornerRadius = UDim.new(1, 0)
 
 local lvText = Instance.new("TextLabel", floatingBtn)
-lvText.Size = UDim2.new(1, 0, 1, 0)
-lvText.Text = "LV"
-lvText.TextColor3 = Color3.new(1, 1, 0)
-lvText.Font = Enum.Font.GothamBold
-lvText.TextSize = 25
-lvText.BackgroundTransparency = 1
+lvText.Size = UDim2.new(1, 0, 1, 0); lvText.Text = "LV"; lvText.TextColor3 = Color3.new(1, 1, 0)
+lvText.Font = Enum.Font.GothamBold; lvText.TextSize = 25; lvText.BackgroundTransparency = 1
 
 local vipLabel = Instance.new("TextLabel", floatingBtn)
-vipLabel.Size = UDim2.new(0, 100, 0, 20)
-vipLabel.Position = UDim2.new(0.5, -50, 1, 5)
-vipLabel.Text = "VIP PREMIUM"
-vipLabel.TextColor3 = Color3.new(1, 1, 1)
-vipLabel.Font = Enum.Font.GothamBold
-vipLabel.TextSize = 12
-vipLabel.BackgroundTransparency = 1
+vipLabel.Size = UDim2.new(0, 100, 0, 20); vipLabel.Position = UDim2.new(0.5, -50, 1, 5)
+vipLabel.Text = "VIP PREMIUM"; vipLabel.TextColor3 = Color3.new(1, 1, 1); vipLabel.BackgroundTransparency = 1
 
--- --- 2. PANEL PRINCIPAL ---
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 300, 0, 420)
-main.Position = UDim2.new(0.5, -150, 0.4, -210)
-main.BackgroundColor3 = Color3.fromRGB(20, 0, 0)
-main.BackgroundTransparency = 0.2
-main.Visible = false
+main.Size = UDim2.new(0, 300, 0, 400); main.Position = UDim2.new(0.5, -150, 0.5, -200)
+main.BackgroundColor3 = Color3.fromRGB(25, 0, 0); main.Visible = false
 Instance.new("UICorner", main)
 
--- Título con minimizar
 local titleBar = Instance.new("TextLabel", main)
-titleBar.Size = UDim2.new(1, 0, 0, 40)
-titleBar.Text = "  AIMBOT LARDYLAN"
-titleBar.TextColor3 = Color3.new(1, 1, 1)
-titleBar.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
-titleBar.Font = Enum.Font.GothamBold
-titleBar.TextSize = 16
-titleBar.TextXAlignment = Enum.TextXAlignment.Left
+titleBar.Size = UDim2.new(1, 0, 0, 40); titleBar.Text = "  AIMBOT LARDYLAN"; titleBar.TextColor3 = Color3.new(1, 1, 1)
+titleBar.BackgroundColor3 = Color3.fromRGB(70, 0, 0); titleBar.TextXAlignment = "Left"
 
 local miniBtn = Instance.new("TextButton", main)
-miniBtn.Size = UDim2.new(0, 30, 0, 30)
-miniBtn.Position = UDim2.new(1, -35, 0, 5)
-miniBtn.Text = "-"
-miniBtn.TextColor3 = Color3.new(1, 1, 1)
-miniBtn.BackgroundTransparency = 1
-miniBtn.TextSize = 30
+miniBtn.Size = UDim2.new(0, 30, 0, 30); miniBtn.Position = UDim2.new(1, -35, 0, 5)
+miniBtn.Text = "-"; miniBtn.TextColor3 = Color3.new(1, 1, 1); miniBtn.BackgroundTransparency = 1
 
--- --- 3. FUNCIONES DE ARRASTRE ---
+-- --- LÓGICA DE MOVIMIENTO ---
 local function makeDraggable(obj)
-    local dragging, dragInput, dragStart, startPos
+    local dragging, dragStart, startPos
     obj.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true dragStart = input.Position startPos = obj.Position
+            dragging = true; dragStart = input.Position; startPos = obj.Position
         end
     end)
     UserInputService.InputChanged:Connect(function(input)
@@ -75,92 +57,109 @@ local function makeDraggable(obj)
             obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
-    obj.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
+    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
 end
+makeDraggable(floatingBtn); makeDraggable(main)
 
-makeDraggable(main)
-makeDraggable(floatingBtn)
-
--- --- 4. FOV VISUAL ---
+-- --- VISUAL FOV ---
 local fovCircle = Instance.new("Frame", sg)
-fovCircle.Size = UDim2.new(0, 100, 0, 100)
-fovCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
-fovCircle.BackgroundTransparency = 0.8
-fovCircle.BackgroundColor3 = Color3.new(1, 1, 1)
-fovCircle.Visible = false
-Instance.new("UICorner", fovCircle).CornerRadius = UDim.new(1, 0)
+fovCircle.Size = UDim2.new(0, 100, 0, 100); fovCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
+fovCircle.BackgroundColor3 = Color3.new(1, 1, 1); fovCircle.BackgroundTransparency = 0.8
+fovCircle.Visible = false; Instance.new("UICorner", fovCircle).CornerRadius = UDim.new(1, 0)
 
--- --- 5. COMPONENTES DEL MENÚ ---
-local content = Instance.new("ScrollingFrame", main)
-content.Size = UDim2.new(1, 0, 1, -45)
-content.Position = UDim2.new(0, 0, 0, 45)
-content.BackgroundTransparency = 1
-content.CanvasSize = UDim2.new(0, 0, 1.5, 0)
-
-local function createToggle(name, posY, callback)
-    local btn = Instance.new("TextButton", content)
-    btn.Size = UDim2.new(0.9, 0, 0, 35)
-    btn.Position = UDim2.new(0.05, 0, 0, posY)
-    btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-    btn.Text = name .. ": OFF"
-    btn.TextColor3 = Color3.new(1,1,1)
-    Instance.new("UICorner", btn)
-    
-    local state = false
-    btn.MouseButton1Click:Connect(function()
-        state = not state
-        btn.Text = name .. (state and ": ON" or ": OFF")
-        btn.BackgroundColor3 = state and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
-        callback(state)
-    end)
+-- --- FUNCIONES DE COMBATE (UNIVERSALES) ---
+local function getClosestEnemy()
+    local target = nil
+    local shortestDistance = math.huge
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= player and v.Character and v.Character:FindFirstChild("Head") and (v.Team ~= player.Team or v.Team == nil) then
+            local pos, onScreen = camera:WorldToViewportPoint(v.Character.Head.Position)
+            if onScreen then
+                local distance = (Vector2.new(pos.X, pos.Y) - Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)).Magnitude
+                if distance < Settings.FOV and distance < shortestDistance then
+                    target = v.Character.Head
+                    shortestDistance = distance
+                end
+            end
+        end
+    end
+    return target
 end
 
-local function createSlider(name, posY, min, max, callback)
-    local label = Instance.new("TextLabel", content)
-    label.Size = UDim2.new(0.9, 0, 0, 20)
-    label.Position = UDim2.new(0.05, 0, 0, posY)
-    label.Text = name .. ": " .. min
-    label.TextColor3 = Color3.new(1,1,1)
-    label.BackgroundTransparency = 1
-    
-    local sliderBG = Instance.new("Frame", content)
-    sliderBG.Size = UDim2.new(0.8, 0, 0, 10)
-    sliderBG.Position = UDim2.new(0.1, 0, 0, posY + 25)
-    sliderBG.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
-    
-    local fill = Instance.new("TextButton", sliderBG)
-    fill.Size = UDim2.new(0, 10, 1, 0)
-    fill.Text = "|"
-    fill.BackgroundColor3 = Color3.new(1, 0, 0)
-    
-    fill.MouseButton1Click:Connect(function()
-        -- Lógica simplificada de slider al tocar el "|"
-        local currentVal = tonumber(label.Text:match("%d+"))
-        local nextVal = currentVal + 50
-        if nextVal > max then nextVal = min end
-        label.Text = name .. ": " .. nextVal
-        callback(nextVal)
-    end)
-end
-
--- LÓGICA DE BOTONES
-createToggle("AIMBOT", 10, function(v) print("Aimbot:", v) end)
-createSlider("FOV SIZE", 55, 1, 1000, function(v) 
-    fovCircle.Visible = true
-    fovCircle.Size = UDim2.new(0, v, 0, v)
-    fovCircle.Position = UDim2.new(0.5, -v/2, 0.5, -v/2)
+RunService.RenderStepped:Connect(function()
+    -- AIMBOT CABEZA
+    if Settings.Aimbot then
+        local target = getClosestEnemy()
+        if target then
+            camera.CFrame = CFrame.new(camera.CFrame.Position, target.Position)
+        end
+    end
+    -- SPIN
+    if Settings.SpinSpeed > 1 then
+        player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(Settings.SpinSpeed), 0)
+    end
 end)
-createSlider("SPIN SPEED", 110, 1, 1000, function(v) print("Spin:", v) end)
-createToggle("ESP ENEMIES", 165, function(v) print("ESP:", v) end)
-createToggle("ANTENAS", 210, function(v) print("Antenas:", v) end)
 
--- ABRIR / CERRAR
+-- --- ESP Y ANTENAS ---
+local function updateVisuals()
+    for _, v in pairs(game.Players:GetPlayers()) do
+        if v ~= player and v.Character and (v.Team ~= player.Team or v.Team == nil) then
+            -- ESP (Highlight)
+            if Settings.ESP then
+                if not v.Character:FindFirstChild("LardylanESP") then
+                    local highlight = Instance.new("Highlight", v.Character)
+                    highlight.Name = "LardylanESP"; highlight.FillColor = Color3.new(1, 0, 0)
+                end
+            elseif v.Character:FindFirstChild("LardylanESP") then
+                v.Character.LardylanESP:Destroy()
+            end
+            -- ANTENA AZUL
+            if Settings.Antennas then
+                if not v.Character:FindFirstChild("LardylanAntenna") then
+                    local antenna = Instance.new("Part", v.Character)
+                    antenna.Name = "LardylanAntenna"; antenna.Size = Vector3.new(0.2, 5, 0.2)
+                    antenna.Color = Color3.new(0, 0, 1); antenna.CanCollide = false
+                    local weld = Instance.new("Weld", antenna)
+                    weld.Part0 = antenna; weld.Part1 = v.Character.Head; weld.C0 = CFrame.new(0, -2.5, 0)
+                end
+            elseif v.Character:FindFirstChild("LardylanAntenna") then
+                v.Character.LardylanAntenna:Destroy()
+            end
+        end
+    end
+end
+task.spawn(function() while task.wait(1) do updateVisuals() end end)
+
+-- --- BOTONES DEL MENÚ ---
+local function addToggle(name, y, key)
+    local btn = Instance.new("TextButton", main)
+    btn.Size = UDim2.new(0.8, 0, 0, 35); btn.Position = UDim2.new(0.1, 0, 0, y)
+    btn.Text = name .. ": OFF"; btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    btn.MouseButton1Click:Connect(function()
+        Settings[key] = not Settings[key]
+        btn.Text = name .. (Settings[key] and ": ON" or ": OFF")
+        btn.BackgroundColor3 = Settings[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+    end)
+end
+
+addToggle("AIMBOT CABEZA", 50, "Aimbot")
+addToggle("ESP ENEMIES", 100, "ESP")
+addToggle("ANTENAS AZUL", 150, "Antennas")
+
+-- FOV SLIDER (SIMPLIFICADO)
+local fovBtn = Instance.new("TextButton", main)
+fovBtn.Size = UDim2.new(0.8, 0, 0, 35); fovBtn.Position = UDim2.new(0.1, 0, 0, 200)
+fovBtn.Text = "FOV: 1 |---------- 1000"; fovBtn.MouseButton1Click:Connect(function()
+    Settings.FOV = Settings.FOV + 100
+    if Settings.FOV > 1000 then Settings.FOV = 100 end
+    fovBtn.Text = "FOV: " .. Settings.FOV .. " |---------- 1000"
+    fovCircle.Visible = true; fovCircle.Size = UDim2.new(0, Settings.FOV, 0, Settings.FOV)
+    fovCircle.Position = UDim2.new(0.5, -Settings.FOV/2, 0.5, -Settings.FOV/2)
+end)
+
 floatingBtn.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
         main.Visible = not main.Visible
     end
 end)
-
-miniBtn.MouseButton1Click:Connect(function()
-    main.Visible = false
-end)
+miniBtn.MouseButton1Click:Connect(function() main.Visible = false end)
