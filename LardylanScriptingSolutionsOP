@@ -1,165 +1,156 @@
--- AIMBOT LARDYLAN OP - UNIVERSAL VERSION
 local player = game.Players.LocalPlayer
-local camera = workspace.CurrentCamera
 local coreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
--- CONFIGURACIÓN DE FUNCIONES
-local Settings = {
-    Aimbot = false,
-    ESP = false,
-    Antennas = false,
-    FOV = 100,
-    SpinSpeed = 1
-}
-
--- --- INTERFAZ (BOTÓN FLOTANTE Y PANEL) ---
+-- 1. CREACIÓN DEL SCREEN GUI
 local sg = Instance.new("ScreenGui", coreGui)
-local floatingBtn = Instance.new("Frame", sg)
-floatingBtn.Size = UDim2.new(0, 60, 0, 60)
-floatingBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
-floatingBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-Instance.new("UICorner", floatingBtn).CornerRadius = UDim.new(1, 0)
+sg.Name = "Lardylan_Ultimate_OP"
 
-local lvText = Instance.new("TextLabel", floatingBtn)
-lvText.Size = UDim2.new(1, 0, 1, 0); lvText.Text = "LV"; lvText.TextColor3 = Color3.new(1, 1, 0)
-lvText.Font = Enum.Font.GothamBold; lvText.TextSize = 25; lvText.BackgroundTransparency = 1
+-- 2. BOTÓN FLOTANTE (LV)
+local float = Instance.new("Frame", sg)
+float.Size = UDim2.new(0, 60, 0, 60)
+float.Position = UDim2.new(0.1, 0, 0.5, 0)
+float.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Instance.new("UICorner", float).CornerRadius = UDim.new(1, 0)
 
-local vipLabel = Instance.new("TextLabel", floatingBtn)
-vipLabel.Size = UDim2.new(0, 100, 0, 20); vipLabel.Position = UDim2.new(0.5, -50, 1, 5)
-vipLabel.Text = "VIP PREMIUM"; vipLabel.TextColor3 = Color3.new(1, 1, 1); vipLabel.BackgroundTransparency = 1
+local lvTxt = Instance.new("TextLabel", float)
+lvTxt.Size = UDim2.new(1, 0, 1, 0); lvTxt.Text = "LV"; lvTxt.TextColor3 = Color3.new(1, 1, 0)
+lvTxt.Font = Enum.Font.GothamBold; lvTxt.TextSize = 25; lvTxt.BackgroundTransparency = 1
 
+local vipTxt = Instance.new("TextLabel", float)
+vipTxt.Size = UDim2.new(0, 100, 0, 20); vipTxt.Position = UDim2.new(0.5, -50, 1, 5)
+vipTxt.Text = "VIP PREMIUM"; vipTxt.TextColor3 = Color3.new(1, 1, 1); vipTxt.Font = Enum.Font.GothamBold; vipTxt.TextSize = 12; vipTxt.BackgroundTransparency = 1
+
+-- 3. PANEL PRINCIPAL (ESTILO ORIGINAL)
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 300, 0, 400); main.Position = UDim2.new(0.5, -150, 0.5, -200)
-main.BackgroundColor3 = Color3.fromRGB(25, 0, 0); main.Visible = false
-Instance.new("UICorner", main)
+main.Size = UDim2.new(0, 280, 0, 380)
+main.Position = UDim2.new(0.5, -140, 0.4, -190)
+main.BackgroundColor3 = Color3.fromRGB(40, 0, 0) -- Rojo muy oscuro
+main.BackgroundTransparency = 0.3
+main.Visible = false
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
-local titleBar = Instance.new("TextLabel", main)
-titleBar.Size = UDim2.new(1, 0, 0, 40); titleBar.Text = "  AIMBOT LARDYLAN"; titleBar.TextColor3 = Color3.new(1, 1, 1)
-titleBar.BackgroundColor3 = Color3.fromRGB(70, 0, 0); titleBar.TextXAlignment = "Left"
+-- Título y Puntitos Decorativos (Como el original)
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -20, 0, 35); title.Position = UDim2.new(0, 12, 0, 5)
+title.Text = "AIMBOT LARDYLAN"; title.TextColor3 = Color3.new(1, 1, 1); title.BackgroundTransparency = 1
+title.Font = Enum.Font.GothamBold; title.TextSize = 16; title.TextXAlignment = "Left"
 
-local miniBtn = Instance.new("TextButton", main)
-miniBtn.Size = UDim2.new(0, 30, 0, 30); miniBtn.Position = UDim2.new(1, -35, 0, 5)
-miniBtn.Text = "-"; miniBtn.TextColor3 = Color3.new(1, 1, 1); miniBtn.BackgroundTransparency = 1
+local function createDot(color, posX)
+    local dot = Instance.new("Frame", main)
+    dot.Size = UDim2.new(0, 10, 0, 10); dot.Position = UDim2.new(1, posX, 0, 12)
+    dot.BackgroundColor3 = color; Instance.new("UICorner", dot).CornerRadius = UDim.new(1, 0)
+end
+createDot(Color3.fromRGB(0, 100, 255), -20)
+createDot(Color3.fromRGB(255, 50, 50), -40)
+createDot(Color3.fromRGB(0, 0, 0), -60)
 
--- --- LÓGICA DE MOVIMIENTO ---
-local function makeDraggable(obj)
-    local dragging, dragStart, startPos
-    obj.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-            dragging = true; dragStart = input.Position; startPos = obj.Position
-        end
+-- 4. FOV (SOLO LINEAL)
+local fovCircle = Instance.new("Frame", sg)
+fovCircle.BackgroundTransparency = 1; fovCircle.Visible = false
+local stroke = Instance.new("UIStroke", fovCircle)
+stroke.Color = Color3.new(1, 1, 1); stroke.Thickness = 1
+Instance.new("UICorner", fovCircle).CornerRadius = UDim.new(1, 0)
+
+-- 5. VARIABLES DE ESTADO
+local Settings = {Aimbot = false, ESP = false, Antenas = false, FOV = 100, Spin = 0}
+
+-- 6. FUNCIÓN SWITCH (IZQ ROJO / DER VERDE)
+local function createSwitch(texto, posY, callback)
+    local container = Instance.new("Frame", main)
+    container.Size = UDim2.new(0.9, 0, 0, 40); container.Position = UDim2.new(0.05, 0, 0, posY); container.BackgroundTransparency = 1
+    
+    local label = Instance.new("TextLabel", container)
+    label.Size = UDim2.new(0.7, 0, 1, 0); label.Text = texto; label.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    label.BackgroundTransparency = 1; label.Font = "Gotham"; label.TextSize = 13; label.TextXAlignment = "Left"
+
+    local bg = Instance.new("TextButton", container)
+    bg.Size = UDim2.new(0, 44, 0, 20); bg.Position = UDim2.new(1, -48, 0.5, -10)
+    bg.BackgroundColor3 = Color3.fromRGB(180, 40, 40); bg.Text = ""
+    Instance.new("UICorner", bg).CornerRadius = UDim.new(1, 0)
+
+    local circle = Instance.new("Frame", bg)
+    circle.Size = UDim2.new(0, 16, 0, 16); circle.Position = UDim2.new(0, 2, 0.5, -8)
+    circle.BackgroundColor3 = Color3.new(1, 1, 1); Instance.new("UICorner", circle).CornerRadius = UDim.new(1, 0)
+
+    local active = false
+    bg.MouseButton1Click:Connect(function()
+        active = not active
+        TweenService:Create(circle, TweenInfo.new(0.15), {Position = active and UDim2.new(1, -18, 0.5, -8) or UDim2.new(0, 2, 0.5, -8)}):Play()
+        TweenService:Create(bg, TweenInfo.new(0.15), {BackgroundColor3 = active and Color3.fromRGB(40, 180, 40) or Color3.fromRGB(180, 40, 40)}):Play()
+        callback(active)
     end)
+end
+
+-- 7. FUNCIÓN SLIDER (ARRASTRE REAL)
+local function createSlider(texto, posY, max, callback)
+    local lab = Instance.new("TextLabel", main)
+    lab.Size = UDim2.new(0.9, 0, 0, 20); lab.Position = UDim2.new(0.05, 0, 0, posY)
+    lab.Text = texto .. ": 1 |--------------- " .. max; lab.TextColor3 = Color3.new(1,1,1); lab.BackgroundTransparency = 1
+
+    local bar = Instance.new("Frame", main)
+    bar.Size = UDim2.new(0.8, 0, 0, 4); bar.Position = UDim2.new(0.1, 0, 0, posY + 25); bar.BackgroundColor3 = Color3.new(0.4, 0.4, 0.4)
+    
+    local knob = Instance.new("TextButton", bar)
+    knob.Size = UDim2.new(0, 12, 0, 20); knob.Position = UDim2.new(0, 0, 0.5, -10)
+    knob.Text = "|"; knob.BackgroundColor3 = Color3.new(1, 0, 0); knob.TextColor3 = Color3.new(1, 1, 1)
+
+    local dragging = false
+    knob.InputBegan:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = true end end)
     UserInputService.InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-            local delta = input.Position - dragStart
-            obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            local relX = math.clamp((input.Position.X - bar.AbsolutePosition.X) / bar.AbsoluteSize.X, 0, 1)
+            knob.Position = UDim2.new(relX, -6, 0.5, -10)
+            local val = math.floor(relX * max); if val < 1 then val = 1 end
+            lab.Text = texto .. ": " .. val .. " |" .. string.rep("-", 10) .. " " .. max
+            callback(val)
         end
     end)
-    UserInputService.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
-end
-makeDraggable(floatingBtn); makeDraggable(main)
-
--- --- VISUAL FOV ---
-local fovCircle = Instance.new("Frame", sg)
-fovCircle.Size = UDim2.new(0, 100, 0, 100); fovCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
-fovCircle.BackgroundColor3 = Color3.new(1, 1, 1); fovCircle.BackgroundTransparency = 0.8
-fovCircle.Visible = false; Instance.new("UICorner", fovCircle).CornerRadius = UDim.new(1, 0)
-
--- --- FUNCIONES DE COMBATE (UNIVERSALES) ---
-local function getClosestEnemy()
-    local target = nil
-    local shortestDistance = math.huge
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= player and v.Character and v.Character:FindFirstChild("Head") and (v.Team ~= player.Team or v.Team == nil) then
-            local pos, onScreen = camera:WorldToViewportPoint(v.Character.Head.Position)
-            if onScreen then
-                local distance = (Vector2.new(pos.X, pos.Y) - Vector2.new(camera.ViewportSize.X/2, camera.ViewportSize.Y/2)).Magnitude
-                if distance < Settings.FOV and distance < shortestDistance then
-                    target = v.Character.Head
-                    shortestDistance = distance
-                end
-            end
-        end
-    end
-    return target
+    UserInputService.InputEnded:Connect(function() dragging = false end)
 end
 
+-- 8. LÓGICA DE ANTENAS GIGANTES Y ESP
 RunService.RenderStepped:Connect(function()
-    -- AIMBOT CABEZA
-    if Settings.Aimbot then
-        local target = getClosestEnemy()
-        if target then
-            camera.CFrame = CFrame.new(camera.CFrame.Position, target.Position)
-        end
-    end
-    -- SPIN
-    if Settings.SpinSpeed > 1 then
-        player.Character.HumanoidRootPart.CFrame = player.Character.HumanoidRootPart.CFrame * CFrame.Angles(0, math.rad(Settings.SpinSpeed), 0)
-    end
-end)
-
--- --- ESP Y ANTENAS ---
-local function updateVisuals()
-    for _, v in pairs(game.Players:GetPlayers()) do
-        if v ~= player and v.Character and (v.Team ~= player.Team or v.Team == nil) then
-            -- ESP (Highlight)
-            if Settings.ESP then
-                if not v.Character:FindFirstChild("LardylanESP") then
-                    local highlight = Instance.new("Highlight", v.Character)
-                    highlight.Name = "LardylanESP"; highlight.FillColor = Color3.new(1, 0, 0)
+    for _, p in pairs(game.Players:GetPlayers()) do
+        if p ~= player and p.Character and p.Character:FindFirstChild("Head") then
+            local isEnemy = (p.Team ~= player.Team or p.Team == nil)
+            -- Antena Gigante al Cielo
+            if Settings.Antenas and isEnemy then
+                if not p.Character.Head:FindFirstChild("AntenaLardy") then
+                    local a = Instance.new("BoxHandleAdornment", p.Character.Head)
+                    a.Name = "AntenaLardy"; a.Size = Vector3.new(0.5, 5000, 0.5) -- GIGANTE
+                    a.Adornee = p.Character.Head; a.Color3 = Color3.new(0, 0, 1) -- AZUL
+                    a.AlwaysOnTop = true; a.ZIndex = 10
                 end
-            elseif v.Character:FindFirstChild("LardylanESP") then
-                v.Character.LardylanESP:Destroy()
-            end
-            -- ANTENA AZUL
-            if Settings.Antennas then
-                if not v.Character:FindFirstChild("LardylanAntenna") then
-                    local antenna = Instance.new("Part", v.Character)
-                    antenna.Name = "LardylanAntenna"; antenna.Size = Vector3.new(0.2, 5, 0.2)
-                    antenna.Color = Color3.new(0, 0, 1); antenna.CanCollide = false
-                    local weld = Instance.new("Weld", antenna)
-                    weld.Part0 = antenna; weld.Part1 = v.Character.Head; weld.C0 = CFrame.new(0, -2.5, 0)
-                end
-            elseif v.Character:FindFirstChild("LardylanAntenna") then
-                v.Character.LardylanAntenna:Destroy()
+            elseif p.Character.Head:FindFirstChild("AntenaLardy") then
+                p.Character.Head.AntenaLardy:Destroy()
             end
         end
     end
-end
-task.spawn(function() while task.wait(1) do updateVisuals() end end)
-
--- --- BOTONES DEL MENÚ ---
-local function addToggle(name, y, key)
-    local btn = Instance.new("TextButton", main)
-    btn.Size = UDim2.new(0.8, 0, 0, 35); btn.Position = UDim2.new(0.1, 0, 0, y)
-    btn.Text = name .. ": OFF"; btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-    btn.MouseButton1Click:Connect(function()
-        Settings[key] = not Settings[key]
-        btn.Text = name .. (Settings[key] and ": ON" or ": OFF")
-        btn.BackgroundColor3 = Settings[key] and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
-    end)
-end
-
-addToggle("AIMBOT CABEZA", 50, "Aimbot")
-addToggle("ESP ENEMIES", 100, "ESP")
-addToggle("ANTENAS AZUL", 150, "Antennas")
-
--- FOV SLIDER (SIMPLIFICADO)
-local fovBtn = Instance.new("TextButton", main)
-fovBtn.Size = UDim2.new(0.8, 0, 0, 35); fovBtn.Position = UDim2.new(0.1, 0, 0, 200)
-fovBtn.Text = "FOV: 1 |---------- 1000"; fovBtn.MouseButton1Click:Connect(function()
-    Settings.FOV = Settings.FOV + 100
-    if Settings.FOV > 1000 then Settings.FOV = 100 end
-    fovBtn.Text = "FOV: " .. Settings.FOV .. " |---------- 1000"
-    fovCircle.Visible = true; fovCircle.Size = UDim2.new(0, Settings.FOV, 0, Settings.FOV)
-    fovCircle.Position = UDim2.new(0.5, -Settings.FOV/2, 0.5, -Settings.FOV/2)
 end)
 
-floatingBtn.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        main.Visible = not main.Visible
-    end
+-- 9. INICIALIZAR COMPONENTES
+createSwitch("AIMBOT CABEZA", 50, function(v) Settings.Aimbot = v; fovCircle.Visible = v end)
+createSlider("FOV", 95, 1000, function(v) 
+    Settings.FOV = v
+    fovCircle.Size = UDim2.new(0, v, 0, v); fovCircle.Position = UDim2.new(0.5, -v/2, 0.5, -v/2)
 end)
-miniBtn.MouseButton1Click:Connect(function() main.Visible = false end)
+createSlider("SPIN SPEED", 145, 1000, function(v) Settings.Spin = v end)
+createSwitch("ESP ENEMIES", 200, function(v) Settings.ESP = v end)
+createSwitch("ANTENAS GIGANTES", 245, function(v) Settings.Antenas = v end)
+
+-- Movimiento de paneles
+local function makeDraggable(obj)
+    local drag, start, inputP
+    obj.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then drag = true; inputP = i.Position; start = obj.Position end end)
+    UserInputService.InputChanged:Connect(function(i) if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+        local delta = i.Position - inputP
+        obj.Position = UDim2.new(start.X.Scale, start.X.Offset + delta.X, start.Y.Scale, start.Y.Offset + delta.Y)
+    end end)
+    obj.InputEnded:Connect(function() drag = false end)
+end
+makeDraggable(main); makeDraggable(float)
+
+float.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then main.Visible = not main.Visible end end)
