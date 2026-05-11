@@ -1,0 +1,166 @@
+local player = game.Players.LocalPlayer
+local coreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+-- CONTENEDOR PRINCIPAL
+local sg = Instance.new("ScreenGui", coreGui)
+sg.Name = "LardylanMenu"
+
+-- --- 1. BOTÓN FLOTANTE (MINI) ---
+local floatingBtn = Instance.new("Frame", sg)
+floatingBtn.Size = UDim2.new(0, 60, 0, 60)
+floatingBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
+floatingBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+floatingBtn.BorderSizePixel = 0
+floatingBtn.Active = true
+Instance.new("UICorner", floatingBtn).CornerRadius = UDim.new(1, 0)
+
+local lvText = Instance.new("TextLabel", floatingBtn)
+lvText.Size = UDim2.new(1, 0, 1, 0)
+lvText.Text = "LV"
+lvText.TextColor3 = Color3.new(1, 1, 0)
+lvText.Font = Enum.Font.GothamBold
+lvText.TextSize = 25
+lvText.BackgroundTransparency = 1
+
+local vipLabel = Instance.new("TextLabel", floatingBtn)
+vipLabel.Size = UDim2.new(0, 100, 0, 20)
+vipLabel.Position = UDim2.new(0.5, -50, 1, 5)
+vipLabel.Text = "VIP PREMIUM"
+vipLabel.TextColor3 = Color3.new(1, 1, 1)
+vipLabel.Font = Enum.Font.GothamBold
+vipLabel.TextSize = 12
+vipLabel.BackgroundTransparency = 1
+
+-- --- 2. PANEL PRINCIPAL ---
+local main = Instance.new("Frame", sg)
+main.Size = UDim2.new(0, 300, 0, 420)
+main.Position = UDim2.new(0.5, -150, 0.4, -210)
+main.BackgroundColor3 = Color3.fromRGB(20, 0, 0)
+main.BackgroundTransparency = 0.2
+main.Visible = false
+Instance.new("UICorner", main)
+
+-- Título con minimizar
+local titleBar = Instance.new("TextLabel", main)
+titleBar.Size = UDim2.new(1, 0, 0, 40)
+titleBar.Text = "  AIMBOT LARDYLAN"
+titleBar.TextColor3 = Color3.new(1, 1, 1)
+titleBar.BackgroundColor3 = Color3.fromRGB(60, 0, 0)
+titleBar.Font = Enum.Font.GothamBold
+titleBar.TextSize = 16
+titleBar.TextXAlignment = Enum.TextXAlignment.Left
+
+local miniBtn = Instance.new("TextButton", main)
+miniBtn.Size = UDim2.new(0, 30, 0, 30)
+miniBtn.Position = UDim2.new(1, -35, 0, 5)
+miniBtn.Text = "-"
+miniBtn.TextColor3 = Color3.new(1, 1, 1)
+miniBtn.BackgroundTransparency = 1
+miniBtn.TextSize = 30
+
+-- --- 3. FUNCIONES DE ARRASTRE ---
+local function makeDraggable(obj)
+    local dragging, dragInput, dragStart, startPos
+    obj.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true dragStart = input.Position startPos = obj.Position
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            local delta = input.Position - dragStart
+            obj.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    obj.InputEnded:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then dragging = false end end)
+end
+
+makeDraggable(main)
+makeDraggable(floatingBtn)
+
+-- --- 4. FOV VISUAL ---
+local fovCircle = Instance.new("Frame", sg)
+fovCircle.Size = UDim2.new(0, 100, 0, 100)
+fovCircle.Position = UDim2.new(0.5, -50, 0.5, -50)
+fovCircle.BackgroundTransparency = 0.8
+fovCircle.BackgroundColor3 = Color3.new(1, 1, 1)
+fovCircle.Visible = false
+Instance.new("UICorner", fovCircle).CornerRadius = UDim.new(1, 0)
+
+-- --- 5. COMPONENTES DEL MENÚ ---
+local content = Instance.new("ScrollingFrame", main)
+content.Size = UDim2.new(1, 0, 1, -45)
+content.Position = UDim2.new(0, 0, 0, 45)
+content.BackgroundTransparency = 1
+content.CanvasSize = UDim2.new(0, 0, 1.5, 0)
+
+local function createToggle(name, posY, callback)
+    local btn = Instance.new("TextButton", content)
+    btn.Size = UDim2.new(0.9, 0, 0, 35)
+    btn.Position = UDim2.new(0.05, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+    btn.Text = name .. ": OFF"
+    btn.TextColor3 = Color3.new(1,1,1)
+    Instance.new("UICorner", btn)
+    
+    local state = false
+    btn.MouseButton1Click:Connect(function()
+        state = not state
+        btn.Text = name .. (state and ": ON" or ": OFF")
+        btn.BackgroundColor3 = state and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(150, 0, 0)
+        callback(state)
+    end)
+end
+
+local function createSlider(name, posY, min, max, callback)
+    local label = Instance.new("TextLabel", content)
+    label.Size = UDim2.new(0.9, 0, 0, 20)
+    label.Position = UDim2.new(0.05, 0, 0, posY)
+    label.Text = name .. ": " .. min
+    label.TextColor3 = Color3.new(1,1,1)
+    label.BackgroundTransparency = 1
+    
+    local sliderBG = Instance.new("Frame", content)
+    sliderBG.Size = UDim2.new(0.8, 0, 0, 10)
+    sliderBG.Position = UDim2.new(0.1, 0, 0, posY + 25)
+    sliderBG.BackgroundColor3 = Color3.new(0.2, 0.2, 0.2)
+    
+    local fill = Instance.new("TextButton", sliderBG)
+    fill.Size = UDim2.new(0, 10, 1, 0)
+    fill.Text = "|"
+    fill.BackgroundColor3 = Color3.new(1, 0, 0)
+    
+    fill.MouseButton1Click:Connect(function()
+        -- Lógica simplificada de slider al tocar el "|"
+        local currentVal = tonumber(label.Text:match("%d+"))
+        local nextVal = currentVal + 50
+        if nextVal > max then nextVal = min end
+        label.Text = name .. ": " .. nextVal
+        callback(nextVal)
+    end)
+end
+
+-- LÓGICA DE BOTONES
+createToggle("AIMBOT", 10, function(v) print("Aimbot:", v) end)
+createSlider("FOV SIZE", 55, 1, 1000, function(v) 
+    fovCircle.Visible = true
+    fovCircle.Size = UDim2.new(0, v, 0, v)
+    fovCircle.Position = UDim2.new(0.5, -v/2, 0.5, -v/2)
+end)
+createSlider("SPIN SPEED", 110, 1, 1000, function(v) print("Spin:", v) end)
+createToggle("ESP ENEMIES", 165, function(v) print("ESP:", v) end)
+createToggle("ANTENAS", 210, function(v) print("Antenas:", v) end)
+
+-- ABRIR / CERRAR
+floatingBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        main.Visible = not main.Visible
+    end
+end)
+
+miniBtn.MouseButton1Click:Connect(function()
+    main.Visible = false
+end)
