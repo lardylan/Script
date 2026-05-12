@@ -1,0 +1,116 @@
+-- Configuración de Variables
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Mouse = LocalPlayer:GetMouse()
+
+local AimbotEnabled = false
+
+-- 1. CREACIÓN DE LA INTERFAZ (Botón y Texto Inferior)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = game.CoreGui
+
+-- Botón Flotante AIMBOT
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "AimbotButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 100, 0) -- Verde militar
+ToggleButton.Position = UDim2.new(0.1, 0, 0.5, 0)
+ToggleButton.Size = UDim2.new(0, 120, 0, 40)
+ToggleButton.Text = "AIMBOT: OFF"
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.TextSize = 20
+ToggleButton.Draggable = true -- Para que sea flotante y movible
+
+-- Texto "Ejército Mexicano" Gigante abajo
+local FooterText = Instance.new("TextLabel")
+FooterText.Parent = ScreenGui
+FooterText.BackgroundTransparency = 1
+FooterText.Position = UDim2.new(0, 0, 0.85, 0)
+FooterText.Size = UDim2.new(1, 0, 0, 100)
+FooterText.Text = "🔉 Ejército Mexicano"
+FooterText.TextColor3 = Color3.new(1, 0, 0) -- Rojo intenso
+FooterText.TextStrokeTransparency = 0
+FooterText.Font = Enum.Font.LuckiestGuy -- Estilo gigante/divertido
+FooterText.TextSize = 60
+
+-- 2. FUNCIÓN AIMBOT
+ToggleButton.MouseButton1Click:Connect(function()
+    AimbotEnabled = not AimbotEnabled
+    ToggleButton.Text = AimbotEnabled and "AIMBOT: ON" or "AIMBOT: OFF"
+    ToggleButton.BackgroundColor3 = AimbotEnabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(100, 0, 0)
+end)
+
+local function GetClosestPlayer()
+    local target = nil
+    local shortestDistance = math.huge
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local pos = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
+            if magnitude < shortestDistance then
+                target = player
+                shortestDistance = magnitude
+            end
+        end
+    end
+    return target
+end
+
+RunService.RenderStepped:Connect(function()
+    if AimbotEnabled then
+        local target = GetClosestPlayer()
+        if target and target.Character then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.HumanoidRootPart.Position)
+        end
+    end
+end)
+
+-- 3. ESP (Cuadrados) Y ANTENAS (Palitos desde el cielo)
+local function CreateESP(player)
+    local box = Drawing.new("Square")
+    box.Visible = false
+    box.Color = Color3.new(1, 0, 0) -- Rojo para enemigos
+    box.Thickness = 2
+    box.Transparency = 1
+    box.Filled = false
+
+    local antenna = Drawing.new("Line")
+    antenna.Visible = false
+    antenna.Color = Color3.new(1, 1, 1) -- Blanco para la antena
+    antenna.Thickness = 1
+
+    RunService.RenderStepped:Connect(function()
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player ~= LocalPlayer then
+            local rootPart = player.Character.HumanoidRootPart
+            local head = player.Character:FindFirstChild("Head")
+            local pos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
+
+            if onScreen then
+                -- Actualizar Cuadrado (ESP)
+                box.Size = Vector2.new(2000 / pos.Z, 2500 / pos.Z)
+                box.Position = Vector2.new(pos.X - box.Size.X / 2, pos.Y - box.Size.Y / 2)
+                box.Visible = true
+
+                -- Actualizar Antena (Desde el cielo a la cabeza)
+                local headPos = Camera:WorldToViewportPoint(head.Position)
+                antenna.From = Vector2.new(headPos.X, 0) -- Inicia arriba de la pantalla
+                antenna.To = Vector2.new(headPos.X, headPos.Y)
+                antenna.Visible = true
+            else
+                box.Visible = false
+                antenna.Visible = false
+            end
+        else
+            box.Visible = false
+            antenna.Visible = false
+        end
+    end)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    CreateESP(player)
+end
+Players.PlayerAdded:Connect(CreateESP)
