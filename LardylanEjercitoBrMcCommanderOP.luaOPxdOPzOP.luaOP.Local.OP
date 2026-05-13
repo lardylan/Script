@@ -1,0 +1,273 @@
+-- Servicios de Roblox
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Crear la interfaz principal (ScreenGui)
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "EjercitoBrMC_GeneratorGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Elemento remoto solicitado por la estructura
+local remoteEvent = Instance.new("RemoteEvent")
+remoteEvent.Name = "VisualMoneyRemote"
+remoteEvent.Parent = screenGui
+
+-- 1. Ventana Principal (Formato horizontal / acostado)
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 450, 0, 220)
+mainFrame.Position = UDim2.new(0.5, -225, 0.5, -110)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 0, 0) -- Rojo oscuro
+mainFrame.BackgroundTransparency = 0.4 -- Fondo transparente
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true -- Permite mover la interfaz en pantalla
+mainFrame.Parent = screenGui
+
+-- Bordes redondeados para estética
+local frameCorner = Instance.new("UICorner")
+frameCorner.CornerRadius = UDim.new(0, 8)
+frameCorner.Parent = mainFrame
+
+-- 2. Barra de Título
+local titleBar = Instance.new("Frame")
+titleBar.Name = "TitleBar"
+titleBar.Size = UDim2.new(1, 0, 0, 35)
+titleBar.BackgroundTransparency = 1
+titleBar.Parent = mainFrame
+
+-- Botón Triángulo (🔼) arriba a la izquierda
+local openButton = Instance.new("TextButton")
+openButton.Name = "OpenButton"
+openButton.Size = UDim2.new(0, 30, 0, 30)
+openButton.Position = UDim2.new(0, 5, 0, 2)
+openButton.BackgroundTransparency = 1
+openButton.Text = "▲"
+openButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+openButton.TextSize = 18
+openButton.Parent = titleBar
+
+-- Texto Central: 🔉Ejército Br&MC
+local titleText = Instance.new("TextLabel")
+titleText.Name = "TitleText"
+titleText.Size = UDim2.new(1, -120, 1, 0)
+titleText.Position = UDim2.new(0, 60, 0, 0)
+titleText.BackgroundTransparency = 1
+titleText.Text = "🔉Ejército Br&MC"
+titleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleText.TextSize = 18
+titleText.Font = Enum.Font.SourceSansBold
+titleText.TextXAlignment = Enum.TextXAlignment.Center
+titleText.Parent = titleBar
+
+-- Botón Minimizar (-)
+local minimizeButton = Instance.new("TextButton")
+minimizeButton.Name = "MinimizeButton"
+minimizeButton.Size = UDim2.new(0, 30, 0, 30)
+minimizeButton.Position = UDim2.new(1, -65, 0, 2)
+minimizeButton.BackgroundTransparency = 1
+minimizeButton.Text = "-"
+minimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeButton.TextSize = 24
+minimizeButton.Font = Enum.Font.SourceSansBold
+minimizeButton.Parent = titleBar
+
+-- Botón Cerrar (X)
+local closeButton = Instance.new("TextButton")
+closeButton.Name = "CloseButton"
+closeButton.Size = UDim2.new(0, 30, 0, 30)
+closeButton.Position = UDim2.new(1, -35, 0, 2)
+closeButton.BackgroundTransparency = 1
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.TextSize = 18
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.Parent = titleBar
+
+-- Barra de control pequeña (Solo contiene - y X cuando se esconde el menú)
+local collapsedBar = Instance.new("Frame")
+collapsedBar.Name = "CollapsedBar"
+collapsedBar.Size = UDim2.new(0, 80, 0, 35)
+collapsedBar.Position = UDim2.new(0.5, -40, 0, 10)
+collapsedBar.BackgroundColor3 = Color3.fromRGB(40, 0, 0)
+collapsedBar.BackgroundTransparency = 0.4
+collapsedBar.Visible = false
+collapsedBar.Parent = screenGui
+
+local barCorner = Instance.new("UICorner")
+barCorner.CornerRadius = UDim.new(0, 8)
+barCorner.Parent = collapsedBar
+
+-- Contenedor de los botones del menú minimizado
+local minBtn = Instance.new("TextButton")
+minBtn.Size = UDim2.new(0, 30, 1, 0)
+minBtn.Position = UDim2.new(0, 8, 0, 0)
+minBtn.BackgroundTransparency = 1
+minBtn.Text = "-"
+minBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minBtn.TextSize = 24
+minBtn.Parent = collapsedBar
+
+local clsBtn = Instance.new("TextButton")
+clsBtn.Size = UDim2.new(0, 30, 1, 0)
+clsBtn.Position = UDim2.new(1, -38, 0, 0)
+clsBtn.BackgroundTransparency = 1
+clsBtn.Text = "X"
+clsBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+clsBtn.TextSize = 18
+clsBtn.Parent = collapsedBar
+
+-- 3. Panel del Sistema de Key
+local keyPanel = Instance.new("Frame")
+keyPanel.Name = "KeyPanel"
+keyPanel.Size = UDim2.new(1, 0, 1, -35)
+keyPanel.Position = UDim2.new(0, 0, 0, 35)
+keyPanel.BackgroundTransparency = 1
+keyPanel.Parent = mainFrame
+
+local keyLabel = Instance.new("TextLabel")
+keyLabel.Size = UDim2.new(1, 0, 0, 30)
+keyLabel.Position = UDim2.new(0, 0, 0, 20)
+keyLabel.BackgroundTransparency = 1
+keyLabel.Text = "INGRESA LA KEY PARA ACCEDER:"
+keyLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+keyLabel.TextSize = 16
+keyLabel.Font = Enum.Font.SourceSansBold
+keyLabel.Parent = keyPanel
+
+local keyInput = Instance.new("TextBox")
+keyInput.Size = UDim2.new(0, 250, 0, 35)
+keyInput.Position = UDim2.new(0.5, -125, 0, 60)
+keyInput.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+keyInput.Text = ""
+keyInput.PlaceholderText = "Escribe la Key aquí..."
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.TextSize = 16
+keyInput.Parent = keyPanel
+
+local keyCorner = Instance.new("UICorner")
+keyCorner.CornerRadius = UDim.new(0, 5)
+keyCorner.Parent = keyInput
+
+local checkKeyButton = Instance.new "TextButton"
+checkKeyButton.Size = UDim2.new(0, 120, 0, 35)
+checkKeyButton.Position = UDim2.new(0.5, -60, 0, 110)
+checkKeyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
+checkKeyButton.Text = "VERIFICAR"
+checkKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+checkKeyButton.TextSize = 16
+checkKeyButton.Font = Enum.Font.SourceSansBold
+checkKeyButton.Parent = keyPanel
+
+local btnCorner = Instance.new("UICorner")
+btnCorner.CornerRadius = UDim.new(0, 5)
+btnCorner.Parent = checkKeyButton
+
+-- 4. Panel del Generador de Dinero (Oculto hasta validar la Key)
+local generatorPanel = Instance.new("Frame")
+generatorPanel.Name = "GeneratorPanel"
+generatorPanel.Size = UDim2.new(1, 0, 1, -35)
+generatorPanel.Position = UDim2.new(0, 0, 0, 35)
+generatorPanel.BackgroundTransparency = 1
+generatorPanel.Visible = false
+generatorPanel.Parent = mainFrame
+
+local moneyLabel = Instance.new("TextLabel")
+moneyLabel.Size = UDim2.new(1, 0, 0, 30)
+moneyLabel.Position = UDim2.new(0, 0, 0, 15)
+moneyLabel.BackgroundTransparency = 1
+moneyLabel.Text = "PON CUANTA CANTIDAD DE DINERO QUIERES:"
+moneyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+moneyLabel.TextSize = 16
+moneyLabel.Font = Enum.Font.SourceSansBold
+moneyLabel.Parent = generatorPanel
+
+local moneyInput = Instance.new("TextBox")
+moneyInput.Size = UDim2.new(0, 250, 0, 35)
+moneyInput.Position = UDim2.new(0.5, -125, 0, 55)
+moneyInput.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+moneyInput.Text = ""
+moneyInput.PlaceholderText = "----------"
+moneyInput.TextColor3 = Color3.fromRGB(0, 255, 0)
+moneyInput.TextSize = 18
+moneyInput.Font = Enum.Font.Code
+moneyInput.Parent = generatorPanel
+
+local moneyCorner = Instance.new("UICorner")
+moneyCorner.CornerRadius = UDim.new(0, 5)
+moneyCorner.Parent = moneyInput
+
+local generateButton = Instance.new("TextButton")
+generateButton.Size = UDim2.new(0, 150, 0, 40)
+generateButton.Position = UDim2.new(0.5, -75, 0, 110)
+generateButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+generateButton.Text = "GENERAR"
+generateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+generateButton.TextSize = 18
+generateButton.Font = Enum.Font.SourceSansBold
+generateButton.Parent = generatorPanel
+
+local genCorner = Instance.new("UICorner")
+genCorner.CornerRadius = UDim.new(0, 5)
+genCorner.Parent = generateButton
+
+
+-- LÓGICA DE FUNCIONAMIENTO
+
+local correctKey = "GIN-TONICXD"
+
+-- Validación del sistema de Keys
+checkKeyButton.MouseButton1Click:Connect(function()
+	if keyInput.Text == correctKey then
+		keyPanel.Visible = false
+		generatorPanel.Visible = true
+	else
+		keyInput.Text = ""
+		keyInput.PlaceholderText = "¡Key Incorrecta!"
+		task.wait(1.5)
+		keyInput.PlaceholderText = "Escribe la Key aquí..."
+	end
+end)
+
+-- Acción del Botón GENERAR (Modificación Visual Local instantánea)
+generateButton.MouseButton1Click:Connect(function()
+	local targetAmount = tonumber(moneyInput.Text)
+	if targetAmount then
+		-- Busca elementos nativos de la interfaz del juego que muestren el dinero en pantalla (R$)
+		for _, v in pairs(playerGui:GetDescendants()) do
+			if v:IsA("TextLabel") and (string.find(v.Text, "R$") or string.find(v.Text, "R%$")) then
+				-- Sube el valor visual instantáneamente de forma directa en pantalla sin retrasos ni alertas
+				v.Text = "R$" .. string.format("%.1fK", targetAmount / 1000)
+			end
+		end
+	end
+end)
+
+-- Comportamiento de Minimizar / Ocultar Interfaz (-)
+local function hideMenu()
+	mainFrame.Visible = false
+	collapsedBar.Visible = true
+end
+
+local function showMenu()
+	collapsedBar.Visible = false
+	mainFrame.Visible = true
+end
+
+minimizeButton.MouseButton1Click:Connect(hideMenu)
+minBtn.MouseButton1Click:Connect(hideMenu)
+
+-- El botón de triángulo abre el menú completo si estaba colapsado o cerrado
+openButton.MouseButton1Click:Connect(showMenu)
+
+-- Comportamiento del Botón Cerrar (X)
+local function destroyGui()
+	screenGui:Destroy()
+end
+
+closeButton.MouseButton1Click:Connect(destroyGui)
+clsBtn.MouseButton1Click:Connect(destroyGui)
