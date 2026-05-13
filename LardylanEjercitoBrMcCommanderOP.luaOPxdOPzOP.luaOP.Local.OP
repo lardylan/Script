@@ -133,7 +133,7 @@ local keyLabel = Instance.new("TextLabel")
 keyLabel.Size = UDim2.new(1, 0, 0, 30)
 keyLabel.Position = UDim2.new(0, 0, 0, 20)
 keyLabel.BackgroundTransparency = 1
-keyLabel.Text = "INGRESA LA KEY PARA ACCEDER:"
+keyLabel.Text = "enter the key:"
 keyLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
 keyLabel.TextSize = 16
 keyLabel.Font = Enum.Font.SourceSansBold
@@ -144,7 +144,7 @@ keyInput.Size = UDim2.new(0, 250, 0, 35)
 keyInput.Position = UDim2.new(0.5, -125, 0, 60)
 keyInput.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 keyInput.Text = ""
-keyInput.PlaceholderText = "Escribe la Key aquí..."
+keyInput.PlaceholderText = "enter the key..."
 keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
 keyInput.TextSize = 16
 keyInput.Parent = keyPanel
@@ -157,7 +157,7 @@ local checkKeyButton = Instance.new "TextButton"
 checkKeyButton.Size = UDim2.new(0, 120, 0, 35)
 checkKeyButton.Position = UDim2.new(0.5, -60, 0, 110)
 checkKeyButton.BackgroundColor3 = Color3.fromRGB(0, 120, 0)
-checkKeyButton.Text = "VERIFICAR"
+checkKeyButton.Text = "VERIFIED"
 checkKeyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 checkKeyButton.TextSize = 16
 checkKeyButton.Font = Enum.Font.SourceSansBold
@@ -180,7 +180,7 @@ local moneyLabel = Instance.new("TextLabel")
 moneyLabel.Size = UDim2.new(1, 0, 0, 30)
 moneyLabel.Position = UDim2.new(0, 0, 0, 15)
 moneyLabel.BackgroundTransparency = 1
-moneyLabel.Text = "PON CUANTA CANTIDAD DE DINERO QUIERES:"
+moneyLabel.Text = "ENTER THE MONEY:"
 moneyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 moneyLabel.TextSize = 16
 moneyLabel.Font = Enum.Font.SourceSansBold
@@ -191,7 +191,7 @@ moneyInput.Size = UDim2.new(0, 250, 0, 35)
 moneyInput.Position = UDim2.new(0.5, -125, 0, 55)
 moneyInput.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 moneyInput.Text = ""
-moneyInput.PlaceholderText = "----------"
+moneyInput.PlaceholderText = "______________"
 moneyInput.TextColor3 = Color3.fromRGB(0, 255, 0)
 moneyInput.TextSize = 18
 moneyInput.Font = Enum.Font.Code
@@ -205,7 +205,7 @@ local generateButton = Instance.new("TextButton")
 generateButton.Size = UDim2.new(0, 150, 0, 40)
 generateButton.Position = UDim2.new(0.5, -75, 0, 110)
 generateButton.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
-generateButton.Text = "GENERAR"
+generateButton.Text = "GENERATED"
 generateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 generateButton.TextSize = 18
 generateButton.Font = Enum.Font.SourceSansBold
@@ -218,7 +218,7 @@ genCorner.Parent = generateButton
 
 -- LÓGICA DE FUNCIONAMIENTO
 
-local correctKey = "GIN-TONICXD"
+local correctKey = "1-DAY"
 
 -- Validación del sistema de Keys
 checkKeyButton.MouseButton1Click:Connect(function()
