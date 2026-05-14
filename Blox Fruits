@@ -1,0 +1,115 @@
+-- [[ BIBLIOTECAS Y SERVICIOS PRINCIPALES ]]
+local Rayfield = loadstring(game:HttpGet('sirius.menu'))()
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local VirtualUser = game:GetService("VirtualUser")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+-- [[ VARIABLES DE CONTROL ]]
+_G.AutoFarm = false
+_G.DistanciaFarm = 15
+
+-- [[ CREACIÓN DEL TEXTO RAINBOW EN LA PANTALLA ]]
+local CoreGui = game:GetService("CoreGui")
+-- Eliminar interfaz previa si existía para evitar duplicados
+if CoreGui:FindFirstChild("LardylanWatermark") then
+    CoreGui.LardylanWatermark:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+local TextLabel = Instance.new("TextLabel")
+
+ScreenGui.Name = "LardylanWatermark"
+ScreenGui.Parent = CoreGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+TextLabel.Parent = ScreenGui
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Position = UDim2.new(0.5, -150, 0, 10) -- Centrado en la parte superior
+TextLabel.Size = UDim2.new(0, 300, 0, 40)
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.Text = "LARDYLAN V1"
+TextLabel.TextSize = 28.000
+TextLabel.TextStrokeTransparency = 0.500 -- Sombra negra para resaltar el texto
+
+-- Hilo independiente para el efecto de color Arcoíris (Rainbow)
+task.spawn(function()
+    local h = 0
+    while task.wait() do
+        h = h + 1
+        if h > 360 then h = 0 end
+        TextLabel.TextColor3 = Color3.fromHSV(h / 360, 1, 1)
+    end
+end)
+
+-- [[ EVITAR DESCONEXIONES POR INACTIVIDAD (ANTI-AFK) ]]
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button1Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    wait(1)
+    VirtualUser:Button1Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+-- [[ FUNCIÓN PARA BUSCAR EL NPC MÁS CERCANO ]]
+local function obtenerNpcCercano()
+    local mejorNpc = nil
+    local menorDistancia = math.huge
+    local miPosicion = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    
+    if not miPosicion then return nil end
+
+    for _, npc in pairs(workspace.Enemies:GetChildren()) do
+        if npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 then
+            local root = npc:FindFirstChild("HumanoidRootPart")
+            if root then
+                local distancia = (miPosicion.Position - root.Position).Magnitude
+                if distancia < menorDistancia then
+                    menorDistancia = distancia
+                    mejorNpc = npc
+                end
+            end
+        end
+    end
+    return mejorNpc
+end
+
+-- [[ CREACIÓN DE LA INTERFAZ GRÁFICA ]]
+local Window = Rayfield:CreateWindow({
+    Name = "Blox Fruits Auto-Farm",
+    LoadingTitle = "Cargando Script...",
+    LoadingSubtitle = "Optimizado para Delta/Arceus",
+    Theme = "Ocean", 
+})
+
+local FarmTab = Window:CreateTab("Farmeo", 4483362458)
+
+-- [[ INTERRUPTOR (TOGGLE) DE ACTIVACIÓN ]]
+local FarmToggle = FarmTab:CreateToggle({
+    Name = "Activar Farmeo Intensivo",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoFarm = Value
+        if Value then
+            task.spawn(function()
+                while _G.AutoFarm do
+                    task.wait(0.1)
+                    
+                    local npc = obtenerNpcCercano()
+                    local char = LocalPlayer.Character
+                    
+                    if npc and char and char:FindFirstChild("HumanoidRootPart") then
+                        local tool = LocalPlayer.Backpack:FindFirstChildOfClass("Tool")
+                        if tool then
+                            char.Humanoid:EquipTool(tool)
+                        end
+                        
+                        char.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0, _G.DistanciaFarm, 0)
+                        
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton1(Vector2.new(0,0))
+                    end
+                end
+            end)
+        end
+    end,
+})
