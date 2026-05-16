@@ -1,6 +1,5 @@
 -- ====================================================================
--- MOD MENÚ PREMIUM COMPLETO - JUEGO: RIVALS (ROBLOX)
--- KEY SYSTEM INVISIBLE + DESPLEGABLE DE MOD MENÚ GARANTIZADO
+-- MOD MENÚ PREMIUM CON OCULTAMIENTO DE CLAVE - JUEGO: RIVALS (ROBLOX)
 -- COMPATIBLE CON DELTA, CODEX, VEGA X (ANDROID / IOS / PC / TABLETS)
 -- ====================================================================
 
@@ -25,7 +24,9 @@ if CoreGui:FindFirstChild("RivalsUltimateMenu") then CoreGui.RivalsUltimateMenu:
 -- COPIA INVISIBLE DEL LINK DE WHATSAPP AL INICIAR EL SCRIPT
 if setclipboard then setclipboard(WHATSAPP_LINK) end
 
--- 1. CREACIÓN DEL MOD MENÚ PRINCIPAL (ESTRUCTURA APARTADA)
+-- ====================================================================
+-- 1. ESTRUCTURA COMPLETA DEL MOD MENÚ PRINCIPAL POST-VERIFICACIÓN
+-- ====================================================================
 local function buildMainModMenu()
     local mainGui = Instance.new("ScreenGui")
     mainGui.Name = "RivalsUltimateMenu"
@@ -105,7 +106,7 @@ local function buildMainModMenu()
     buttonCorner2.CornerRadius = UDim.new(0, 18)
     buttonCorner2.Parent = aimbotButton
 
-    -- Lógica del minimizado colapsable al cuadrito flotante
+    -- Lógica de minimizado colapsable al cuadrito flotante
     local isMinimized = false
     minimizeButton.MouseButton1Click:Connect(function()
         isMinimized = not isMinimized
@@ -228,7 +229,7 @@ local function buildMainModMenu()
 end
 
 -- ====================================================================
--- 2. CONSTRUCCIÓN DE LA INTERFAZ DEL KEY SYSTEM (APARICIÓN INICIAL)
+-- 2. CONSTRUCCIÓN VISIBLE DE LA INTERFAZ DEL KEY SYSTEM
 -- ====================================================================
 local keyGui = Instance.new("ScreenGui")
 keyGui.Name = "RivalsKeyMenuSystem"
@@ -238,22 +239,22 @@ keyGui.Parent = CoreGui
 local keyFrame = Instance.new("Frame")
 keyFrame.Size = UDim2.new(0, 260, 0, 150)
 keyFrame.Position = UDim2.new(0.5, -130, 0.4, 0)
-keyFrame.BackgroundColor3 = Color3.fromRGB(230, 230, 230) -- Blanco un poco oscuro
+keyFrame.BackgroundColor3 = Color3.fromRGB(230, 230, 230) -- Blanco un poco oscuro (VISIBLE)
 keyFrame.BorderSizePixel = 0
 keyFrame.Active = true
-keyFrame.Draggable = true -- Se mueve fluido arrastrándolo en móviles
+keyFrame.Draggable = true 
 keyFrame.Parent = keyGui
 
 local keyFrameCorner = Instance.new("UICorner")
-keyFrameCorner.CornerRadius = UDim.new(0, 20) -- Bordes redondos de mod menú
+keyFrameCorner.CornerRadius = UDim.new(0, 20) -- Bordes redondos (VISIBLE)
 keyFrameCorner.Parent = keyFrame
 
 local keyFrameStroke = Instance.new("UIStroke")
 keyFrameStroke.Thickness = 2
-keyFrameStroke.Color = Color3.fromRGB(120, 120, 120) -- Lineales redondos grises
+keyFrameStroke.Color = Color3.fromRGB(120, 120, 120) -- Lineales grises (VISIBLE)
 keyFrameStroke.Parent = keyFrame
 
--- TEXTO SUPERIOR: KEY SYSTEM
+-- TEXTO SUPERIOR COMPLETAMENTE VISIBLE: KEY SYSTEM
 local keyTitle = Instance.new("TextLabel")
 keyTitle.Size = UDim2.new(1, 0, 0, 30)
 keyTitle.Position = UDim2.new(0, 0, 0, 10)
@@ -264,7 +265,7 @@ keyTitle.TextSize = 16
 keyTitle.Font = Enum.Font.SourceSansBold
 keyTitle.Parent = keyFrame
 
--- CUADRO DE TEXTO CAMUFLADO (TEXTO INVISIBLE / PASSWORD MODE)
+-- CUADRO DE TEXTO VISIBLE CON CARACTERES OCULTOS (IsPassword = true)
 local keyTextBox = Instance.new("TextBox")
 keyTextBox.Size = UDim2.new(0, 220, 0, 35)
 keyTextBox.Position = UDim2.new(0, 20, 0, 48)
@@ -274,7 +275,7 @@ keyTextBox.PlaceholderText = "Ingresa la clave aqui..."
 keyTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 keyTextBox.TextSize = 14
 keyTextBox.Font = Enum.Font.SourceSans
-keyTextBox.IsPassword = true -- Hace que la contraseña sea invisible/oculta al pegarse
+keyTextBox.IsPassword = true -- SOLO LAS LETRAS SON INVISIBLES AL ESCRIBIRLAS O PEGARLAS
 keyTextBox.Parent = keyFrame
 
 local boxCorner = Instance.new("UICorner")
@@ -286,7 +287,7 @@ boxStroke.Thickness = 1
 boxStroke.Color = Color3.fromRGB(160, 160, 160)
 boxStroke.Parent = keyTextBox
 
--- BOTÓN IZQUIERDO: GET KEY
+-- BOTÓN IZQUIERDO VISIBLE: GET KEY
 local getKeyButton = Instance.new("TextButton")
 getKeyButton.Size = UDim2.new(0, 105, 0, 35)
 getKeyButton.Position = UDim2.new(0, 20, 0, 98)
@@ -301,7 +302,7 @@ local btnCorner1 = Instance.new("UICorner")
 btnCorner1.CornerRadius = UDim.new(0, 12)
 btnCorner1.Parent = getKeyButton
 
--- BOTÓN DERECHO: ENTER KEY
+-- BOTÓN DERECHO VISIBLE: ENTER KEY
 local enterKeyButton = Instance.new("TextButton")
 enterKeyButton.Size = UDim2.new(0, 105, 0, 35)
 enterKeyButton.Position = UDim2.new(0, 135, 0, 98)
@@ -317,7 +318,7 @@ btnCorner2.CornerRadius = UDim.new(0, 12)
 btnCorner2.Parent = enterKeyButton
 
 -- ====================================================================
--- ACCIONES Y GATILLOS DEL SISTEMA DE VERIFICACIÓN
+-- ACCIONES Y COMPROBACIONES DE ACCESO DEL SISTEMA
 -- ====================================================================
 
 getKeyButton.MouseButton1Click:Connect(function()
@@ -335,7 +336,7 @@ enterKeyButton.MouseButton1Click:Connect(function()
         keyTextBox.Text = "ACCESO CONCEDIDO!"
         keyTextBox.TextColor3 = Color3.fromRGB(0, 180, 0)
         
-        -- COPIAR EL ENLACE DE YOUTUBE AUTOMÁTICAMENTE AL ACCEDER EXITOSAMENTE
+        -- COPIAR EL ENLACE DE YOUTUBE AUTOMÁTICAMENTE AL PORTAPAPELES AL PASAR
         if setclipboard then
             setclipboard(YOUTUBE_URL)
         elseif toclipboard then
@@ -346,7 +347,7 @@ enterKeyButton.MouseButton1Click:Connect(function()
         
         task.wait(0.8)
         
-        -- BORRA LA KEY UI Y ABRE EL MOD MENÚ CON UNLOCK ALL / AIMBOT
+        -- BORRA LA KEY UI Y CONSTRUYE EL MOD MENÚ CON UNLOCK ALL / AIMBOT
         keyGui:Destroy()
         buildMainModMenu()
     else
