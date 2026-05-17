@@ -1,6 +1,7 @@
 -- ====================================================================
 -- MOD MENÚ PREMIUM - JUEGO: RIVALS (ROBLOX)
 -- KEY SYSTEM VISIBLE + ACCESO CONFIGURADO CON REDIRECCIÓN A YOUTUBE
+-- EDICIÓN LIMPIA: SIN ENLACES NI FUNCIONES DE WHATSAPP
 -- COMPATIBLE CON DELTA, CODEX, VEGA X (ANDROID / IOS / PC / TABLETS)
 -- ====================================================================
 
@@ -262,7 +263,7 @@ keyTitle.TextSize = 16
 keyTitle.Font = Enum.Font.SourceSansBold
 keyTitle.Parent = keyFrame
 
--- CUADRO DE TEXTO COMPLETAMENTE VISIBLE (SE PUEDEN LEER LAS LETRAS AL ESCRIBIR)
+-- CUADRO DE TEXTO COMPLETAMENTE VISIBLE (SE PUEDEN LEER LAS LETRAS AL ESCRIBIR O PEGAR)
 local keyTextBox = Instance.new("TextBox")
 keyTextBox.Size = UDim2.new(0, 220, 0, 35)
 keyTextBox.Position = UDim2.new(0, 20, 0, 48)
@@ -272,7 +273,7 @@ keyTextBox.PlaceholderText = "Ingresa la clave aqui..."
 keyTextBox.TextColor3 = Color3.fromRGB(0, 0, 0)
 keyTextBox.TextSize = 14
 keyTextBox.Font = Enum.Font.SourceSans
-keyTextBox.IsPassword = false -- DESACTIVADO: EL TEXTO SÍ SE PUEDE VER COMPLETAMENTE
+keyTextBox.IsPassword = false -- CONFIGURADO: LA CLAVE SÍ ES VISIBLE PARA EL USUARIO
 keyTextBox.Parent = keyFrame
 
 local boxCorner = Instance.new("UICorner")
@@ -332,7 +333,7 @@ enterKeyButton.MouseButton1Click:Connect(function()
         keyTextBox.Text = "ACCESO CONCEDIDO!"
         keyTextBox.TextColor3 = Color3.fromRGB(0, 180, 0)
         
-        -- COPIAR LA URL DE YOUTUBE AL PORTAPAPELES AL COINCIDIR LA CLAVE
+        -- COPIAR LA URL DE YOUTUBE AL PORTAPAPELES AL CANJEAR CON ÉXITO
         if setclipboard then
             setclipboard(YOUTUBE_URL)
         elseif toclipboard then
@@ -343,7 +344,7 @@ enterKeyButton.MouseButton1Click:Connect(function()
         
         task.wait(0.8)
         
-        -- BORRA LA KEY UI Y CONSTRUYE EL MOD MENÚ CON UNLOCK ALL / AIMBOT
+        -- BORRA LA UI DE LA LLAVE Y DESPLIEGA EL MOD MENÚ CON UNLOCK ALL / AIMBOT
         keyGui:Destroy()
         buildMainModMenu()
     else
