@@ -1,0 +1,209 @@
+-- FHEX HUB - Roblox Brainrot Panel & Admin System
+-- Colocar este código dentro de un LocalScript
+
+local Players = game:Service("Players")
+local TweenService = game:Service("TweenService")
+local UserInputService = game:Service("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- LISTA DE FRASES BRAINROT
+local brainrotPhrases = {
+	"Skibidi Toilet Rizzler en Ohio",
+	"Sigma Grindset alcanzado con Fanum Tax",
+	"Gyatt detectado en el streamer Kai Cenat",
+	"Mewing nivel dios por 100 días seguidos",
+	"Bebiste la poción de Grimace a las 3 AM",
+	"Baby Gronk devoró el livestream completo",
+	"Livvy Dunne validó tu nivel de Rizz",
+	"¡No eres Sigma, eres un impostor de Ohio!"
+}
+
+-- LISTA DE COMANDOS FHEX HUB
+local adminCommands = {
+	{name = ";fly", desc = "Habilita el modo vuelo en el personaje"},
+	{name = ";speed [num]", desc = "Cambia la velocidad de caminata"},
+	{name = ";jump [num]", desc = "Modifica la fuerza de salto del avatar"},
+	{name = ";infyield", desc = "Simula comandos infinitos en el juego"},
+	{name = ";noclip", desc = "Te permite atravesar las paredes del mapa"},
+	{name = ";btools", desc = "Te otorga herramientas de construcción clásicas"}
+}
+
+-- 1. CREACIÓN DE LA INTERFAZ BASE (GUI)
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "FHEX_Hub_Gui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 2. BOTÓN FLOTANTE "FB" (Para abrir/cerrar el panel)
+local FB_Button = Instance.new("TextButton")
+FB_Button.Name = "FB_Button"
+FB_Button.Size = UDim2.new(0, 60, 0, 60)
+FB_Button.Position = UDim2.new(0.05, 0, 0.4, 0)
+FB_Button.BackgroundColor3 = Color3.fromRGB(138, 43, 226) -- Color Púrpura Fhex
+FB_Button.Text = "FB"
+FB_Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+FB_Button.TextSize = 24
+FB_Button.Font = Enum.Font.SourceSansBold
+FB_Button.Parent = ScreenGui
+
+local UICorner_FB = Instance.new("UICorner")
+UICorner_FB.CornerRadius = UDim.new(1, 0) -- Botón completamente circular
+UICorner_FB.Parent = FB_Button
+
+-- 3. PANEL PRINCIPAL "FHEX HUB" (MÓVIL)
+local MainPanel = Instance.new("Frame")
+MainPanel.Name = "FHEX_Hub_Main"
+MainPanel.Size = UDim2.new(0, 400, 0, 300)
+MainPanel.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainPanel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainPanel.BorderSizePixel = 0
+MainPanel.Visible = false -- Inicia oculto hasta presionar FB
+MainPanel.Parent = ScreenGui
+
+local UICorner_Panel = Instance.new("UICorner")
+UICorner_Panel.CornerRadius = UDim.new(0, 12)
+UICorner_Panel.Parent = MainPanel
+
+-- Barra de Título (Arrastrable)
+local TitleBar = Instance.new("Frame")
+TitleBar.Name = "TitleBar"
+TitleBar.Size = UDim2.new(1, 0, 0, 40)
+TitleBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+TitleBar.BorderSizePixel = 0
+TitleBar.Parent = MainPanel
+
+local UICorner_Title = Instance.new("UICorner")
+UICorner_Title.CornerRadius = UDim.new(0, 12)
+UICorner_Title.Parent = TitleBar
+
+local TitleText = Instance.new("TextLabel")
+TitleText.Size = UDim2.new(1, -40, 1, 0)
+TitleText.Position = UDim2.new(0, 15, 0, 0)
+TitleText.Text = "FHEX HUB - Brainrot Admin v1.0"
+TitleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleText.TextSize = 18
+TitleText.Font = Enum.Font.SourceSansBold
+TitleText.TextXAlignment = Enum.TextXAlignment.Left
+TitleText.BackgroundTransparency = 1
+TitleText.Parent = TitleBar
+
+-- 4. CONTENIDO INTERNO: GENERADOR BRAINROT
+local BrainrotSection = Instance.new("Frame")
+BrainrotSection.Size = UDim2.new(0.5, -15, 1, -55)
+BrainrotSection.Position = UDim2.new(0, 10, 0, 50)
+BrainrotSection.BackgroundTransparency = 1
+BrainrotSection.Parent = MainPanel
+
+local DisplayText = Instance.new("TextLabel")
+DisplayText.Size = UDim2.new(1, 0, 0, 100)
+DisplayText.Position = UDim2.new(0, 0, 0, 10)
+DisplayText.Text = "Presiona el botón para robar Brainrot"
+DisplayText.TextColor3 = Color3.fromRGB(200, 200, 200)
+DisplayText.TextSize = 16
+DisplayText.Font = Enum.Font.SourceSansItalic
+DisplayText.TextWrapped = true
+DisplayText.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+DisplayText.Parent = BrainrotSection
+
+local UICorner_Display = Instance.new("UICorner")
+UICorner_Display.CornerRadius = UDim.new(0, 8)
+UICorner_Display.Parent = DisplayText
+
+local GenerateButton = Instance.new("TextButton")
+GenerateButton.Size = UDim2.new(1, 0, 0, 45)
+GenerateButton.Position = UDim2.new(0, 0, 0, 125)
+GenerateButton.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+GenerateButton.Text = "STEAL BRAINROT 🧠"
+GenerateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+GenerateButton.TextSize = 16
+GenerateButton.Font = Enum.Font.SourceSansBold
+GenerateButton.Parent = BrainrotSection
+
+local UICorner_GenBtn = Instance.new("UICorner")
+UICorner_GenBtn.CornerRadius = UDim.new(0, 8)
+UICorner_GenBtn.Parent = GenerateButton
+
+-- 5. CONTENIDO INTERNO: COMANDOS FHEX HUB
+local CommandsSection = Instance.new("ScrollingFrame")
+CommandsSection.Size = UDim2.new(0.5, -15, 1, -55)
+CommandsSection.Position = UDim2.new(0.5, 5, 0, 50)
+CommandsSection.BackgroundTransparency = 1
+CommandsSection.CanvasSize = UDim2.new(0, 0, 0, #adminCommands * 45)
+CommandsSection.ScrollBarThickness = 6
+CommandsSection.Parent = MainPanel
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.Padding = UDim.new(0, 5)
+UIListLayout.Parent = CommandsSection
+
+for _, cmd in ipairs(adminCommands) do
+	local CmdFrame = Instance.new("Frame")
+	CmdFrame.Size = UDim2.new(1, -10, 0, 40)
+	CmdFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	CmdFrame.Parent = CommandsSection
+	
+	local UICorner_Cmd = Instance.new("UICorner")
+	UICorner_Cmd.CornerRadius = UDim.new(0, 6)
+	UICorner_Cmd.Parent = CmdFrame
+
+	local CmdLabel = Instance.new("TextLabel")
+	CmdLabel.Size = UDim2.new(1, 0, 1, 0)
+	CmdLabel.Position = UDim2.new(0, 10, 0, 0)
+	CmdLabel.Text = cmd.name .. " : " .. cmd.desc
+	CmdLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
+	CmdLabel.TextSize = 14
+	CmdLabel.Font = Enum.Font.SourceSans
+	CmdLabel.TextXAlignment = Enum.TextXAlignment.Left
+	CmdLabel.BackgroundTransparency = 1
+	CmdLabel.Parent = CmdFrame
+end
+
+-- 6. LÓGICA Y FUNCIONALIDADES
+
+-- Intercambiar visibilidad con el botón FB
+FB_Button.MouseButton1Click:Connect(function()
+	MainPanel.Visible = not MainPanel.Visible
+end)
+
+-- Generador de Frases Brainrot
+GenerateButton.MouseButton1Click:Connect(function()
+	local randomPhrase = brainrotPhrases[math.random(1, #brainrotPhrases)]
+	DisplayText.Text = "¡Robaste un pensamiento!:\n\"" .. randomPhrase .. "\""
+end)
+
+-- Sistema de arrastre (Hacer el panel móvil)
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	MainPanel.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+TitleBar.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = MainPanel.Position
+		
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+TitleBar.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
