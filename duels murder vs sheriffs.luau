@@ -1,6 +1,6 @@
 -- ⚔️ LARDYLAN HUB / DUELOS VS SHERIFFS ⚔️
 -- ✅ Clave: ELLARDYLANHUBXD
--- ✅ VEE A TRAVÉS DE PAREDES | Solo Enemigos | Líneas Blancas | HitBox Verde | Muerte Segura
+-- ✅ SOLO ACTIVO EN PVP | En Obby NO funciona | VEE A TRAVÉS DE PAREDES | Solo Enemigos | Líneas Blancas | HitBox Verde | Muerte Segura
 
 repeat task.wait() until game:IsLoaded()
 
@@ -25,6 +25,7 @@ UI.Name = "LARDYLAN_HUB_DUELS"
 UI.Parent = LocalPlayer:WaitForChild("PlayerGui")
 UI.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 UI.AlwaysOnTop = true -- Para que nada lo tape
+UI.Enabled = false -- 🔴 EMPIEZA DESACTIVADO HASTA ENTRAR A PVP
 
 -- TITULO ARRIBA
 local Title = Instance.new("TextLabel")
@@ -41,6 +42,37 @@ Title.AnchorPoint = Vector2.new(0.5, 0)
 
 -- ALMACENAMIENTO
 local Drawings = {}
+local EnZonaPVP = false -- 🔴 VARIABLE PARA SABER DONDE ESTÁS
+
+-- ✅ DETECTAR SI ESTÁS EN ZONA DE PVP
+local function RevisarZona()
+    local char = LocalPlayer.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then
+        EnZonaPVP = false
+        return
+    end
+
+    -- RAYO HACIA ABAJO PARA DETECTAR EL SUELO
+    local suelo = Workspace:FindPartOnRay(Ray.new(char.HumanoidRootPart.Position, Vector3.new(0, -15, 0)), char)
+
+    -- ✅ SI EL SUELO SE LLAMA: PVP, DUELO, COMBATE O ARENA → SE ACTIVA
+    if suelo and (
+       suelo.Name:lower():find("pvp") or 
+       suelo.Name:lower():find("duelo") or 
+       suelo.Name:lower():find("combate") or 
+       suelo.Name:lower():find("arena")
+    ) then
+        EnZonaPVP = true
+        UI.Enabled = true
+    else
+        -- SI ES OBBY, INICIO O CUALQUIER OTRA COSA → SE DESACTIVA
+        EnZonaPVP = false
+        UI.Enabled = false
+        -- BORRA MARCAS SI SALES DE PVP
+        for _,d in pairs(Drawings) do if d then d:Remove() end end
+        Drawings = {}
+    end
+end
 
 -- FUNCIONES
 local function EsEnemigo(jugador)
@@ -62,18 +94,34 @@ local function CrearHitbox(personaje)
         Hitbox.Parent = personaje
         Hitbox.CFrame = personaje.Head.CFrame
         
-        -- SEGUIR LA CABEZA SIEMPRE
+        -- SEGUIR LA CABEZA SOLO SI ESTÁ EN PVP
         RunService.RenderStepped:Connect(function()
             if personaje and personaje:FindFirstChild("Head") and Hitbox then
-                Hitbox.CFrame = personaje.Head.CFrame
-                Hitbox.Visible = true -- ✅ SIEMPRE VISIBLE, AUN DETRÁS DE PAREDES
+                if EnZonaPVP then
+                    Hitbox.CFrame = personaje.Head.CFrame
+                    Hitbox.Visible = true -- ✅ SIEMPRE VISIBLE, AUN DETRÁS DE PAREDES
+                else
+                    Hitbox.Visible = false -- 🔴 OCULTO FUERA DE PVP
+                end
             end
         end)
     end
 end
 
--- DIBUJAR LÍNEAS Y CUADROS
+-- DIBUJAR LÍNEAS Y CUADROS (SOLO SI ESTÁ EN PVP)
 RunService.RenderStepped:Connect(function()
+    RevisarZona() -- 🔴 REVISA LA ZONA CADA FRAME
+
+    -- 🚫 SI NO ESTÁS EN PVP, NO DIBUJA NADA
+    if not EnZonaPVP then
+        for _, dibujo in pairs(Drawings) do
+            if dibujo then dibujo:Remove() end
+        end
+        Drawings = {}
+        return
+    end
+
+    -- ✅ SI ESTÁ EN PVP, HACE LO DE SIEMPRE
     -- BORRA DIBUJOS ANTERIORES
     for _, dibujo in pairs(Drawings) do
         if dibujo then dibujo:Remove() end
@@ -129,8 +177,10 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- 🔫 DETECCIÓN DE TIRO: SI DAS AL VERDE → MUERE
+-- 🔫 DETECCIÓN DE TIRO: SOLO FUNCIONA SI ESTÁS EN PVP
 Mouse.Button1Down:Connect(function()
+    if not EnZonaPVP then return end -- 🚫 SI NO ES PVP, EL TIRO NO HACE NADA
+
     local rayo = Ray.new(Camera.CFrame.Position, (Mouse.Hit.Position - Camera.CFrame.Position).Unit * 1000)
     -- <<< PARÁMETRO ESPECIAL: OMITIR OBSTÁCULOS AL DETECTAR EL TIRO
     local parte, posicionGolpe = Workspace:FindPartOnRay(rayo, LocalPlayer.Character, false, true)
@@ -148,7 +198,7 @@ end)
 
 -- MENSAJE DE CARGA
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "✅ LARDYLAN HUB ACTIVADO",
-    Text = "DUELS ASESINO VS SHERIFFS | Todo listo: Ve paredes + Hitbox Verde",
+    Title = "✅ LARDYLAN HUB CARGADO",
+    Text = "Esperando zona de PVP...",
     Duration = 4
 })
