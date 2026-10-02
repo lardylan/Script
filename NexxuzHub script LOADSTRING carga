@@ -1,0 +1,289 @@
+-- Services
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Función para aplicar IDs de imagen de forma segura en ejecutores
+local function applyImageAsset(imageObject, rawId)
+	local idStr = tostring(rawId):gsub("%D", "") -- Limpiar caracteres no numéricos
+	imageObject.Image = "rbxthumb://type=Asset&id=" .. idStr .. "&w=420&h=420"
+end
+
+-- ScreenGui Principal
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NexxuzHubLoader"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true -- Hace que cubra la pantalla completa tapando la barra superior de Roblox
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+---------------------------------------------------------
+-- 1. PANTALLA DE CARGA (LOADING FRAME)
+---------------------------------------------------------
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Name = "LoadingFrame"
+LoadingFrame.Size = UDim2.new(1, 0, 1, 0)
+LoadingFrame.Position = UDim2.new(0, 0, 0, 0)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
+LoadingFrame.BackgroundTransparency = 0.5
+LoadingFrame.Parent = ScreenGui
+
+-- Texto grande arriba del Ícono: NexxuzHub Cargando...
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Name = "LoadingText"
+LoadingText.Size = UDim2.new(0, 400, 0, 50)
+LoadingText.Position = UDim2.new(0.5, -200, 0.4, -150)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Text = "NexxuzHub Cargando."
+LoadingText.TextColor3 = Color3.fromRGB(0, 191, 255) -- Color Celeste
+LoadingText.TextSize = 28
+LoadingText.Font = Enum.Font.SourceSansBold
+LoadingText.TextScaled = true
+LoadingText.Parent = LoadingFrame
+
+-- Bucle animado para los puntos (...)
+task.spawn(function()
+	local dots = {".", "..", "...", "...."}
+	local index = 1
+	while LoadingFrame.Parent and LoadingFrame.Visible do
+		LoadingText.Text = "NexxuzHub Cargando" .. dots[index]
+		index = (index % #dots) + 1
+		task.wait(0.4)
+	end
+end)
+
+-- Ícono Redondo Gigante del centro
+local CenterIcon = Instance.new("ImageLabel")
+CenterIcon.Name = "CenterIcon"
+CenterIcon.Size = UDim2.new(0, 180, 0, 180)
+CenterIcon.Position = UDim2.new(0.5, -90, 0.4, -80)
+CenterIcon.BackgroundTransparency = 1
+applyImageAsset(CenterIcon, "121337111061204")
+CenterIcon.Parent = LoadingFrame
+
+local UICornerCenter = Instance.new("UICorner")
+UICornerCenter.CornerRadius = UDim.new(1, 0)
+UICornerCenter.Parent = CenterIcon
+
+-- Barrita de Carga Contenedor (Abajo, chocando los bordes)
+local ProgressBarBackground = Instance.new("Frame")
+ProgressBarBackground.Name = "ProgressBarBackground"
+ProgressBarBackground.Size = UDim2.new(1, 0, 0, 15)
+ProgressBarBackground.Position = UDim2.new(0, 0, 1, -15)
+ProgressBarBackground.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ProgressBarBackground.BorderSizePixel = 0
+ProgressBarBackground.Parent = LoadingFrame
+
+-- Barrita de Carga Relleno
+local ProgressBarFill = Instance.new("Frame")
+ProgressBarFill.Name = "ProgressBarFill"
+ProgressBarFill.Size = UDim2.new(0, 0, 1, 0)
+ProgressBarFill.BackgroundColor3 = Color3.fromRGB(0, 200, 100)
+ProgressBarFill.BorderSizePixel = 0
+ProgressBarFill.Parent = ProgressBarBackground
+
+---------------------------------------------------------
+-- 2. GUI PRINCIPAL
+---------------------------------------------------------
+local MainGui = Instance.new("Frame")
+MainGui.Name = "MainGui"
+MainGui.Size = UDim2.new(0, 520, 0, 260)
+MainGui.Position = UDim2.new(0.5, -260, 0.5, -130)
+MainGui.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainGui.ClipsDescendants = true
+MainGui.Visible = false
+MainGui.Parent = ScreenGui
+
+local UICornerMain = Instance.new("UICorner")
+UICornerMain.CornerRadius = UDim.new(0, 12)
+UICornerMain.Parent = MainGui
+
+-- Ícono de fondo
+local BackgroundIcon = Instance.new("ImageLabel")
+BackgroundIcon.Name = "BackgroundIcon"
+BackgroundIcon.Size = UDim2.new(1, 0, 1, 0)
+BackgroundIcon.Position = UDim2.new(0, 0, 0, 0)
+BackgroundIcon.BackgroundTransparency = 1
+applyImageAsset(BackgroundIcon, "87064955652309")
+BackgroundIcon.ImageTransparency = 0.8
+BackgroundIcon.ScaleType = Enum.ScaleType.Crop
+BackgroundIcon.Parent = MainGui
+
+---------------------------------------------------------
+-- 3. BARRA SUPERIOR (HEADER) CON BOTÓN DE CERRAR (X)
+---------------------------------------------------------
+-- Ícono chiquito redondo
+local SmallIcon = Instance.new("ImageLabel")
+SmallIcon.Name = "SmallIcon"
+SmallIcon.Size = UDim2.new(0, 30, 0, 30)
+SmallIcon.Position = UDim2.new(0, 12, 0, 10)
+SmallIcon.BackgroundTransparency = 1
+applyImageAsset(SmallIcon, "121337111061204")
+SmallIcon.Parent = MainGui
+
+local UICornerSmall = Instance.new("UICorner")
+UICornerSmall.CornerRadius = UDim.new(1, 0)
+UICornerSmall.Parent = SmallIcon
+
+-- Texto "NexxuzHub LOADSTRING"
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Name = "TitleLabel"
+TitleLabel.Size = UDim2.new(0, 200, 0, 30)
+TitleLabel.Position = UDim2.new(0, 48, 0, 10)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "NexxuzHub LOADSTRING"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 16
+TitleLabel.Font = Enum.Font.SourceSansBold
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = MainGui
+
+-- Botón Ícono de Discord
+local DiscordIconButton = Instance.new("ImageButton")
+DiscordIconButton.Name = "DiscordIconButton"
+DiscordIconButton.Size = UDim2.new(0, 30, 0, 30)
+DiscordIconButton.Position = UDim2.new(0, 255, 0, 10)
+DiscordIconButton.BackgroundTransparency = 1
+applyImageAsset(DiscordIconButton, "92904714959352")
+DiscordIconButton.Parent = MainGui
+
+-- Texto "COPIED" al lado del ícono de Discord
+local DiscordCopiedText = Instance.new("TextLabel")
+DiscordCopiedText.Name = "DiscordCopiedText"
+DiscordCopiedText.Size = UDim2.new(0, 70, 0, 30)
+DiscordCopiedText.Position = UDim2.new(0, 290, 0, 10)
+DiscordCopiedText.BackgroundTransparency = 1
+DiscordCopiedText.Text = "COPIED"
+DiscordCopiedText.TextColor3 = Color3.fromRGB(0, 255, 120)
+DiscordCopiedText.TextSize = 13
+DiscordCopiedText.Font = Enum.Font.SourceSansBold
+DiscordCopiedText.TextXAlignment = Enum.TextXAlignment.Left
+DiscordCopiedText.Visible = false
+DiscordCopiedText.Parent = MainGui
+
+-- Botón de Cerrar (X)
+local CloseButton = Instance.new("TextButton")
+CloseButton.Name = "CloseButton"
+CloseButton.Size = UDim2.new(0, 30, 0, 30)
+CloseButton.Position = UDim2.new(1, -40, 0, 10)
+CloseButton.BackgroundColor3 = Color3.fromRGB(200, 40, 40)
+CloseButton.Text = "X"
+CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseButton.TextSize = 18
+CloseButton.Font = Enum.Font.SourceSansBold
+CloseButton.Parent = MainGui
+
+local UICornerClose = Instance.new("UICorner")
+UICornerClose.CornerRadius = UDim.new(0, 6)
+UICornerClose.Parent = CloseButton
+
+---------------------------------------------------------
+-- 4. CONTENIDO (LOADSTRING, BOTÓN Y ADVERTENCIA)
+---------------------------------------------------------
+local LoadstringCode = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/lardylan/Script/refs/heads/main/NexxuzHub%20script%20movimiento%20tela"))()'
+
+-- TextBox para ver y copiar la Loadstring
+local LoadstringBox = Instance.new("TextBox")
+LoadstringBox.Name = "LoadstringBox"
+LoadstringBox.Size = UDim2.new(0, 496, 0, 60)
+LoadstringBox.Position = UDim2.new(0, 12, 0, 55)
+LoadstringBox.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+LoadstringBox.BackgroundTransparency = 0.3
+LoadstringBox.Text = LoadstringCode
+LoadstringBox.TextColor3 = Color3.fromRGB(220, 220, 220)
+LoadstringBox.TextSize = 12
+LoadstringBox.Font = Enum.Font.Code
+LoadstringBox.ClearTextOnFocus = false
+LoadstringBox.TextWrapped = true
+LoadstringBox.Parent = MainGui
+
+local UICornerBox = Instance.new("UICorner")
+UICornerBox.CornerRadius = UDim.new(0, 6)
+UICornerBox.Parent = LoadstringBox
+
+-- Botón COPIE
+local CopyButton = Instance.new("TextButton")
+CopyButton.Name = "CopyButton"
+CopyButton.Size = UDim2.new(0, 100, 0, 35)
+CopyButton.Position = UDim2.new(0, 12, 0, 130)
+CopyButton.BackgroundColor3 = Color3.fromRGB(40, 110, 220)
+CopyButton.Text = "COPIE"
+CopyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+CopyButton.TextSize = 15
+CopyButton.Font = Enum.Font.SourceSansBold
+CopyButton.Parent = MainGui
+
+local UICornerBtn = Instance.new("UICorner")
+UICornerBtn.CornerRadius = UDim.new(0, 6)
+UICornerBtn.Parent = CopyButton
+
+-- Texto de estado "copiado"
+local StatusText = Instance.new("TextLabel")
+StatusText.Name = "StatusText"
+StatusText.Size = UDim2.new(0, 80, 0, 35)
+StatusText.Position = UDim2.new(0, 120, 0, 130)
+StatusText.BackgroundTransparency = 1
+StatusText.Text = "copiado"
+StatusText.TextColor3 = Color3.fromRGB(0, 255, 120)
+StatusText.TextSize = 14
+StatusText.Font = Enum.Font.SourceSansBold
+StatusText.TextXAlignment = Enum.TextXAlignment.Left
+StatusText.Visible = false
+StatusText.Parent = MainGui
+
+-- Texto de Advertencia
+local WarningLabel = Instance.new("TextLabel")
+WarningLabel.Name = "WarningLabel"
+WarningLabel.Size = UDim2.new(0, 496, 0, 40)
+WarningLabel.Position = UDim2.new(0, 12, 0, 185)
+WarningLabel.BackgroundTransparency = 1
+WarningLabel.Text = "⚠️ESTE SCRIPT TENDRA KEY ENTRA AL DISCORD SI QUIERES DESBLOQUEARLO⚠️"
+WarningLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
+WarningLabel.TextSize = 13
+WarningLabel.Font = Enum.Font.SourceSansBold
+WarningLabel.TextWrapped = true
+WarningLabel.Parent = MainGui
+
+---------------------------------------------------------
+-- LÓGICA Y FUNCIONES
+---------------------------------------------------------
+local function copyToClipboard(text)
+	if setclipboard then
+		setclipboard(text)
+	elseif toclipboard then
+		toclipboard(text)
+	end
+end
+
+-- Evento Botón Cerrar
+CloseButton.MouseButton1Click:Connect(function()
+	ScreenGui:Destroy()
+end)
+
+-- Evento Botón Ícono Discord
+DiscordIconButton.MouseButton1Click:Connect(function()
+	copyToClipboard("https://discord.gg/J6FGyeNCN")
+	DiscordCopiedText.Visible = true
+	task.delay(2, function()
+		DiscordCopiedText.Visible = false
+	end)
+end)
+
+-- Evento Botón COPIE
+CopyButton.MouseButton1Click:Connect(function()
+	copyToClipboard(LoadstringCode)
+	StatusText.Visible = true
+	task.delay(2, function()
+		StatusText.Visible = false
+	end)
+end)
+
+-- Animación de la barra de carga
+local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
+local tweenProgress = TweenService:Create(ProgressBarFill, tweenInfo, {Size = UDim2.new(1, 0, 1, 0)})
+
+tweenProgress:Play()
+
+tweenProgress.Completed:Connect(function()
+	LoadingFrame.Visible = false
+	MainGui.Visible = true
+end)
