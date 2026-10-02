@@ -1,0 +1,444 @@
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- Destruir interfaz si ya existía para evitar duplicados
+if PlayerGui:FindFirstChild("NexxuzHubGUI") then
+	PlayerGui.NexxuzHubGUI:Destroy()
+end
+
+-- IDs exactos configurados como imágenes de Roblox
+local ID_BOTON_NB = "rbxthumb://type=Asset&id=121337111061204&w=420&h=420"
+local ID_FONDO_KEY = "rbxthumb://type=Asset&id=87064955652309&w=420&h=420"
+local ID_ICONO_DISCORD = "rbxthumb://type=Asset&id=92904714959352&w=420&h=420"
+
+-- ScreenGui Principal
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "NexxuzHubGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = PlayerGui
+
+---------------------------------------------------------
+-- FUNCIONALIDAD PARA MOVER LA INTERFAZ CON EL DEDO/RATÓN
+---------------------------------------------------------
+local function makeDraggable(guiObject)
+	local dragging, dragInput, dragStart, startPos
+
+	guiObject.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragStart = input.Position
+			startPos = guiObject.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	guiObject.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			dragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			guiObject.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X.Offset + delta.X,
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+---------------------------------------------------------
+-- 1. BOTÓN FLOTANTE
+---------------------------------------------------------
+local deltaBtn = Instance.new("ImageButton")
+deltaBtn.Name = "DeltaButton"
+deltaBtn.Size = UDim2.new(0, 55, 0, 55)
+deltaBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+deltaBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+deltaBtn.Image = ID_BOTON_NB
+deltaBtn.Visible = true
+deltaBtn.Parent = screenGui
+
+local deltaBtnCorner = Instance.new("UICorner")
+deltaBtnCorner.CornerRadius = UDim.new(1, 0)
+deltaBtnCorner.Parent = deltaBtn
+
+local deltaBtnStroke = Instance.new("UIStroke")
+deltaBtnStroke.Thickness = 2.5
+deltaBtnStroke.Color = Color3.fromRGB(255, 120, 0)
+deltaBtnStroke.Parent = deltaBtn
+
+makeDraggable(deltaBtn)
+
+---------------------------------------------------------
+-- 2. KEY SYSTEM (BORDES REDONDEADOS)
+---------------------------------------------------------
+local keyFrame = Instance.new("Frame")
+keyFrame.Name = "KeyFrame"
+keyFrame.Size = UDim2.new(0, 330, 0, 200)
+keyFrame.Position = UDim2.new(0.5, -165, 0.5, -100)
+keyFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+keyFrame.ClipsDescendants = true
+keyFrame.Visible = false
+keyFrame.Parent = screenGui
+
+local keyCorner = Instance.new("UICorner")
+keyCorner.CornerRadius = UDim.new(0, 14)
+keyCorner.Parent = keyFrame
+
+local keyStroke = Instance.new("UIStroke")
+keyStroke.Thickness = 2
+keyStroke.Color = Color3.fromRGB(255, 120, 0)
+keyStroke.Parent = keyFrame
+
+local keyBackground = Instance.new("ImageLabel")
+keyBackground.Size = UDim2.new(1, 0, 1, 0)
+keyBackground.Image = ID_FONDO_KEY
+keyBackground.BackgroundTransparency = 0.1
+keyBackground.ScaleType = Enum.ScaleType.Crop
+keyBackground.ZIndex = 1
+keyBackground.Parent = keyFrame
+
+local keyBackgroundCorner = Instance.new("UICorner")
+keyBackgroundCorner.CornerRadius = UDim.new(0, 14)
+keyBackgroundCorner.Parent = keyBackground
+
+local keySmallIcon = Instance.new("ImageLabel")
+keySmallIcon.Size = UDim2.new(0, 26, 0, 26)
+keySmallIcon.Position = UDim2.new(0.04, 0, 0, 8)
+keySmallIcon.Image = ID_BOTON_NB
+keySmallIcon.BackgroundTransparency = 1
+keySmallIcon.ZIndex = 2
+keySmallIcon.Parent = keyFrame
+
+local keySmallIconCorner = Instance.new("UICorner")
+keySmallIconCorner.CornerRadius = UDim.new(1, 0)
+keySmallIconCorner.Parent = keySmallIcon
+
+local titleMain = Instance.new("TextLabel")
+titleMain.Size = UDim2.new(0, 150, 0, 30)
+titleMain.Position = UDim2.new(0.14, 0, 0, 6)
+titleMain.BackgroundTransparency = 1
+titleMain.Text = "NexxuzHub"
+titleMain.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleMain.TextSize = 16
+titleMain.Font = Enum.Font.SourceSansBold
+titleMain.TextXAlignment = Enum.TextXAlignment.Left
+titleMain.ZIndex = 3
+titleMain.Parent = keyFrame
+
+local discordBtnKey = Instance.new("ImageButton")
+discordBtnKey.Size = UDim2.new(0, 24, 0, 24)
+discordBtnKey.Position = UDim2.new(0.88, 0, 0, 8)
+discordBtnKey.Image = ID_ICONO_DISCORD
+discordBtnKey.BackgroundTransparency = 1
+discordBtnKey.ZIndex = 3
+discordBtnKey.Parent = keyFrame
+
+local keyInput = Instance.new("TextBox")
+keyInput.Size = UDim2.new(0.85, 0, 0, 38)
+keyInput.Position = UDim2.new(0.075, 0, 0.38, 0)
+keyInput.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+keyInput.BackgroundTransparency = 0.2
+keyInput.PlaceholderText = "Ingresa la Key..."
+keyInput.Text = ""
+keyInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+keyInput.TextSize = 14
+keyInput.Font = Enum.Font.SourceSans
+keyInput.ZIndex = 2
+keyInput.Parent = keyFrame
+
+local keyInputCorner = Instance.new("UICorner")
+keyInputCorner.CornerRadius = UDim.new(0, 10)
+keyInputCorner.Parent = keyInput
+
+local keyInputStroke = Instance.new("UIStroke")
+keyInputStroke.Thickness = 1.5
+keyInputStroke.Color = Color3.fromRGB(255, 120, 0)
+keyInputStroke.Transparency = 0.5
+keyInputStroke.Parent = keyInput
+
+local submitKeyBtn = Instance.new("TextButton")
+submitKeyBtn.Size = UDim2.new(0.85, 0, 0, 38)
+submitKeyBtn.Position = UDim2.new(0.075, 0, 0.68, 0)
+submitKeyBtn.BackgroundColor3 = Color3.fromRGB(255, 120, 0)
+submitKeyBtn.Text = "VERIFICAR KEY"
+submitKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+submitKeyBtn.TextSize = 14
+submitKeyBtn.Font = Enum.Font.SourceSansBold
+submitKeyBtn.ZIndex = 2
+submitKeyBtn.Parent = keyFrame
+
+local submitCorner = Instance.new("UICorner")
+submitCorner.CornerRadius = UDim.new(0, 10)
+submitCorner.Parent = submitKeyBtn
+
+makeDraggable(keyFrame)
+
+---------------------------------------------------------
+-- 3. GUI PRINCIPAL (BORDES REDONDEADOS Y ANIMACIÓN)
+---------------------------------------------------------
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainExecutorFrame"
+mainFrame.Size = UDim2.new(0, 330, 0, 200)
+mainFrame.Position = UDim2.new(0.5, -165, 0.5, -100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+mainFrame.ClipsDescendants = true
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+local mainCorner = Instance.new("UICorner")
+mainCorner.CornerRadius = UDim.new(0, 14)
+mainCorner.Parent = mainFrame
+
+local mainStroke = Instance.new("UIStroke")
+mainStroke.Thickness = 2
+mainStroke.Color = Color3.fromRGB(255, 120, 0)
+mainStroke.Parent = mainFrame
+
+local mainBackground = Instance.new("ImageLabel")
+mainBackground.Size = UDim2.new(1, 0, 1, 0)
+mainBackground.Image = ID_FONDO_KEY
+mainBackground.BackgroundTransparency = 0.2
+mainBackground.ScaleType = Enum.ScaleType.Crop
+mainBackground.ZIndex = 1
+mainBackground.Parent = mainFrame
+
+local mainBackgroundCorner = Instance.new("UICorner")
+mainBackgroundCorner.CornerRadius = UDim.new(0, 14)
+mainBackgroundCorner.Parent = mainBackground
+
+-- ICONO SUPERIOR
+local mainSmallIcon = Instance.new("ImageLabel")
+mainSmallIcon.Size = UDim2.new(0, 26, 0, 26)
+mainSmallIcon.Position = UDim2.new(0.04, 0, 0, 7)
+mainSmallIcon.Image = ID_BOTON_NB
+mainSmallIcon.BackgroundTransparency = 1
+mainSmallIcon.ZIndex = 3
+mainSmallIcon.Parent = mainFrame
+
+local mainSmallIconCorner = Instance.new("UICorner")
+mainSmallIconCorner.CornerRadius = UDim.new(1, 0)
+mainSmallIconCorner.Parent = mainSmallIcon
+
+-- NOMBRE SUPERIOR
+local mainTitle = Instance.new("TextLabel")
+mainTitle.Size = UDim2.new(0, 150, 0, 40)
+mainTitle.Position = UDim2.new(0.14, 0, 0, 0)
+mainTitle.BackgroundTransparency = 1
+mainTitle.Text = "NexxuzHub TELA"
+mainTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+mainTitle.TextSize = 16
+mainTitle.Font = Enum.Font.SourceSansBold
+mainTitle.TextXAlignment = Enum.TextXAlignment.Left
+mainTitle.ZIndex = 3
+mainTitle.Parent = mainFrame
+
+-- BOTÓN DISCORD
+local discordBtnMain = Instance.new("ImageButton")
+discordBtnMain.Size = UDim2.new(0, 24, 0, 24)
+discordBtnMain.Position = UDim2.new(0.72, 0, 0, 8)
+discordBtnMain.Image = ID_ICONO_DISCORD
+discordBtnMain.BackgroundTransparency = 1
+discordBtnMain.ZIndex = 3
+discordBtnMain.Parent = mainFrame
+
+-- BOTÓN - / +
+local minimizeBtn = Instance.new("TextButton")
+minimizeBtn.Size = UDim2.new(0, 30, 0, 30)
+minimizeBtn.Position = UDim2.new(0.88, 0, 0, 5)
+minimizeBtn.BackgroundTransparency = 1
+minimizeBtn.Text = "-"
+minimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+minimizeBtn.TextSize = 26
+minimizeBtn.Font = Enum.Font.SourceSansBold
+minimizeBtn.ZIndex = 3
+minimizeBtn.Parent = mainFrame
+
+-- CONTENEDOR DE CONTENIDO
+local contentContainer = Instance.new("CanvasGroup")
+contentContainer.Name = "ContentContainer"
+contentContainer.Size = UDim2.new(1, 0, 1, -40)
+contentContainer.Position = UDim2.new(0, 0, 0, 40)
+contentContainer.BackgroundTransparency = 1
+contentContainer.GroupTransparency = 0
+contentContainer.ZIndex = 2
+contentContainer.Parent = mainFrame
+
+local telaToggleBtn = Instance.new("TextButton")
+telaToggleBtn.Size = UDim2.new(0.85, 0, 0, 45)
+telaToggleBtn.Position = UDim2.new(0.075, 0, 0.3, 0)
+telaToggleBtn.BackgroundColor3 = Color3.fromRGB(30, 150, 60)
+telaToggleBtn.Text = "ACTIVAR"
+telaToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+telaToggleBtn.Font = Enum.Font.GothamBold
+telaToggleBtn.TextSize = 16
+telaToggleBtn.ZIndex = 3
+telaToggleBtn.Parent = contentContainer
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0, 10)
+toggleCorner.Parent = telaToggleBtn
+
+makeDraggable(mainFrame)
+
+---------------------------------------------------------
+-- 4. ANIMACIÓN LENTA DE MINIMIZAR / EXPANDIR
+---------------------------------------------------------
+local isMinimized = false
+local isAnimating = false
+
+local tweenInfo = TweenInfo.new(
+	0.5,
+	Enum.EasingStyle.Quart,
+	Enum.EasingDirection.Out
+)
+
+minimizeBtn.MouseButton1Click:Connect(function()
+	if isAnimating then return end
+	isAnimating = true
+
+	if not isMinimized then
+		minimizeBtn.Text = "+"
+		local tweenSize = TweenService:Create(mainFrame, tweenInfo, {Size = UDim2.new(0, 330, 0, 40)})
+		local tweenAlpha = TweenService:Create(contentContainer, tweenInfo, {GroupTransparency = 1})
+
+		tweenSize:Play()
+		tweenAlpha:Play()
+
+		tweenSize.Completed:Connect(function()
+			contentContainer.Visible = false
+			isMinimized = true
+			isAnimating = false
+		end)
+	else
+		minimizeBtn.Text = "-"
+		contentContainer.Visible = true
+		local tweenSize = TweenService:Create(mainFrame, tweenInfo, {Size = UDim2.new(0, 330, 0, 200)})
+		local tweenAlpha = TweenService:Create(contentContainer, tweenInfo, {GroupTransparency = 0})
+
+		tweenSize:Play()
+		tweenAlpha:Play()
+
+		tweenSize.Completed:Connect(function()
+			isMinimized = false
+			isAnimating = false
+		end)
+	end
+end)
+
+---------------------------------------------------------
+-- 5. LÓGICA DE MOVIMIENTO TELA
+---------------------------------------------------------
+local keyUnlocked = false
+local activo = false
+local conexion
+
+local function copyDiscordLink()
+	local discordURL = "https://discord.gg/J6FGyeNCN"
+	if setclipboard then
+		setclipboard(discordURL)
+	elseif toclipboard then
+		toclipboard(discordURL)
+	end
+end
+
+discordBtnKey.MouseButton1Click:Connect(copyDiscordLink)
+discordBtnMain.MouseButton1Click:Connect(copyDiscordLink)
+
+local function configurarPersonaje()
+	local character = LocalPlayer.Character
+	if not character then return end
+
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		humanoid.AutoRotate = not activo
+	end
+end
+
+telaToggleBtn.MouseButton1Click:Connect(function()
+	activo = not activo
+
+	telaToggleBtn.Text = activo and "DESACTIVAR" or "ACTIVAR"
+	telaToggleBtn.BackgroundColor3 = activo
+		and Color3.fromRGB(190, 40, 40)
+		or Color3.fromRGB(30, 150, 60)
+
+	configurarPersonaje()
+
+	if conexion then
+		conexion:Disconnect()
+		conexion = nil
+	end
+
+	if activo then
+		conexion = RunService.RenderStepped:Connect(function()
+			local character = LocalPlayer.Character
+			if not character then return end
+
+			local humanoid = character:FindFirstChildOfClass("Humanoid")
+			local root = character:FindFirstChild("HumanoidRootPart")
+
+			if not humanoid or not root then return end
+
+			local direction = humanoid.MoveDirection
+
+			if direction.Magnitude > 0.05 then
+				local flatDirection = Vector3.new(
+					direction.X,
+					0,
+					direction.Z
+				)
+
+				if flatDirection.Magnitude > 0 then
+					root.CFrame = CFrame.lookAt(
+						root.Position,
+						root.Position + flatDirection.Unit
+					)
+				end
+			end
+		end)
+	end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function()
+	task.wait(1)
+	configurarPersonaje()
+end)
+
+---------------------------------------------------------
+-- 6. CONTROL DE INTERFAZ Y TECLAS
+---------------------------------------------------------
+deltaBtn.MouseButton1Click:Connect(function()
+	if not keyUnlocked then
+		keyFrame.Visible = not keyFrame.Visible
+	else
+		mainFrame.Visible = not mainFrame.Visible
+	end
+end)
+
+submitKeyBtn.MouseButton1Click:Connect(function()
+	if keyInput.Text == "MoTelaNexxuz" then
+		keyUnlocked = true
+		keyFrame.Visible = false
+		mainFrame.Visible = true
+		deltaBtn.Visible = true
+	else
+		keyInput.Text = ""
+		keyInput.PlaceholderText = "Key Incorrecta"
+	end
+end)
