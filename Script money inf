@@ -1,0 +1,101 @@
+-- Cargamos la librería Rayfield
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- Creamos la ventana principal
+local Window = Rayfield:CreateWindow({
+   Name = "NexxuzHub",
+   LoadingTitle = "NexxuzHub Cargando...",
+   LoadingSubtitle = "por ti",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "NexxuzHubConfig",
+      FileName = "Config"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvite",
+      RememberJoins = true
+   },
+   KeySystem = false,
+})
+
+-- Creamos una pestaña
+local Tab = Window:CreateTab("Principal", 4483362458) -- Icono opcional
+
+-- Sección para Dar Dinero
+local SectionMoney = Tab:CreateSection("Sistema de Dinero")
+
+local cantidadDinero = "500000" -- Valor por defecto
+
+-- Input para ingresar la cantidad de dinero
+local InputMoney = Tab:CreateInput({
+   Name = "Cantidad de Dinero",
+   PlaceholderText = "Escribe la cantidad...",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      cantidadDinero = Text
+   end,
+})
+
+-- Botón para ejecutar el evento de dar dinero
+local ButtonMoney = Tab:CreateButton({
+   Name = "Dar Dinero",
+   Callback = function()
+      local success, err = pcall(function()
+         local Event = game:GetService("ReplicatedStorage").CratesUtilities.Remotes.GiveReward
+         Event:FireServer(tostring(cantidadDinero))
+      end)
+      
+      if success then
+         Rayfield:Notify({
+            Title = "Éxito",
+            Content = "Se ha enviado la recompensa de: " .. cantidadDinero,
+            Duration = 3.5,
+            Image = 4483362458,
+         })
+      else
+         Rayfield:Notify({
+            Title = "Error",
+            Content = "No se pudo ejecutar el evento.",
+            Duration = 3.5,
+            Image = 4483362458,
+         })
+      end
+   end,
+})
+
+-- Sección para Ítems
+local SectionItems = Tab:CreateSection("Sección de Ítems")
+
+-- Obtenemos una lista de ejemplo de ítems desde ReplicatedStorage (o una lista estática si la ruta varía)
+local listaItems = {"Ítem 1", "Ítem 2", "Ítem 3"}
+
+-- Si existe la ruta de ítems, intentamos extraer los nombres de los hijos
+pcall(function()
+   local folderItems = game:GetService("ReplicatedStorage").CratesUtilities.Itens
+   if folderItems then
+      listaItems = {}
+      for _, item in ipairs(folderItems:GetChildren()) do
+         table.insert(listaItems, item.Name)
+      end
+   end
+end)
+
+local itemSeleccionado = listaItems[1] or "Ninguno"
+
+-- Dropdown para seleccionar ítems
+local DropdownItems = Tab:CreateDropdown({
+   Name = "Seleccionar Ítem",
+   Options = listaItems,
+   CurrentOption = itemSeleccionado,
+   Flag = "DropdownItems",
+   Callback = function(Option)
+      itemSeleccionado = Option
+      Rayfield:Notify({
+         Title = "Ítem Seleccionado",
+         Content = "Has seleccionado: " .. tostring(Option),
+         Duration = 2,
+         Image = 4483362458,
+      })
+   end,
+})
