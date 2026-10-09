@@ -1,0 +1,56 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "NexvyrToolsVisual",
+   LoadingTitle = "Nexvyr Interface Suite",
+   LoadingSubtitle = "by Nexvyr",
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = "NexvyrConfigs",
+      FileName = "NexvyrVisual"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false, -- Cambia a true si deseas agregar un sistema de claves
+   KeySettings = {
+      Title = "Nexvyr Key",
+      Subtitle = "Sistema de Verificación",
+      Note = "Introduce la clave",
+      FileName = "NexvyrKey",
+      SaveKey = true,
+      GrabKeyFromSite = false,
+      Key = {"1234"}
+   }
+})
+
+-- Creación de una pestaña principal
+local Tab = Window:CreateTab("Herramientas", 4483362458)
+
+-- Ejemplo de un botón interactivo
+Tab:CreateButton({
+   Name = "Botón de Ejemplo",
+   Callback = function()
+      Rayfield:Notify({
+         Title = "Notificación",
+         Content = "¡Has presionado el botón correctamente!",
+         Duration = 6.5,
+         Image = 4483362458,
+      })
+   end,
+})
+
+-- Ejemplo de un Toggle (Interruptor)
+Tab:CreateToggle({
+   Name = "Activar Opción Visual",
+   CurrentValue = false,
+   Flag = "ToggleVisual1", 
+   Callback = function(Value)
+      print("Estado del toggle:", Value)
+   end,
+})
+
+-- Cargar configuración guardada previamente
+Rayfield:LoadConfiguration()
