@@ -1,0 +1,61 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "x2zuToggleGui"
+ScreenGui.ResetOnSpawn = false
+
+local success = pcall(function()
+    ScreenGui.Parent = CoreGui
+end)
+if not success then
+    ScreenGui.Parent = playerGui
+end
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "OpenFluentButton"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(138, 43, 226)
+ToggleButton.BackgroundTransparency = 0.5
+ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+ToggleButton.Size = UDim2.new(0, 140, 0, 35)
+ToggleButton.AutoButtonColor = true
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = "Abrir x2zu"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 14
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.Parent = ToggleButton
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/Fluent.lua"))()
+
+local Window = nil
+
+ToggleButton.MouseButton1Click:Connect(function()
+    if not Window then
+        Window = Fluent:Window({
+            Title = "x2zu [ Stellar ]",
+            Desc = "x2zu on top",
+            Icon = 105059922903197,
+            Theme = "Dark",
+            Config = {
+                Keybind = Enum.KeyCode.LeftControl,
+                Size = UDim2.new(0, 500, 0, 400)
+            },
+            CloseUIButton = {
+                Enabled = true,
+                Text = "x2zu"
+            }
+        })
+        
+        local Tab = Window:AddTab({ Title = "Principal", Icon = "" })
+        Tab:AddParagraph({
+            Title = "Bienvenido",
+            Content = "Interfaz cargada correctamente mediante el botón flotante."
+        })
+    end
+end)
