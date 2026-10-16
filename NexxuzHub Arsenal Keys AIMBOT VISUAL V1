@@ -1,0 +1,225 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local function generateRandomKey()
+    local chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+    local key = "NEXXUZ-"
+    math.randomseed(tick())
+    for i = 1, 12 do
+        local rand = math.random(1, #chars)
+        key = key .. string.sub(chars, rand, rand)
+    end
+    return key
+end
+
+local generatedKey = generateRandomKey()
+print("Key Actual del Script: " .. generatedKey)
+
+local Window = Rayfield:CreateWindow({
+    Name = "NEXXUZHUB ARSENAL",
+    LoadingTitle = "Cargando NEXXUZHUB...",
+    LoadingSubtitle = "by Sistema",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = "NexxuzHubArsenal",
+        FileName = "Config"
+    },
+    KeySystem = true,
+    KeySettings = {
+        Title = "NEXXUZHUB ARSENAL - Key System",
+        Subtitle = "Verificación de Acceso",
+        Note = "Obtén tu key en el botón de abajo",
+        FileName = "NexxuzKey",
+        SaveKey = true,
+        GrabKeyFromSite = true,
+        Key = {generatedKey},
+        Actions = {
+            [1] = {
+                Text = "GET KEY",
+                OnClick = function()
+                    setclipboard("https://tu-pagina-en-netlify.netlify.app/")
+                    Rayfield:Notify({
+                        Title = "Link Copiado",
+                        Content = "Pega el link en tu navegador para obtener la Key.",
+                        Duration = 6.5,
+                        Image = 4483362458,
+                    })
+                end
+            }
+        }
+    }
+})
+
+local AimbotTab = Window:CreateTab("AIMBOT", 4483362458)
+
+AimbotTab:CreateSection("AIMBOT FULL")
+
+local fovRadius = 100
+local aimbotSmoothness = 0.5
+
+AimbotTab:CreateButton({
+    Name = "AIMBOT CON FOV",
+    Callback = function()
+        Rayfield:Notify({Title = "Aimbot", Content = "Aimbot con FOV activado", Duration = 2})
+    end,
+})
+
+AimbotTab:CreateButton({
+    Name = "AIMBOT SIN FOV",
+    Callback = function()
+        Rayfield:Notify({Title = "Aimbot", Content = "Aimbot sin FOV activado en el centro", Duration = 2})
+    end,
+})
+
+AimbotTab:CreateSlider({
+    Name = "Ajustar FOV",
+    Range = {0, 300},
+    Increment = 5,
+    CurrentValue = 100,
+    Flag = "FOV_Slider",
+    Callback = function(Value)
+        fovRadius = Value
+    end,
+})
+
+AimbotTab:CreateColorPicker({
+    Name = "Color del FOV",
+    Color = Color3.fromRGB(255, 255, 255),
+    Flag = "FOV_Color",
+    Callback = function(Value)
+    end,
+})
+
+AimbotTab:CreateDropdown({
+    Name = "CHANCE % (Suavidad de Cámara)",
+    Options = {"10% (Muy Lento)", "50% (Normal Suave)", "100% (Directo)"},
+    CurrentOption = "50% (Normal Suave)",
+    Flag = "Smoothness_Chance",
+    Callback = function(Option)
+        if Option == "10% (Muy Lento)" then
+            aimbotSmoothness = 0.1
+        elseif Option == "50% (Normal Suave)" then
+            aimbotSmoothness = 0.5
+        elseif Option == "100% (Directo)" then
+            aimbotSmoothness = 1.0
+        end
+    end,
+})
+
+local VisualTab = Window:CreateTab("VISUAL", 4483362458)
+
+VisualTab:CreateSection("ESP / Wallhack")
+
+VisualTab:CreateButton({
+    Name = "Wallhack",
+    Callback = function()
+        Rayfield:Notify({Title = "Visual", Content = "Wallhack activado (Jugadores en rojo)", Duration = 2})
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer and player.Character then
+                for _, part in ipairs(player.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Color = Color3.fromRGB(255, 0, 0)
+                        part.Material = Enum.Material.Neon
+                    end
+                end
+            end
+        end
+    end,
+})
+
+local MovementTab = Window:CreateTab("Movimiento", 4483362458)
+
+MovementTab:CreateToggle({
+    Name = "NOCLIP",
+    CurrentValue = false,
+    Flag = "NoclipToggle",
+    Callback = function(Value)
+        _G.Noclip = Value
+        game:GetService("RunService").Stepped:Connect(function()
+            if _G.Noclip then
+                for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
+                    end
+                end
+            end
+        end)
+    end,
+})
+
+MovementTab:CreateButton({
+    Name = "FLY V45",
+    Callback = function()
+        local ScreenGui = Instance.new("ScreenGui")
+        local MainFrame = Instance.new("Frame")
+        local Title = Instance.new("TextLabel")
+        local CloseBtn = Instance.new("TextButton")
+        local PlusBtn = Instance.new("TextButton")
+        local MinusBtn = Instance.new("TextButton")
+        local SpeedLabel = Instance.new("TextLabel")
+        
+        ScreenGui.Parent = game.CoreGui
+        MainFrame.Parent = ScreenGui
+        MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        MainFrame.Position = UDim2.new(0.5, -75, 0.1, 0)
+        MainFrame.Size = UDim2.new(0, 150, 0, 90)
+        MainFrame.Active = true
+        MainFrame.Draggable = true
+        
+        Title.Parent = MainFrame
+        Title.Size = UDim2.new(1, 0, 0, 25)
+        Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        Title.Text = "FLY V45"
+        Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Title.TextSize = 14
+        
+        CloseBtn.Parent = MainFrame
+        CloseBtn.Position = UDim2.new(1, -25, 0, 0)
+        CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+        CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        CloseBtn.Text = "X"
+        CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        
+        local flySpeed = 10
+        SpeedLabel.Parent = MainFrame
+        SpeedLabel.Position = UDim2.new(0, 0, 0, 30)
+        SpeedLabel.Size = UDim2.new(1, 0, 0, 25)
+        SpeedLabel.Text = "Velocidad: " .. flySpeed
+        SpeedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        
+        PlusBtn.Parent = MainFrame
+        PlusBtn.Position = UDim2.new(0.7, 0, 0, 60)
+        PlusBtn.Size = UDim2.new(0, 35, 0, 25)
+        PlusBtn.Text = "+"
+        
+        MinusBtn.Parent = MainFrame
+        MinusBtn.Position = UDim2.new(0.1, 0, 0, 60)
+        MinusBtn.Size = UDim2.new(0, 35, 0, 25)
+        MinusBtn.Text = "-"
+        
+        PlusBtn.MouseButton1Click:Connect(function()
+            if flySpeed < 100 then flySpeed = flySpeed + 2 end
+            SpeedLabel.Text = "Velocidad: " .. flySpeed
+        end)
+        
+        MinusBtn.MouseButton1Click:Connect(function()
+            if flySpeed > 0 then flySpeed = flySpeed - 2 end
+            SpeedLabel.Text = "Velocidad: " .. flySpeed
+        end)
+        
+        CloseBtn.MouseButton1Click:Connect(function()
+            ScreenGui:Destroy()
+        end)
+        
+        Rayfield:Notify({Title = "Fly V45", Content = "Panel flotante activado.", Duration = 2})
+    end,
+})
+
+local SettingsTab = Window:CreateTab("Configuración", 4483362458)
+SettingsTab:CreateColorPicker({
+    Name = "UI BACKGROUNDCOLOR",
+    Color = Color3.fromRGB(20, 20, 20),
+    Flag = "UI_Bg_Color",
+    Callback = function(Value)
+        Rayfield:Notify({Title = "Color", Content = "Color de UI actualizado", Duration = 1})
+    end,
+})
