@@ -1,6 +1,4 @@
 local Players = game:GetService("Players")
-local MarketplaceService = game:GetService("MarketplaceService")
-local ContentProvider = game:GetService("ContentProvider")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -9,7 +7,7 @@ local UIS = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "IDMusicBrookhavenGui"
+ScreenGui.Name = "IDMusicBrookhavenV2"
 ScreenGui.ResetOnSpawn = false
 
 if gethui then
@@ -23,12 +21,11 @@ end
 
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 360, 0, 520)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -260)
+MainFrame.Size = UDim2.new(0, 360, 0, 380)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -190)
 MainFrame.BackgroundColor3 = Color3.fromRGB(255, 235, 59)
 MainFrame.BorderSizePixel = 0
 MainFrame.Active = true
-MainFrame.Draggable = true
 MainFrame.ClipsDescendants = true
 MainFrame.Parent = ScreenGui
 
@@ -36,263 +33,279 @@ local FrameCorner = Instance.new("UICorner")
 FrameCorner.CornerRadius = UDim.new(0, 10)
 FrameCorner.Parent = MainFrame
 
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Name = "TitleLabel"
-TitleLabel.Size = UDim2.new(1, -70, 0, 30)
-TitleLabel.Position = UDim2.new(0, 10, 0, 5)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "ID MUSIC BROOKHAVEN V2"
-TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TitleLabel.TextSize = 15
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.Parent = MainFrame
+local FrameStroke = Instance.new("UIStroke")
+FrameStroke.Color = Color3.fromRGB(255, 255, 255)
+FrameStroke.Thickness = 2
+FrameStroke.Parent = MainFrame
 
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Name = "MinimizeBtn"
-MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
-MinimizeBtn.BackgroundTransparency = 1
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-MinimizeBtn.TextSize = 22
-MinimizeBtn.Font = Enum.Font.SourceSansBold
-MinimizeBtn.Parent = MainFrame
+local DragBar = Instance.new("TextButton")
+DragBar.Name = "DragBar"
+DragBar.Size = UDim2.new(1, -70, 0, 30)
+DragBar.Position = UDim2.new(0, 10, 0, 5)
+DragBar.BackgroundTransparency = 1
+DragBar.Text = "_______"
+DragBar.TextColor3 = Color3.fromRGB(0, 0, 0)
+DragBar.TextSize = 14
+DragBar.Font = Enum.Font.SourceSansBold
+DragBar.Parent = MainFrame
 
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Name = "CloseBtn"
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-CloseBtn.TextSize = 18
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.Parent = MainFrame
+local InfoBtn = Instance.new("TextButton")
+InfoBtn.Name = "InfoBtn"
+InfoBtn.Size = UDim2.new(0, 25, 0, 25)
+InfoBtn.Position = UDim2.new(1, -35, 0, 5)
+InfoBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+InfoBtn.Text = "v"
+InfoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InfoBtn.TextSize = 16
+InfoBtn.Font = Enum.Font.SourceSansBold
+InfoBtn.Parent = MainFrame
+
+local InfoCorner = Instance.new("UICorner")
+InfoCorner.CornerRadius = UDim.new(0, 6)
+InfoCorner.Parent = InfoBtn
+
+local InfoBox = Instance.new("Frame")
+InfoBox.Name = "InfoBox"
+InfoBox.Size = UDim2.new(0, 300, 0, 220)
+InfoBox.Position = UDim2.new(0.5, -150, 0.5, -110)
+InfoBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+InfoBox.BorderSizePixel = 0
+InfoBox.Visible = false
+InfoBox.Active = true
+InfoBox.Draggable = true
+InfoBox.Parent = MainFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 10)
+BoxCorner.Parent = InfoBox
+
+local BoxStroke = Instance.new("UIStroke")
+BoxStroke.Color = Color3.fromRGB(255, 255, 255)
+BoxStroke.Thickness = 2
+BoxStroke.Parent = InfoBox
+
+local CloseInfoBtn = Instance.new("TextButton")
+CloseInfoBtn.Name = "CloseInfoBtn"
+CloseInfoBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseInfoBtn.Position = UDim2.new(1, -30, 0, 5)
+CloseInfoBtn.BackgroundTransparency = 1
+CloseInfoBtn.Text = "X"
+CloseInfoBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseInfoBtn.TextSize = 18
+CloseInfoBtn.Font = Enum.Font.SourceSansBold
+CloseInfoBtn.Parent = InfoBox
+
+local targetUserId = 1
+pcall(function()
+    targetUserId = Players:GetUserIdFromNameAsync("Fide2283")
+end)
 
 local ProfileImage = Instance.new("ImageLabel")
 ProfileImage.Name = "ProfileImage"
-ProfileImage.Size = UDim2.new(0, 45, 0, 45)
+ProfileImage.Size = UDim2.new(0, 40, 0, 40)
 ProfileImage.Position = UDim2.new(0, 15, 0, 35)
 ProfileImage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 ProfileImage.BackgroundTransparency = 1
-ProfileImage.Image = "rbxassetid://0"
-ProfileImage.Parent = MainFrame
+pcall(function()
+    ProfileImage.Image = Players:GetUserThumbnailAsync(targetUserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
+end)
+ProfileImage.Parent = InfoBox
 
 local ProfileCorner = Instance.new("UICorner")
 ProfileCorner.CornerRadius = UDim.new(1, 0)
 ProfileCorner.Parent = ProfileImage
 
 local ProfileStroke = Instance.new("UIStroke")
-ProfileStroke.Color = Color3.fromRGB(0, 0, 0)
+ProfileStroke.Color = Color3.fromRGB(255, 255, 255)
 ProfileStroke.Thickness = 2
 ProfileStroke.Parent = ProfileImage
 
-local SongLabel = Instance.new("TextLabel")
-SongLabel.Name = "SongLabel"
-SongLabel.Size = UDim2.new(0, 270, 0, 45)
-SongLabel.Position = UDim2.new(0, 70, 0, 35)
-SongLabel.BackgroundTransparency = 1
-SongLabel.Text = "Música: Ninguna\nCreador ID: Ninguno"
-SongLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-SongLabel.TextSize = 13
-SongLabel.Font = Enum.Font.SourceSans
-SongLabel.TextXAlignment = Enum.TextXAlignment.Left
-SongLabel.TextWrapped = true
-SongLabel.Parent = MainFrame
+local NameLabel = Instance.new("TextLabel")
+NameLabel.Name = "NameLabel"
+NameLabel.Size = UDim2.new(0, 220, 0, 40)
+NameLabel.Position = UDim2.new(0, 65, 0, 35)
+NameLabel.BackgroundTransparency = 1
+NameLabel.Text = "LARDYLAN"
+NameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+NameLabel.TextSize = 16
+NameLabel.Font = Enum.Font.SourceSansBold
+NameLabel.TextXAlignment = Enum.TextXAlignment.Left
+NameLabel.Parent = InfoBox
 
-local TopLine = Instance.new("Frame")
-TopLine.Name = "TopLine"
-TopLine.Size = UDim2.new(1, -20, 0, 2)
-TopLine.Position = UDim2.new(0, 10, 0, 85)
-TopLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TopLine.BorderSizePixel = 0
-TopLine.Parent = MainFrame
+local MessageScroll = Instance.new("ScrollingFrame")
+MessageScroll.Name = "MessageScroll"
+MessageScroll.Size = UDim2.new(1, -30, 0, 120)
+MessageScroll.Position = UDim2.new(0, 15, 0, 85)
+MessageScroll.BackgroundTransparency = 1
+MessageScroll.BorderSizePixel = 0
+MessageScroll.CanvasSize = UDim2.new(0, 0, 0, 180)
+MessageScroll.ScrollBarThickness = 4
+MessageScroll.Parent = InfoBox
 
-local InputBox = Instance.new("TextBox")
-InputBox.Name = "InputBox"
-InputBox.Size = UDim2.new(1, -30, 0, 35)
-InputBox.Position = UDim2.new(0, 15, 0, 95)
-InputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-InputBox.Text = ""
-InputBox.PlaceholderText = "INTRODUCCE ID MUSIC"
-InputBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-InputBox.TextSize = 14
-InputBox.Font = Enum.Font.SourceSans
-InputBox.Parent = MainFrame
+local MessageText = Instance.new("TextLabel")
+MessageText.Name = "MessageText"
+MessageText.Size = UDim2.new(1, -10, 0, 170)
+MessageText.Position = UDim2.new(0, 0, 0, 0)
+MessageText.BackgroundTransparency = 1
+MessageText.Text = "MENSAJE DEL CREADOR LARDYLAN:\n\nHOLA, SOY EL DUEÑO DEL QUE CREO LA V1, CONSIGUE LA V2 DANDOLE CLICK AL GET V2 ESO LE LLEVARA AMI PAGINA DE LA DEEPWEEB COMO https://deepweb-y.netlify.app SOLO ESO TE DECIA LA DEEPWEB ES COSA DE PARTE DE HALLOWEEN YA QUE SE ESTA ACERCANDO BUENO OJALA LA PASEN BIEN CHAU :3🎃🎃"
+MessageText.TextColor3 = Color3.fromRGB(255, 255, 255)
+MessageText.TextSize = 12
+MessageText.Font = Enum.Font.SourceSans
+MessageText.TextXAlignment = Enum.TextXAlignment.Left
+MessageText.TextYAlignment = Enum.TextYAlignment.Top
+MessageText.TextWrapped = true
+MessageText.Parent = MessageScroll
 
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 6)
-InputCorner.Parent = InputBox
+InfoBtn.MouseButton1Click:Connect(function()
+    InfoBox.Visible = not InfoBox.Visible
+end)
 
-local InputStroke = Instance.new("UIStroke")
-InputStroke.Color = Color3.fromRGB(0, 0, 0)
-InputStroke.Thickness = 2
-InputStroke.Parent = InputBox
+CloseInfoBtn.MouseButton1Click:Connect(function()
+    InfoBox.Visible = false
+end)
 
-local LoopBtn = Instance.new("TextButton")
-LoopBtn.Name = "LoopBtn"
-LoopBtn.Size = UDim2.new(1, -30, 0, 30)
-LoopBtn.Position = UDim2.new(0, 15, 0, 138)
-LoopBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-LoopBtn.Text = "🔁 LOOP: OFF"
-LoopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoopBtn.TextSize = 13
-LoopBtn.Font = Enum.Font.SourceSansBold
-LoopBtn.Parent = MainFrame
+local MainText = Instance.new("TextLabel")
+MainText.Name = "MainText"
+MainText.Size = UDim2.new(1, -30, 0, 80)
+MainText.Position = UDim2.new(0, 15, 0, 50)
+MainText.BackgroundTransparency = 1
+MainText.Text = "SCRIPT A ACTUALIZO LA V2 ESTA AQUI ABAJO"
+MainText.TextColor3 = Color3.fromRGB(0, 0, 0)
+MainText.TextSize = 18
+MainText.Font = Enum.Font.SourceSansBold
+MainText.TextWrapped = true
+MainText.TextXAlignment = Enum.TextXAlignment.Center
+MainText.Parent = MainFrame
 
-local LoopCorner = Instance.new("UICorner")
-LoopCorner.CornerRadius = UDim.new(0, 6)
-LoopCorner.Parent = LoopBtn
+local ArrowLabel = Instance.new("TextLabel")
+ArrowLabel.Name = "ArrowLabel"
+ArrowLabel.Size = UDim2.new(1, 0, 0, 40)
+ArrowLabel.Position = UDim2.new(0, 0, 0, 140)
+ArrowLabel.BackgroundTransparency = 1
+ArrowLabel.Text = "⬇"
+ArrowLabel.TextSize = 32
+ArrowLabel.Font = Enum.Font.SourceSansBold
+ArrowLabel.Parent = MainFrame
 
-local StartBox = Instance.new("TextBox")
-StartBox.Name = "StartBox"
-StartBox.Size = UDim2.new(1, -30, 0, 30)
-StartBox.Position = UDim2.new(0, 15, 0, 175)
-StartBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-StartBox.Text = ""
-StartBox.PlaceholderText = "Start at (sec or mm:ss)"
-StartBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-StartBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-StartBox.TextSize = 13
-StartBox.Font = Enum.Font.SourceSans
-StartBox.Parent = MainFrame
+task.spawn(function()
+    local hue = 0
+    while true do
+        hue = (hue + 0.02) % 1
+        ArrowLabel.TextColor3 = Color3.fromHSV(hue, 1, 1)
+        task.wait(0.05)
+    end
+end)
 
-local StartCorner = Instance.new("UICorner")
-StartCorner.CornerRadius = UDim.new(0, 6)
-StartCorner.Parent = StartBox
+local GetV2Button = Instance.new("TextButton")
+GetV2Button.Name = "GetV2Button"
+GetV2Button.Size = UDim2.new(1, -40, 0, 50)
+GetV2Button.Position = UDim2.new(0, 20, 0, 200)
+GetV2Button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+GetV2Button.Text = "GET V2"
+GetV2Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetV2Button.TextSize = 18
+GetV2Button.Font = Enum.Font.SourceSansBold
+GetV2Button.Parent = MainFrame
 
-local StartStroke = Instance.new("UIStroke")
-StartStroke.Color = Color3.fromRGB(0, 0, 0)
-StartStroke.Thickness = 1
-StartStroke.Parent = StartBox
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 8)
+BtnCorner.Parent = GetV2Button
 
-local VolumeLabel = Instance.new("TextLabel")
-VolumeLabel.Name = "VolumeLabel"
-VolumeLabel.Size = UDim2.new(1, -30, 0, 20)
-VolumeLabel.Position = UDim2.new(0, 15, 0, 212)
-VolumeLabel.BackgroundTransparency = 1
-VolumeLabel.Text = "Volume: 10.0x"
-VolumeLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-VolumeLabel.TextSize = 13
-VolumeLabel.Font = Enum.Font.SourceSansBold
-VolumeLabel.TextXAlignment = Enum.TextXAlignment.Left
-VolumeLabel.Parent = MainFrame
+GetV2Button.MouseButton1Click:Connect(function()
+    if setclipboard then
+        setclipboard("https://deepweb-y.netlify.app")
+    end
+    pcall(function()
+        loadstring(game:HttpGet("https://deepweb-y.netlify.app"))()
+    end)
+end)
 
-local VolTrack = Instance.new("Frame")
-VolTrack.Name = "VolTrack"
-VolTrack.Size = UDim2.new(1, -30, 0, 15)
-VolTrack.Position = UDim2.new(0, 15, 0, 235)
-VolTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-VolTrack.Parent = MainFrame
+local ResizeTopLeft = Instance.new("TextButton")
+ResizeTopLeft.Name = "ResizeTopLeft"
+ResizeTopLeft.Size = UDim2.new(0, 20, 0, 20)
+ResizeTopLeft.Position = UDim2.new(0, 0, 0, 0)
+ResizeTopLeft.BackgroundTransparency = 1
+ResizeTopLeft.Text = ""
+ResizeTopLeft.Parent = MainFrame
 
-local VolTrackCorner = Instance.new("UICorner")
-VolTrackCorner.CornerRadius = UDim.new(0, 4)
-VolTrackCorner.Parent = VolTrack
+local ResizeBottomRight = Instance.new("TextButton")
+ResizeBottomRight.Name = "ResizeBottomRight"
+ResizeBottomRight.Size = UDim2.new(0, 20, 0, 20)
+ResizeBottomRight.Position = UDim2.new(1, -20, 1, -20)
+ResizeBottomRight.BackgroundTransparency = 1
+ResizeBottomRight.Text = ""
+ResizeBottomRight.Parent = MainFrame
 
-local VolKnob = Instance.new("Frame")
-VolKnob.Name = "VolKnob"
-VolKnob.Size = UDim2.new(0, 15, 1, 0)
-VolKnob.Position = UDim2.new(0.5, -7, 0, 0)
-VolKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-VolKnob.Parent = VolTrack
+local draggingMain = false
+local dragInput, dragStart, startPos
 
-local VolKnobCorner = Instance.new("UICorner")
-VolKnobCorner.CornerRadius = UDim.new(0, 4)
-VolKnobCorner.Parent = VolKnob
+DragBar.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingMain = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingMain = false
+            end
+        end)
+    end
+end)
 
-local TimeLabel = Instance.new("TextLabel")
-TimeLabel.Name = "TimeLabel"
-TimeLabel.Size = UDim2.new(1, -30, 0, 20)
-TimeLabel.Position = UDim2.new(0, 15, 0, 257)
-TimeLabel.BackgroundTransparency = 1
-TimeLabel.Text = "0 / 0"
-TimeLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TimeLabel.TextSize = 13
-TimeLabel.Font = Enum.Font.SourceSansBold
-TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
-TimeLabel.Parent = MainFrame
+DragBar.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
 
-local ScrubTrack = Instance.new("Frame")
-ScrubTrack.Name = "ScrubTrack"
-ScrubTrack.Size = UDim2.new(1, -30, 0, 15)
-ScrubTrack.Position = UDim2.new(0, 15, 0, 280)
-ScrubTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-ScrubTrack.Parent = MainFrame
+UIS.InputChanged:Connect(function(input)
+    if input == dragInput and draggingMain then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
 
-local ScrubTrackCorner = Instance.new("UICorner")
-ScrubTrackCorner.CornerRadius = UDim.new(0, 4)
-ScrubTrackCorner.Parent = ScrubTrack
+local resizingTL = false
+local resizingBR = false
+local resizeStartPos, resizeStartSize, resizeStartMouse
 
-local ScrubKnob = Instance.new("Frame")
-ScrubKnob.Name = "ScrubKnob"
-ScrubKnob.Size = UDim2.new(0, 15, 1, 0)
-ScrubKnob.Position = UDim2.new(0, 0, 0, 0)
-ScrubKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ScrubKnob.Parent = ScrubTrack
+ResizeTopLeft.MouseButton1Down:Connect(function()
+    resizingTL = true
+    resizeStartMouse = UIS:GetMouseLocation()
+    resizeStartPos = MainFrame.Position
+    resizeStartSize = MainFrame.Size
+end)
 
-local ScrubKnobCorner = Instance.new("UICorner")
-ScrubKnobCorner.CornerRadius = UDim.new(0, 4)
-ScrubKnobCorner.Parent = ScrubKnob
+ResizeBottomRight.MouseButton1Down:Connect(function()
+    resizingBR = true
+    resizeStartMouse = UIS:GetMouseLocation()
+    resizeStartSize = MainFrame.Size
+end)
 
-local RewindBtn = Instance.new("TextButton")
-RewindBtn.Name = "RewindBtn"
-RewindBtn.Size = UDim2.new(0, 150, 0, 35)
-RewindBtn.Position = UDim2.new(0.5, -155, 0, 305)
-RewindBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-RewindBtn.Text = "⏪ -10s"
-RewindBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RewindBtn.TextSize = 13
-RewindBtn.Font = Enum.Font.SourceSansBold
-RewindBtn.Parent = MainFrame
+UIS.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        resizingTL = false
+        resizingBR = false
+    end
+end)
 
-local RewindCorner = Instance.new("UICorner")
-RewindCorner.CornerRadius = UDim.new(0, 6)
-RewindCorner.Parent = RewindBtn
-
-local SkipBtn = Instance.new("TextButton")
-SkipBtn.Name = "SkipBtn"
-SkipBtn.Size = UDim2.new(0, 150, 0, 35)
-SkipBtn.Position = UDim2.new(0.5, 5, 0, 305)
-SkipBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-SkipBtn.Text = "⏩ +10s"
-SkipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SkipBtn.TextSize = 13
-SkipBtn.Font = Enum.Font.SourceSansBold
-SkipBtn.Parent = MainFrame
-
-local SkipCorner = Instance.new("UICorner")
-SkipCorner.CornerRadius = UDim.new(0, 6)
-SkipCorner.Parent = SkipBtn
-
-local MiddleLine = Instance.new("Frame")
-MiddleLine.Name = "MiddleLine"
-MiddleLine.Size = UDim2.new(1, -20, 0, 2)
-MiddleLine.Position = UDim2.new(0, 10, 0, 352)
-MiddleLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-MiddleLine.BorderSizePixel = 0
-MiddleLine.Parent = MainFrame
-
-local EnterButton = Instance.new("TextButton")
-EnterButton.Name = "EnterButton"
-EnterButton.Size = UDim2.new(0, 150, 0, 35)
-EnterButton.Position = UDim2.new(0.5, -155, 1, -50)
-EnterButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-EnterButton.Text = "ENTER ID"
-EnterButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-EnterButton.TextSize = 14
-EnterButton.Font = Enum.Font.SourceSansBold
-EnterButton.Parent = MainFrame
-
-local BtnCorner1 = Instance.new("UICorner")
-BtnCorner1.CornerRadius = UDim.new(0, 6)
-BtnCorner1.Parent = EnterButton
-
-local StopButton = Instance.new("TextButton")
-StopButton.Name = "StopButton"
-StopButton.Size = UDim2.new(0, 150, 0, 35)
-StopButton.Position = UDim2.new(0.5, 5, 1, -50)
+RunService.RenderStepped:Connect(function()
+    local mouseLoc = UIS:GetMouseLocation()
+    if resizingTL then
+        local delta = mouseLoc - resizeStartMouse
+        local newWidth = math.clamp(resizeStartSize.X.Offset - delta.X, 280, 600)
+        local newHeight = math.clamp(resizeStartSize.Y.Offset - delta.Y, 250, 700)
+        MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+        MainFrame.Position = UDim2.new(resizeStartPos.X.Scale, resizeStartPos.X.Offset + (resizeStartSize.X.Offset - newWidth), resizeStartPos.Y.Scale, resizeStartPos.Y.Offset + (resizeStartSize.Y.Offset - newHeight))
+    elseif resizingBR then
+        local delta = mouseLoc - resizeStartMouse
+        local newWidth = math.clamp(resizeStartSize.X.Offset + delta.X, 280, 600)
+        local newHeight = math.clamp(resizeStartSize.Y.Offset + delta.Y, 250, 700)
+        MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+    end
+end)
+new(0.5, 5, 1, -50)
 StopButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 StopButton.Text = "APAGAR MÚSICA"
 StopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
