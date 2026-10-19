@@ -1,297 +1,217 @@
 local Players = game:GetService("Players")
-local MarketplaceService = game:GetService("MarketplaceService")
-local ContentProvider = game:GetService("ContentProvider")
-local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
+local SoundService = game:GetService("SoundService")
 local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 
-local LocalPlayer = Players.LocalPlayer
+local player = Players.LocalPlayer
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "IDMusicBrookhavenGui"
-ScreenGui.ResetOnSpawn = false
+local gui = Instance.new("ScreenGui")
+gui.Name = "ID MUSIC BROOKHAVEN V2"
+gui.Parent = player:WaitForChild("PlayerGui")
+gui.ResetOnSpawn = false
 
-if gethui then
-    ScreenGui.Parent = gethui()
-elseif syn and syn.protect_gui then
-    syn.protect_gui(ScreenGui)
-    ScreenGui.Parent = CoreGui
-else
-    ScreenGui.Parent = CoreGui
-end
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.fromScale(0.6, 0.7)
+frame.Position = UDim2.fromScale(0.2, 0.15)
+frame.BackgroundColor3 = Color3.fromRGB(35,35,35)
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 360, 0, 310)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -155)
-MainFrame.BackgroundColor3 = Color3.fromRGB(255, 235, 59)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.Draggable = true
-MainFrame.ClipsDescendants = true
-MainFrame.Parent = ScreenGui
+local toggleBtn = Instance.new("TextButton", gui)
+toggleBtn.Size = UDim2.fromScale(0.25,0.1)
+toggleBtn.Position = UDim2.fromScale(0.05,0.05)
+toggleBtn.Text = "🎵 ID MUSIC BROOKHAVEN V2"
+toggleBtn.TextScaled = true
+toggleBtn.Active = true
+toggleBtn.Draggable = true
+toggleBtn.BackgroundColor3 = Color3.fromRGB(60,60,60)
+toggleBtn.TextColor3 = Color3.new(1,1,1)
 
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 10)
-FrameCorner.Parent = MainFrame
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Name = "TitleLabel"
-TitleLabel.Size = UDim2.new(1, -70, 0, 30)
-TitleLabel.Position = UDim2.new(0, 10, 0, 5)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "ID MUSIC BROOKHAVEN V1"
-TitleLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TitleLabel.TextSize = 15
-TitleLabel.Font = Enum.Font.SourceSansBold
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.Parent = MainFrame
-
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Name = "MinimizeBtn"
-MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
-MinimizeBtn.BackgroundTransparency = 1
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-MinimizeBtn.TextSize = 22
-MinimizeBtn.Font = Enum.Font.SourceSansBold
-MinimizeBtn.Parent = MainFrame
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Name = "CloseBtn"
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-CloseBtn.TextSize = 18
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.Parent = MainFrame
-
-local ProfileImage = Instance.new("ImageLabel")
-ProfileImage.Name = "ProfileImage"
-ProfileImage.Size = UDim2.new(0, 45, 0, 45)
-ProfileImage.Position = UDim2.new(0, 15, 0, 35)
-ProfileImage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ProfileImage.BackgroundTransparency = 1
-ProfileImage.Image = "rbxassetid://0"
-ProfileImage.Parent = MainFrame
-
-local ProfileCorner = Instance.new("UICorner")
-ProfileCorner.CornerRadius = UDim.new(1, 0)
-ProfileCorner.Parent = ProfileImage
-
-local ProfileStroke = Instance.new("UIStroke")
-ProfileStroke.Color = Color3.fromRGB(0, 0, 0)
-ProfileStroke.Thickness = 2
-ProfileStroke.Parent = ProfileImage
-
-local SongLabel = Instance.new("TextLabel")
-SongLabel.Name = "SongLabel"
-SongLabel.Size = UDim2.new(0, 270, 0, 45)
-SongLabel.Position = UDim2.new(0, 70, 0, 35)
-SongLabel.BackgroundTransparency = 1
-SongLabel.Text = "Música: Ninguna\nCreador ID: Ninguno"
-SongLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-SongLabel.TextSize = 13
-SongLabel.Font = Enum.Font.SourceSans
-SongLabel.TextXAlignment = Enum.TextXAlignment.Left
-SongLabel.TextWrapped = true
-SongLabel.Parent = MainFrame
-
-local TopLine = Instance.new("Frame")
-TopLine.Name = "TopLine"
-TopLine.Size = UDim2.new(1, -20, 0, 2)
-TopLine.Position = UDim2.new(0, 10, 0, 85)
-TopLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TopLine.BorderSizePixel = 0
-TopLine.Parent = MainFrame
-
-local InputBox = Instance.new("TextBox")
-InputBox.Name = "InputBox"
-InputBox.Size = UDim2.new(1, -30, 0, 35)
-InputBox.Position = UDim2.new(0, 15, 0, 95)
-InputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-InputBox.Text = ""
-InputBox.PlaceholderText = "INTRODUCCE ID MUSIC"
-InputBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-InputBox.TextSize = 14
-InputBox.Font = Enum.Font.SourceSans
-InputBox.Parent = MainFrame
-
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 6)
-InputCorner.Parent = InputBox
-
-local InputStroke = Instance.new("UIStroke")
-InputStroke.Color = Color3.fromRGB(0, 0, 0)
-InputStroke.Thickness = 2
-InputStroke.Parent = InputBox
-
-local MiddleLine = Instance.new("Frame")
-MiddleLine.Name = "MiddleLine"
-MiddleLine.Size = UDim2.new(1, -20, 0, 2)
-MiddleLine.Position = UDim2.new(0, 10, 0, 140)
-MiddleLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-MiddleLine.BorderSizePixel = 0
-MiddleLine.Parent = MainFrame
-
-local EnterButton = Instance.new("TextButton")
-EnterButton.Name = "EnterButton"
-EnterButton.Size = UDim2.new(0, 150, 0, 35)
-EnterButton.Position = UDim2.new(0.5, -155, 1, -50)
-EnterButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-EnterButton.Text = "ENTER ID"
-EnterButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-EnterButton.TextSize = 14
-EnterButton.Font = Enum.Font.SourceSansBold
-EnterButton.Parent = MainFrame
-
-local BtnCorner1 = Instance.new("UICorner")
-BtnCorner1.CornerRadius = UDim.new(0, 6)
-BtnCorner1.Parent = EnterButton
-
-local StopButton = Instance.new("TextButton")
-StopButton.Name = "StopButton"
-StopButton.Size = UDim2.new(0, 150, 0, 35)
-StopButton.Position = UDim2.new(0.5, 5, 1, -50)
-StopButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-StopButton.Text = "APAGAR MÚSICA"
-StopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-StopButton.TextSize = 14
-StopButton.Font = Enum.Font.SourceSansBold
-StopButton.Parent = MainFrame
-
-local BtnCorner2 = Instance.new("UICorner")
-BtnCorner2.CornerRadius = UDim.new(0, 6)
-BtnCorner2.Parent = StopButton
-
-local SoundPlayer = Instance.new("Sound")
-SoundPlayer.Name = "PublicSoundPlayer"
-SoundPlayer.Volume = 10
-SoundPlayer.RollOffMaxDistance = 10000
-SoundPlayer.RollOffMinDistance = 10
-SoundPlayer.EmitterSize = 5
-SoundPlayer.Parent = workspace
-
-local isMinimized = false
-local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-RunService.Heartbeat:Connect(function()
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-        if SoundPlayer.Parent == workspace then
-            SoundPlayer.CFrame = LocalPlayer.Character.HumanoidRootPart.CFrame
-        end
-    end
+toggleBtn.MouseButton1Click:Connect(function()
+	frame.Visible = not frame.Visible
 end)
 
-local function toggleMenu()
-    isMinimized = not isMinimized
-    if isMinimized then
-        ProfileImage.Visible = false
-        SongLabel.Visible = false
-        TopLine.Visible = false
-        InputBox.Visible = false
-        MiddleLine.Visible = false
-        EnterButton.Visible = false
-        StopButton.Visible = false
-        
-        local targetSize = UDim2.new(0, 260, 0, 35)
-        local targetPos = UDim2.new(0.5, -130, 0, 10)
-        TweenService:Create(MainFrame, tweenInfo, {Size = targetSize, Position = targetPos}):Play()
-    else
-        local targetSize = UDim2.new(0, 360, 0, 310)
-        local targetPos = UDim2.new(0.5, -180, 0.5, -155)
-        
-        local openTween = TweenService:Create(MainFrame, tweenInfo, {Size = targetSize, Position = targetPos})
-        openTween:Play()
-        openTween.Completed:Connect(function()
-            if not isMinimized then
-                ProfileImage.Visible = true
-                SongLabel.Visible = true
-                TopLine.Visible = true
-                InputBox.Visible = true
-                MiddleLine.Visible = true
-                EnterButton.Visible = true
-                StopButton.Visible = true
-            end
-        end)
-    end
+local sound = Instance.new("Sound")
+sound.Parent = SoundService
+sound.Volume = 1
+sound.Looped = false
+
+local function button(text, size, pos)
+	local b = Instance.new("TextButton", frame)
+	b.Size = size
+	b.Position = pos
+	b.Text = text
+	b.TextScaled = true
+	b.BackgroundColor3 = Color3.fromRGB(80,80,80)
+	b.TextColor3 = Color3.new(1,1,1)
+	return b
 end
 
-MinimizeBtn.MouseButton1Click:Connect(toggleMenu)
+local function box(placeholder, size, pos)
+	local t = Instance.new("TextBox", frame)
+	t.Size = size
+	t.Position = pos
+	t.PlaceholderText = placeholder
+	t.Text = ""
+	t.TextScaled = true
+	t.ClearTextOnFocus = false
+	t.BackgroundColor3 = Color3.fromRGB(60,60,60)
+	t.TextColor3 = Color3.new(1,1,1)
+	return t
+end
 
-CloseBtn.MouseButton1Click:Connect(function()
-    local closeTween = TweenService:Create(MainFrame, tweenInfo, {
-        Size = UDim2.new(0, 260, 0, 0),
-        Position = UDim2.new(0.5, -130, 0, 0)
-    })
-    closeTween:Play()
-    closeTween.Completed:Connect(function()
-        ScreenGui:Destroy()
-        if SoundPlayer then
-            SoundPlayer:Destroy()
-        end
-    end)
+local function formatTime(sec)
+	sec = math.floor(sec)
+	if sec < 60 then return tostring(sec) end
+	return math.floor(sec/60) .. ":" .. string.format("%02d", sec % 60)
+end
+
+local function parseTime(text)
+	if string.find(text, ":") then
+		local m,s = text:match("(%d+):(%d+)")
+		return (tonumber(m) or 0)*60 + (tonumber(s) or 0)
+	end
+	return tonumber(text) or 0
+end
+
+local songBox = box("Song ID", UDim2.fromScale(0.9,0.08), UDim2.fromScale(0.05,0.03))
+
+local playBtn = button("▶ PLAY", UDim2.fromScale(0.4,0.08), UDim2.fromScale(0.05,0.13))
+local stopBtn = button("⏹ STOP", UDim2.fromScale(0.4,0.08), UDim2.fromScale(0.55,0.13))
+
+local loopBtn = button("🔂 LOOP: OFF", UDim2.fromScale(0.9,0.08), UDim2.fromScale(0.05,0.23))
+local looping = false
+
+local startBox = box("Start at (sec or mm:ss)", UDim2.fromScale(0.9,0.07), UDim2.fromScale(0.05,0.33))
+local startTime = 0
+
+local volumeLabel = Instance.new("TextLabel", frame)
+volumeLabel.Size = UDim2.fromScale(0.9,0.05)
+volumeLabel.Position = UDim2.fromScale(0.05,0.41)
+volumeLabel.BackgroundTransparency = 1
+volumeLabel.TextScaled = true
+volumeLabel.TextColor3 = Color3.new(1,1,1)
+volumeLabel.Text = "Volume: 1.0x"
+
+local volTrack = Instance.new("Frame", frame)
+volTrack.Size = UDim2.fromScale(0.9,0.045)
+volTrack.Position = UDim2.fromScale(0.05,0.47)
+volTrack.BackgroundColor3 = Color3.fromRGB(70,70,70)
+
+local volKnob = Instance.new("Frame", volTrack)
+volKnob.Size = UDim2.fromScale(0.04,1)
+volKnob.Position = UDim2.fromScale(0.45,0)
+volKnob.BackgroundColor3 = Color3.fromRGB(200,200,200)
+
+local timeLabel = Instance.new("TextLabel", frame)
+timeLabel.Size = UDim2.fromScale(0.9,0.05)
+timeLabel.Position = UDim2.fromScale(0.05,0.53)
+timeLabel.BackgroundTransparency = 1
+timeLabel.TextScaled = true
+timeLabel.TextColor3 = Color3.new(1,1,1)
+timeLabel.Text = "0 / 0"
+
+local scrubTrack = Instance.new("Frame", frame)
+scrubTrack.Size = UDim2.fromScale(0.9,0.045)
+scrubTrack.Position = UDim2.fromScale(0.05,0.59)
+scrubTrack.BackgroundColor3 = Color3.fromRGB(70,70,70)
+
+local scrubKnob = Instance.new("Frame", scrubTrack)
+scrubKnob.Size = UDim2.fromScale(0.03,1)
+scrubKnob.Position = UDim2.fromScale(0,0)
+scrubKnob.BackgroundColor3 = Color3.fromRGB(220,220,220)
+
+local rewindBtn = button("⏪ -10s", UDim2.fromScale(0.42,0.07), UDim2.fromScale(0.05,0.66))
+local skipBtn = button("⏩ +10s", UDim2.fromScale(0.42,0.07), UDim2.fromScale(0.53,0.66))
+
+local function applyStartTime()
+	startTime = parseTime(startBox.Text)
+	if sound.TimeLength > 0 then
+		sound.TimePosition = math.clamp(startTime, 0, sound.TimeLength)
+	end
+end
+
+playBtn.MouseButton1Click:Connect(function()
+	if songBox.Text == "" then return end
+	sound.SoundId = "rbxassetid://" .. songBox.Text
+	sound:Stop()
+	sound:Play()
+	task.wait(0.05)
+	applyStartTime()
 end)
 
-local function processAudio()
-    local rawText = InputBox.Text
-    local id = tonumber(rawText)
+stopBtn.MouseButton1Click:Connect(function()
+	sound:Stop()
+end)
 
-    if not id then
-        SongLabel.Text = "Estado: ID inválido o falso"
-        ProfileImage.Image = "rbxassetid://0"
-        if SoundPlayer.IsPlaying then
-            SoundPlayer:Stop()
-        end
-        return
-    end
+loopBtn.MouseButton1Click:Connect(function()
+	looping = not looping
+	loopBtn.Text = looping and "🔂 LOOP: ON" or "🔂 LOOP: OFF"
+end)
 
-    SongLabel.Text = "Estado: Verificando..."
+sound.Ended:Connect(function()
+	if looping then
+		sound:Play()
+		task.wait(0.05)
+		applyStartTime()
+	end
+end)
 
-    task.spawn(function()
-        local success, assetInfo = pcall(function()
-            return MarketplaceService:GetProductInfo(id, Enum.InfoType.Asset)
-        end)
+skipBtn.MouseButton1Click:Connect(function()
+	sound.TimePosition = math.min(sound.TimePosition + 10, sound.TimeLength)
+end)
 
-        if success and assetInfo and assetInfo.AssetTypeId == 3 then
-            local creatorName = "Roblox"
-            local creatorId = assetInfo.Creator and assetInfo.Creator.Id or 1
-            local creatorType = assetInfo.Creator and assetInfo.Creator.CreatorType
-            
-            if assetInfo.Creator then
-                creatorName = assetInfo.Creator.Name or "Roblox"
-            end
+rewindBtn.MouseButton1Click:Connect(function()
+	sound.TimePosition = math.max(sound.TimePosition - 10, 0)
+end)
 
-            if creatorType == Enum.CreatorType.User and creatorId > 0 then
-                pcall(function()
-                    local thumb = Players:GetUserThumbnailAsync(creatorId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-                    ProfileImage.Image = thumb
-                end)
-            else
-                ProfileImage.Image = "rbxassetid://0"
-            end
-            
-            SongLabel.Text = "Música: " .. assetInfo.Name .. "\nCreador ID: " .. creatorName
-            
-            SoundPlayer:Stop()
-            SoundPlayer.SoundId = "rbxassetid://" .. id
-            
-            pcall(function()
-                ContentProvider:PreloadAsync({SoundPlayer})
-            end)
-            
-            SoundPlayer:Play()
-        else
-            SongLabel.Text = "Estado: ID falso o Roblox lo tumbó"
-            ProfileImage.Image = "rbxassetid://0"
-            if SoundPlayer.IsPlaying then
-                SoundPlayer:Stop()
-            end
-        end
+local draggingVol, draggingScrub = false, false
+
+volKnob.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+		draggingVol = true
+	end
+end)
+
+scrubKnob.InputBegan:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+		draggingScrub = true
+	end
+end)
+
+UIS.InputEnded:Connect(function(i)
+	if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+		draggingVol = false
+		draggingScrub = false
+	end
+end)
+
+RunService.RenderStepped:Connect(function()
+	if draggingVol then
+		local x = math.clamp((UIS:GetMouseLocation().X - volTrack.AbsolutePosition.X) / volTrack.AbsoluteSize.X, 0, 1)
+		volKnob.Position = UDim2.fromScale(x - 0.02, 0)
+		local vol = 0.1 + (x * 1.9)
+		sound.Volume = vol
+		volumeLabel.Text = string.format("Volume: %.1fx", vol)
+	end
+
+	if draggingScrub and sound.TimeLength > 0 then
+		local x = math.clamp((UIS:GetMouseLocation().X - scrubTrack.AbsolutePosition.X) / scrubTrack.AbsoluteSize.X, 0, 1)
+		scrubKnob.Position = UDim2.fromScale(x - 0.015, 0)
+		sound.TimePosition = x * sound.TimeLength
+	end
+
+	if sound.IsPlaying and sound.TimeLength > 0 then
+		timeLabel.Text =
+			formatTime(sound.TimePosition) ..
+			" / " ..
+			formatTime(sound.TimeLength)
+
+		scrubKnob.Position = UDim2.fromScale(
+			sound.TimePosition / sound.TimeLength - 0.015,
+			0
+		)
+	end
+end)
+ end
     end)
 end
 
