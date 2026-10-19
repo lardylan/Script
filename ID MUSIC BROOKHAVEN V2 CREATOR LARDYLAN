@@ -1,330 +1,40 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "ID MUSIC BROOKHAVEN V2",
+   LoadingTitle = "Cargando Script...",
+   LoadingSubtitle = "Creado por LARDYLAN",
+   ConfigurationSaving = {
+      Enabled = false,
+   },
+   Discord = {
+      Enabled = false,
+   },
+   KeySystem = false
+})
+
+local MainTab = Window:CreateTab("Reproductor", 4483362458)
+local GamepassTab = Window:CreateTab("Gamepasses / Extra", 4483362458)
+local HouseTab = Window:CreateTab("Casas", 4483363465)
+local InfoTab = Window:CreateTab("Creador / Info", 4483363465)
+
 local Players = game:GetService("Players")
 local MarketplaceService = game:GetService("MarketplaceService")
 local ContentProvider = game:GetService("ContentProvider")
-local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CoreGui = game:GetService("CoreGui")
 local LocalPlayer = Players.LocalPlayer
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "IDMusicBrookhavenGui"
-ScreenGui.ResetOnSpawn = false
-
-if gethui then
-    ScreenGui.Parent = gethui()
-elseif syn and syn.protect_gui then
-    syn.protect_gui(ScreenGui)
-    ScreenGui.Parent = CoreGui
-else
-    ScreenGui.Parent = CoreGui
-end
-
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 360, 0, 480)
-MainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
-MainFrame.BackgroundColor3 = Color3.fromRGB(255, 235, 59)
-MainFrame.BorderSizePixel = 0
-MainFrame.Active = true
-MainFrame.ClipsDescendants = true
-MainFrame.Parent = ScreenGui
-
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 10)
-FrameCorner.Parent = MainFrame
-
-local FrameStroke = Instance.new("UIStroke")
-FrameStroke.Color = Color3.fromRGB(255, 255, 255)
-FrameStroke.Thickness = 2
-FrameStroke.Parent = MainFrame
-
-local DragBar = Instance.new("TextButton")
-DragBar.Name = "DragBar"
-DragBar.Size = UDim2.new(1, -70, 0, 30)
-DragBar.Position = UDim2.new(0, 10, 0, 5)
-DragBar.BackgroundTransparency = 1
-DragBar.Text = "_______"
-DragBar.TextColor3 = Color3.fromRGB(0, 0, 0)
-DragBar.TextSize = 14
-DragBar.Font = Enum.Font.SourceSansBold
-DragBar.Parent = MainFrame
-
-local MinimizeBtn = Instance.new("TextButton")
-MinimizeBtn.Name = "MinimizeBtn"
-MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
-MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
-MinimizeBtn.BackgroundTransparency = 1
-MinimizeBtn.Text = "-"
-MinimizeBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-MinimizeBtn.TextSize = 22
-MinimizeBtn.Font = Enum.Font.SourceSansBold
-MinimizeBtn.Parent = MainFrame
-
-local CloseBtn = Instance.new("TextButton")
-CloseBtn.Name = "CloseBtn"
-CloseBtn.Size = UDim2.new(0, 25, 0, 25)
-CloseBtn.Position = UDim2.new(1, -30, 0, 5)
-CloseBtn.BackgroundTransparency = 1
-CloseBtn.Text = "X"
-CloseBtn.TextColor3 = Color3.fromRGB(0, 0, 0)
-CloseBtn.TextSize = 18
-CloseBtn.Font = Enum.Font.SourceSansBold
-CloseBtn.Parent = MainFrame
-
-local ProfileImage = Instance.new("ImageLabel")
-ProfileImage.Name = "ProfileImage"
-ProfileImage.Size = UDim2.new(0, 45, 0, 45)
-ProfileImage.Position = UDim2.new(0, 15, 0, 35)
-ProfileImage.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ProfileImage.BackgroundTransparency = 1
-ProfileImage.Image = "rbxassetid://0"
-ProfileImage.Parent = MainFrame
-
-local ProfileCorner = Instance.new("UICorner")
-ProfileCorner.CornerRadius = UDim.new(1, 0)
-ProfileCorner.Parent = ProfileImage
-
-local ProfileStroke = Instance.new("UIStroke")
-ProfileStroke.Color = Color3.fromRGB(0, 0, 0)
-ProfileStroke.Thickness = 2
-ProfileStroke.Parent = ProfileImage
-
-local SongLabel = Instance.new("TextLabel")
-SongLabel.Name = "SongLabel"
-SongLabel.Size = UDim2.new(0, 270, 0, 45)
-SongLabel.Position = UDim2.new(0, 70, 0, 35)
-SongLabel.BackgroundTransparency = 1
-SongLabel.Text = "Música: Ninguna\nCreador ID: Ninguno"
-SongLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-SongLabel.TextSize = 13
-SongLabel.Font = Enum.Font.SourceSans
-SongLabel.TextXAlignment = Enum.TextXAlignment.Left
-SongLabel.TextWrapped = true
-SongLabel.Parent = MainFrame
-
-local TopLine = Instance.new("Frame")
-TopLine.Name = "TopLine"
-TopLine.Size = UDim2.new(1, -20, 0, 2)
-TopLine.Position = UDim2.new(0, 10, 0, 85)
-TopLine.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TopLine.BorderSizePixel = 0
-TopLine.Parent = MainFrame
-
-local EnterButton = Instance.new("TextButton")
-EnterButton.Name = "EnterButton"
-EnterButton.Size = UDim2.new(0, 150, 0, 35)
-EnterButton.Position = UDim2.new(0.5, -155, 0, 95)
-EnterButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-EnterButton.Text = "ENTER ID"
-EnterButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-EnterButton.TextSize = 14
-EnterButton.Font = Enum.Font.SourceSansBold
-EnterButton.Parent = MainFrame
-
-local BtnCorner1 = Instance.new("UICorner")
-BtnCorner1.CornerRadius = UDim.new(0, 6)
-BtnCorner1.Parent = EnterButton
-
-local StopButton = Instance.new("TextButton")
-StopButton.Name = "StopButton"
-StopButton.Size = UDim2.new(0, 150, 0, 35)
-StopButton.Position = UDim2.new(0.5, 5, 0, 95)
-StopButton.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-StopButton.Text = "APAGAR MÚSICA"
-StopButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-StopButton.TextSize = 14
-StopButton.Font = Enum.Font.SourceSansBold
-StopButton.Parent = MainFrame
-
-local BtnCorner2 = Instance.new("UICorner")
-BtnCorner2.CornerRadius = UDim.new(0, 6)
-BtnCorner2.Parent = StopButton
-
-local InputBox = Instance.new("TextBox")
-InputBox.Name = "InputBox"
-InputBox.Size = UDim2.new(1, -30, 0, 35)
-InputBox.Position = UDim2.new(0, 15, 0, 138)
-InputBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-InputBox.Text = ""
-InputBox.PlaceholderText = "INTRODUCCE ID MUSIC"
-InputBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-InputBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-InputBox.TextSize = 14
-InputBox.Font = Enum.Font.SourceSans
-InputBox.Parent = MainFrame
-
-local InputCorner = Instance.new("UICorner")
-InputCorner.CornerRadius = UDim.new(0, 6)
-InputCorner.Parent = InputBox
-
-local InputStroke = Instance.new("UIStroke")
-InputStroke.Color = Color3.fromRGB(0, 0, 0)
-InputStroke.Thickness = 2
-InputStroke.Parent = InputBox
-
-local LoopBtn = Instance.new("TextButton")
-LoopBtn.Name = "LoopBtn"
-LoopBtn.Size = UDim2.new(1, -30, 0, 30)
-LoopBtn.Position = UDim2.new(0, 15, 0, 180)
-LoopBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-LoopBtn.Text = "🔁 LOOP: OFF"
-LoopBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-LoopBtn.TextSize = 13
-LoopBtn.Font = Enum.Font.SourceSansBold
-LoopBtn.Parent = MainFrame
-
-local LoopCorner = Instance.new("UICorner")
-LoopCorner.CornerRadius = UDim.new(0, 6)
-LoopCorner.Parent = LoopBtn
-
-local StartBox = Instance.new("TextBox")
-StartBox.Name = "StartBox"
-StartBox.Size = UDim2.new(1, -30, 0, 30)
-StartBox.Position = UDim2.new(0, 15, 0, 217)
-StartBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-StartBox.Text = ""
-StartBox.PlaceholderText = "Start at (sec or mm:ss)"
-StartBox.TextColor3 = Color3.fromRGB(0, 0, 0)
-StartBox.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
-StartBox.TextSize = 13
-StartBox.Font = Enum.Font.SourceSans
-StartBox.Parent = MainFrame
-
-local StartCorner = Instance.new("UICorner")
-StartCorner.CornerRadius = UDim.new(0, 6)
-StartCorner.Parent = StartBox
-
-local StartStroke = Instance.new("UIStroke")
-StartStroke.Color = Color3.fromRGB(0, 0, 0)
-StartStroke.Thickness = 1
-StartStroke.Parent = StartBox
-
-local VolumeLabel = Instance.new("TextLabel")
-VolumeLabel.Name = "VolumeLabel"
-VolumeLabel.Size = UDim2.new(1, -30, 0, 20)
-VolumeLabel.Position = UDim2.new(0, 15, 0, 254)
-VolumeLabel.BackgroundTransparency = 1
-VolumeLabel.Text = "Volume: 10.0x"
-VolumeLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-VolumeLabel.TextSize = 13
-VolumeLabel.Font = Enum.Font.SourceSansBold
-VolumeLabel.TextXAlignment = Enum.TextXAlignment.Left
-VolumeLabel.Parent = MainFrame
-
-local VolTrack = Instance.new("Frame")
-VolTrack.Name = "VolTrack"
-VolTrack.Size = UDim2.new(1, -30, 0, 15)
-VolTrack.Position = UDim2.new(0, 15, 0, 277)
-VolTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-VolTrack.Parent = MainFrame
-
-local VolTrackCorner = Instance.new("UICorner")
-VolTrackCorner.CornerRadius = UDim.new(0, 4)
-VolTrackCorner.Parent = VolTrack
-
-local VolKnob = Instance.new("Frame")
-VolKnob.Name = "VolKnob"
-VolKnob.Size = UDim2.new(0, 15, 1, 0)
-VolKnob.Position = UDim2.new(0.5, -7, 0, 0)
-VolKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-VolKnob.Parent = VolTrack
-
-local VolKnobCorner = Instance.new("UICorner")
-VolKnobCorner.CornerRadius = UDim.new(0, 4)
-VolKnobCorner.Parent = VolKnob
-
-local TimeLabel = Instance.new("TextLabel")
-TimeLabel.Name = "TimeLabel"
-TimeLabel.Size = UDim2.new(1, -30, 0, 20)
-TimeLabel.Position = UDim2.new(0, 15, 0, 299)
-TimeLabel.BackgroundTransparency = 1
-TimeLabel.Text = "0 / 0"
-TimeLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
-TimeLabel.TextSize = 13
-TimeLabel.Font = Enum.Font.SourceSansBold
-TimeLabel.TextXAlignment = Enum.TextXAlignment.Left
-TimeLabel.Parent = MainFrame
-
-local ScrubTrack = Instance.new("Frame")
-ScrubTrack.Name = "ScrubTrack"
-ScrubTrack.Size = UDim2.new(1, -30, 0, 15)
-ScrubTrack.Position = UDim2.new(0, 15, 0, 322)
-ScrubTrack.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-ScrubTrack.Parent = MainFrame
-
-local ScrubTrackCorner = Instance.new("UICorner")
-ScrubTrackCorner.CornerRadius = UDim.new(0, 4)
-ScrubTrackCorner.Parent = ScrubTrack
-
-local ScrubKnob = Instance.new("Frame")
-ScrubKnob.Name = "ScrubKnob"
-ScrubKnob.Size = UDim2.new(0, 15, 1, 0)
-ScrubKnob.Position = UDim2.new(0, 0, 0, 0)
-ScrubKnob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-ScrubKnob.Parent = ScrubTrack
-
-local ScrubKnobCorner = Instance.new("UICorner")
-ScrubKnobCorner.CornerRadius = UDim.new(0, 4)
-ScrubKnobCorner.Parent = ScrubKnob
-
-local RewindBtn = Instance.new("TextButton")
-RewindBtn.Name = "RewindBtn"
-RewindBtn.Size = UDim2.new(0, 150, 0, 35)
-RewindBtn.Position = UDim2.new(0.5, -155, 0, 347)
-RewindBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-RewindBtn.Text = "⏪ -10s"
-RewindBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-RewindBtn.TextSize = 13
-RewindBtn.Font = Enum.Font.SourceSansBold
-RewindBtn.Parent = MainFrame
-
-local RewindCorner = Instance.new("UICorner")
-RewindCorner.CornerRadius = UDim.new(0, 6)
-RewindCorner.Parent = RewindBtn
-
-local SkipBtn = Instance.new("TextButton")
-SkipBtn.Name = "SkipBtn"
-SkipBtn.Size = UDim2.new(0, 150, 0, 35)
-SkipBtn.Position = UDim2.new(0.5, 5, 0, 347)
-SkipBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-SkipBtn.Text = "⏩ +10s"
-SkipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-SkipBtn.TextSize = 13
-SkipBtn.Font = Enum.Font.SourceSansBold
-SkipBtn.Parent = MainFrame
-
-local SkipCorner = Instance.new("UICorner")
-SkipCorner.CornerRadius = UDim.new(0, 6)
-SkipCorner.Parent = SkipBtn
-
-local ResizeTopLeft = Instance.new("TextButton")
-ResizeTopLeft.Name = "ResizeTopLeft"
-ResizeTopLeft.Size = UDim2.new(0, 20, 0, 20)
-ResizeTopLeft.Position = UDim2.new(0, 0, 0, 0)
-ResizeTopLeft.BackgroundTransparency = 1
-ResizeTopLeft.Text = ""
-ResizeTopLeft.Parent = MainFrame
-
-local ResizeBottomRight = Instance.new("TextButton")
-ResizeBottomRight.Name = "ResizeBottomRight"
-ResizeBottomRight.Size = UDim2.new(0, 20, 0, 20)
-ResizeBottomRight.Position = UDim2.new(1, -20, 1, -20)
-ResizeBottomRight.BackgroundTransparency = 1
-ResizeBottomRight.Text = ""
-ResizeBottomRight.Parent = MainFrame
-
 local SoundPlayer = Instance.new("Sound")
-SoundPlayer.Name = "PublicSoundPlayer"
+SoundPlayer.Name = "RayfieldPublicSound"
 SoundPlayer.Volume = 10
 SoundPlayer.RollOffMaxDistance = 10000
 SoundPlayer.RollOffMinDistance = 10
 SoundPlayer.EmitterSize = 5
 SoundPlayer.Parent = workspace
 
-local isMinimized = false
-local tweenInfo = TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+local currentId = ""
 local looping = false
 local startTime = 0
 
@@ -336,239 +46,144 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-local draggingMain = false
-local dragInput, dragStart, startPos
-
-DragBar.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        draggingMain = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
-        
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-                draggingMain = false
-            end
-        end)
-    end
-end)
-
-DragBar.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UIS.InputChanged:Connect(function(input)
-    if input == dragInput and draggingMain then
-        local delta = input.Position - dragStart
-        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-    end
-end)
-
-local resizingTL = false
-local resizingBR = false
-local resizeStartPos, resizeStartSize, resizeStartMouse
-
-ResizeTopLeft.MouseButton1Down:Connect(function()
-    resizingTL = true
-    resizeStartMouse = UIS:GetMouseLocation()
-    resizeStartPos = MainFrame.Position
-    resizeStartSize = MainFrame.Size
-end)
-
-ResizeBottomRight.MouseButton1Down:Connect(function()
-    resizingBR = true
-    resizeStartMouse = UIS:GetMouseLocation()
-    resizeStartSize = MainFrame.Size
-end)
-
-UIS.InputEnded:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        resizingTL = false
-        resizingBR = false
-    end
-end)
-
-RunService.RenderStepped:Connect(function()
-    local mouseLoc = UIS:GetMouseLocation()
-    if resizingTL then
-        local delta = mouseLoc - resizeStartMouse
-        local newWidth = math.clamp(resizeStartSize.X.Offset - delta.X, 260, 600)
-        local newHeight = math.clamp(resizeStartSize.Y.Offset - delta.Y, 200, 700)
-        MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
-        MainFrame.Position = UDim2.new(resizeStartPos.X.Scale, resizeStartPos.X.Offset + (resizeStartSize.X.Offset - newWidth), resizeStartPos.Y.Scale, resizeStartPos.Y.Offset + (resizeStartSize.Y.Offset - newHeight))
-    elseif resizingBR then
-        local delta = mouseLoc - resizeStartMouse
-        local newWidth = math.clamp(resizeStartSize.X.Offset + delta.X, 260, 600)
-        local newHeight = math.clamp(resizeStartSize.Y.Offset + delta.Y, 200, 700)
-        MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
-    end
-end)
-
-local function toggleMenu()
-    isMinimized = not isMinimized
-    if isMinimized then
-        ProfileImage.Visible = false
-        SongLabel.Visible = false
-        TopLine.Visible = false
-        EnterButton.Visible = false
-        StopButton.Visible = false
-        InputBox.Visible = false
-        LoopBtn.Visible = false
-        StartBox.Visible = false
-        VolumeLabel.Visible = false
-        VolTrack.Visible = false
-        TimeLabel.Visible = false
-        ScrubTrack.Visible = false
-        RewindBtn.Visible = false
-        SkipBtn.Visible = false
-        ResizeTopLeft.Visible = false
-        ResizeBottomRight.Visible = false
-        
-        local targetSize = UDim2.new(0, 260, 0, 35)
-        local targetPos = UDim2.new(0.5, -130, 0, 10)
-        TweenService:Create(MainFrame, tweenInfo, {Size = targetSize, Position = targetPos}):Play()
-    else
-        local targetSize = UDim2.new(0, 360, 0, 480)
-        local targetPos = UDim2.new(0.5, -180, 0.5, -240)
-        
-        local openTween = TweenService:Create(MainFrame, tweenInfo, {Size = targetSize, Position = targetPos})
-        openTween:Play()
-        openTween.Completed:Connect(function()
-            if not isMinimized then
-                ProfileImage.Visible = true
-                SongLabel.Visible = true
-                TopLine.Visible = true
-                EnterButton.Visible = true
-                StopButton.Visible = true
-                InputBox.Visible = true
-                LoopBtn.Visible = true
-                StartBox.Visible = true
-                VolumeLabel.Visible = true
-                VolTrack.Visible = true
-                TimeLabel.Visible = true
-                ScrubTrack.Visible = true
-                RewindBtn.Visible = true
-                SkipBtn.Visible = true
-                ResizeTopLeft.Visible = true
-                ResizeBottomRight.Visible = true
-            end
-        end)
-    end
-end
-
-MinimizeBtn.MouseButton1Click:Connect(toggleMenu)
-
-CloseBtn.MouseButton1Click:Connect(function()
-    local closeTween = TweenService:Create(MainFrame, tweenInfo, {
-        Size = UDim2.new(0, 260, 0, 0),
-        Position = UDim2.new(0.5, -130, 0, 0)
-    })
-    closeTween:Play()
-    closeTween.Completed:Connect(function()
-        ScreenGui:Destroy()
-        if SoundPlayer then
-            SoundPlayer:Destroy()
-        end
-    end)
-end)
-
-local function formatTime(sec)
-    sec = math.floor(sec)
-    if sec < 60 then return tostring(sec) end
-    return math.floor(sec/60) .. ":" .. string.format("%02d", sec % 60)
-end
-
 local function parseTime(text)
     if string.find(text, ":") then
-        local m,s = text:match("(%d+):(%d+)")
-        return (tonumber(m) or 0)*60 + (tonumber(s) or 0)
+        local m, s = text:match("(%d+):(%d+)")
+        return (tonumber(m) or 0) * 60 + (tonumber(s) or 0)
     end
     return tonumber(text) or 0
 end
 
 local function applyStartTime()
-    startTime = parseTime(StartBox.Text)
     if SoundPlayer.TimeLength > 0 then
         SoundPlayer.TimePosition = math.clamp(startTime, 0, SoundPlayer.TimeLength)
     end
 end
 
-local function processAudio()
-    local rawText = InputBox.Text
-    local id = tonumber(rawText)
+-- SECCIÓN MÚSICA --
+MainTab:CreateInput({
+   Name = "Introducir ID de Música",
+   PlaceholderText = "Escribe el ID aquí...",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      currentId = Text
+   end,
+})
 
-    if not id then
-        SongLabel.Text = "Estado: ID inválido o falso"
-        ProfileImage.Image = "rbxassetid://0"
-        if SoundPlayer.IsPlaying then
-            SoundPlayer:Stop()
-        end
-        return
-    end
+MainTab:CreateButton({
+   Name = "ENTER ID (Reproducir)",
+   Callback = function()
+      local id = tonumber(currentId)
+      if not id then
+         Rayfield:Notify({
+            Title = "Error",
+            Content = "Ingresa un ID numérico válido",
+            Duration = 3,
+            Image = 4483362458,
+         })
+         return
+      end
 
-    SongLabel.Text = "Estado: Verificando..."
+      task.spawn(function()
+         local success, assetInfo = pcall(function()
+             return MarketplaceService:GetProductInfo(id, Enum.InfoType.Asset)
+         end)
 
-    task.spawn(function()
-        local success, assetInfo = pcall(function()
-            return MarketplaceService:GetProductInfo(id, Enum.InfoType.Asset)
-        end)
+         if success and assetInfo and assetInfo.AssetTypeId == 3 then
+             SoundPlayer:Stop()
+             SoundPlayer.SoundId = "rbxassetid://" .. id
+             
+             pcall(function()
+                 ContentProvider:PreloadAsync({SoundPlayer})
+             end)
+             
+             SoundPlayer:Play()
+             task.wait(0.05)
+             applyStartTime()
 
-        if success and assetInfo and assetInfo.AssetTypeId == 3 then
-            local creatorName = "Roblox"
-            local creatorId = assetInfo.Creator and assetInfo.Creator.Id or 1
-            local creatorType = assetInfo.Creator and assetInfo.Creator.CreatorType
-            
-            if assetInfo.Creator then
-                creatorName = assetInfo.Creator.Name or "Roblox"
-            end
+             Rayfield:Notify({
+                Title = "Música Cargada",
+                Content = assetInfo.Name .. " por " .. (assetInfo.Creator and assetInfo.Creator.Name or "Desconocido"),
+                Duration = 4,
+                Image = 4483362458,
+             })
+         else
+             Rayfield:Notify({
+                Title = "Error de Audio",
+                Content = "ID inválido o bloqueado por Roblox",
+                Duration = 3,
+                Image = 4483362458,
+             })
+         end
+      end)
+   end,
+})
 
-            if creatorType == Enum.CreatorType.User and creatorId > 0 then
-                pcall(function()
-                    local thumb = Players:GetUserThumbnailAsync(creatorId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size420x420)
-                    ProfileImage.Image = thumb
-                end)
-            else
-                ProfileImage.Image = "rbxassetid://0"
-            end
-            
-            SongLabel.Text = "Música: " .. assetInfo.Name .. "\nCreador ID: " .. creatorName
-            
-            SoundPlayer:Stop()
-            SoundPlayer.SoundId = "rbxassetid://" .. id
-            
-            pcall(function()
-                ContentProvider:PreloadAsync({SoundPlayer})
-            end)
-            
-            SoundPlayer:Play()
-            task.wait(0.05)
-            applyStartTime()
-        else
-            SongLabel.Text = "Estado: ID falso o Roblox lo tumbó"
-            ProfileImage.Image = "rbxassetid://0"
-            if SoundPlayer.IsPlaying then
-                SoundPlayer:Stop()
-            end
-        end
-    end)
-end
+MainTab:CreateButton({
+   Name = "APAGAR MÚSICA",
+   Callback = function()
+      if SoundPlayer.IsPlaying then
+         SoundPlayer:Stop()
+         Rayfield:Notify({
+            Title = "Música Apagada",
+            Content = "Se ha detenido la reproducción",
+            Duration = 2,
+            Image = 4483362458,
+         })
+      end
+   end,
+})
 
-EnterButton.MouseButton1Click:Connect(processAudio)
+MainTab:CreateToggle({
+   Name = "Activar Loop",
+   CurrentValue = false,
+   Flag = "LoopToggle",
+   Callback = function(Value)
+      looping = Value
+   end,
+})
 
-StopButton.MouseButton1Click:Connect(function()
-    if SoundPlayer.IsPlaying then
-        SoundPlayer:Stop()
-        SongLabel.Text = "Música: Apagada\nCreador ID: Ninguno"
-        ProfileImage.Image = "rbxassetid://0"
-    end
-end)
+MainTab:CreateInput({
+   Name = "Iniciar en (seg o mm:ss)",
+   PlaceholderText = "Ejemplo: 30 o 1:15",
+   RemoveTextAfterFocusLost = false,
+   Callback = function(Text)
+      startTime = parseTime(Text)
+      if SoundPlayer.IsPlaying then
+         applyStartTime()
+      end
+   end,
+})
 
-LoopBtn.MouseButton1Click:Connect(function()
-    looping = not looping
-    LoopBtn.Text = looping and "🔁 LOOP: ON" or "🔁 LOOP: OFF"
-end)
+MainTab:CreateSlider({
+   Name = "Volumen",
+   Range = {0, 100},
+   Increment = 1,
+   Suffix = "%",
+   CurrentValue = 100,
+   Flag = "VolSlider",
+   Callback = function(Value)
+      SoundPlayer.Volume = (Value / 100) * 10
+   end,
+})
+
+MainTab:CreateButton({
+   Name = "⏪ Adelantar 10s",
+   Callback = function()
+      if SoundPlayer.TimeLength > 0 then
+         SoundPlayer.TimePosition = math.min(SoundPlayer.TimePosition + 10, SoundPlayer.TimeLength)
+      end
+   end,
+})
+
+MainTab:CreateButton({
+   Name = "⏩ Retroceder 10s",
+   Callback = function()
+      if SoundPlayer.TimeLength > 0 then
+         SoundPlayer.TimePosition = math.max(SoundPlayer.TimePosition - 10, 0)
+      end
+   end,
+})
 
 SoundPlayer.Ended:Connect(function()
     if looping then
@@ -578,17 +193,207 @@ SoundPlayer.Ended:Connect(function()
     end
 end)
 
-SkipBtn.MouseButton1Click:Connect(function()
-    if SoundPlayer.TimeLength > 0 then
-        SoundPlayer.TimePosition = math.min(SoundPlayer.TimePosition + 10, SoundPlayer.TimeLength)
-    end
-end)
+-- SECCIÓN VERIFICADO FAKE PERMANENTE EN CHAT & MENÚ --
+GamepassTab:CreateSection("Verificado Fake Permante")
 
-RewindBtn.MouseButton1Click:Connect(function()
-    SoundPlayer.TimePosition = math.max(SoundPlayer.TimePosition - 10, 0)
-end)
+local verifiedActive = false
 
-local draggingVol, draggingScrub = false, false
+GamepassTab:CreateButton({
+   Name = "VERIFICADO (Auto-Fix Chat)",
+   Callback = function()
+      if verifiedActive then return end
+      verifiedActive = true
+      
+      local verifiedSymbol = ""
 
-VolKnob.InputBegan:Connect(function(i)
-  
+      task.spawn(function()
+          while verifiedActive do
+              pcall(function()
+                  -- 1. Mantener el símbolo en el DisplayName
+                  if not LocalPlayer.DisplayName:find(verifiedSymbol) then
+                      LocalPlayer.DisplayName = LocalPlayer.DisplayName .. " " .. verifiedSymbol
+                  end
+
+                  -- 2. Corregir etiquetas en el Chat de Roblox al escribir
+                  if LocalPlayer:FindFirstChild("PlayerGui") then
+                      local chatGui = LocalPlayer.PlayerGui:FindFirstChild("Chat") or CoreGui:FindFirstChild("ExperienceChat")
+                      if chatGui then
+                          for _, label in pairs(chatGui:GetDescendants()) do
+                              if label:IsA("TextLabel") and (label.Text:find(LocalPlayer.Name) or label.Text:find(LocalPlayer.DisplayName)) then
+                                  if not label.Text:find(verifiedSymbol) then
+                                      label.Text = label.Text .. " " .. verifiedSymbol
+                                  end
+                              end
+                          end
+                      end
+                  end
+
+                  -- 3. Corregir en el menú del Engranaje de Roblox
+                  local robloxGui = CoreGui:FindFirstChild("RobloxGui")
+                  if robloxGui then
+                      for _, label in pairs(robloxGui:GetDescendants()) do
+                          if label:IsA("TextLabel") and (label.Text == LocalPlayer.Name or label.Text == LocalPlayer.DisplayName) then
+                              if not label.Text:find(verifiedSymbol) then
+                                  label.Text = LocalPlayer.DisplayName .. " @" .. LocalPlayer.Name .. " " .. verifiedSymbol
+                              end
+                          end
+                      end
+                  end
+              end)
+              task.wait(0.2) -- Bucle continuo rápido para que nunca se quite al hablar
+          end
+      end)
+
+      Rayfield:Notify({
+         Title = "FAKE VERIFIED ACTIVADO",
+         Content = "¡Verificado fijado de forma permanente en el Chat y Menú!",
+         Duration = 4,
+         Image = 4483362458,
+      })
+   end,
+})
+
+GamepassTab:CreateSection("Desbloqueo Total de Gamepasses")
+
+GamepassTab:CreateButton({
+   Name = "🚗 FORZAR DESBLOQUEO DE AUTOS Y PASSES",
+   Callback = function()
+      pcall(function()
+          LocalPlayer:SetAttribute("Premium", true)
+          LocalPlayer:SetAttribute("VIP", true)
+          LocalPlayer:SetAttribute("HasPass_Premium", true)
+          LocalPlayer:SetAttribute("HasPass_VIP", true)
+          LocalPlayer:SetAttribute("HasPass_Speed", true)
+          LocalPlayer:SetAttribute("HasPass_Vehicle", true)
+          LocalPlayer:SetAttribute("HasPass_Easter", true)
+
+          if LocalPlayer:FindFirstChild("PlayerGui") then
+              for _, gui in pairs(LocalPlayer.PlayerGui:GetDescendants()) do
+                  if gui:IsA("TextButton") or gui:IsA("ImageButton") then
+                      if gui.Name:lower():find("lock") or gui.Name:lower():find("buy") or gui.Name:lower():find("pass") then
+                          pcall(function()
+                              gui.Visible = false
+                          end)
+                      end
+                  end
+              end
+          end
+      end)
+
+      Rayfield:Notify({
+         Title = "Gamepasses Desbloqueados",
+         Content = "¡Los candados de vehículos y pase VIP han sido modificados!",
+         Duration = 4,
+         Image = 4483362458,
+      })
+   end,
+})
+
+-- SECCIÓN CASAS / EXTRA --
+HouseTab:CreateSection("Desbaneo de Casas")
+
+local unbanConnection = nil
+
+HouseTab:CreateToggle({
+   Name = "🔓 ANTI-BAN HOUSE (Bucle)",
+   CurrentValue = false,
+   Flag = "UnbanToggle",
+   Callback = function(Value)
+      if Value then
+         unbanConnection = RunService.Stepped:Connect(function()
+             pcall(function()
+                 for _, v in pairs(workspace:GetDescendants()) do
+                     if v.Name == "BanBlock" or v.Name == "BannedBlock" or v.Name == "HouseBan" or v.Name == "BanTouch" then
+                         v:Destroy()
+                     end
+                 end
+                 if LocalPlayer.PlayerGui:FindFirstChild("HouseBanGui") then
+                     LocalPlayer.PlayerGui.HouseBanGui:Destroy()
+                 end
+             end)
+         end)
+
+         Rayfield:Notify({
+            Title = "Anti-Ban Activado",
+            Content = "Paredes y sensores de ban eliminados.",
+            Duration = 3,
+            Image = 4483362458,
+         })
+      else
+         if unbanConnection then
+             unbanConnection:Disconnect()
+             unbanConnection = nil
+         end
+         Rayfield:Notify({
+            Title = "Anti-Ban Desactivado",
+            Content = "Sistemas de casa restaurados.",
+            Duration = 2,
+            Image = 4483362458,
+         })
+      end
+   end,
+})
+
+HouseTab:CreateSection("Soporte de Pies")
+
+local basePart = nil
+local baseConnection = nil
+
+HouseTab:CreateToggle({
+   Name = "🛡️ BASE EN LOS PIES (Evitar caídas)",
+   CurrentValue = false,
+   Flag = "BaseFeetToggle",
+   Callback = function(Value)
+      if Value then
+         basePart = Instance.new("Part")
+         basePart.Name = "FeetBasePlate"
+         basePart.Size = Vector3.new(6, 0.5, 6)
+         basePart.Transparency = 1
+         basePart.Anchored = true
+         basePart.CanCollide = true
+         basePart.Parent = workspace
+
+         baseConnection = RunService.RenderStepped:Connect(function()
+             if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and basePart then
+                 local root = LocalPlayer.Character.HumanoidRootPart
+                 basePart.CFrame = CFrame.new(root.Position.X, root.Position.Y - 3.1, root.Position.Z)
+             end
+         end)
+
+         Rayfield:Notify({
+            Title = "Placa de Soporte Activada",
+            Content = "Base colocada debajo de tus pies.",
+            Duration = 3,
+            Image = 4483362458,
+         })
+      else
+         if baseConnection then
+             baseConnection:Disconnect()
+             baseConnection = nil
+         end
+         if basePart then
+             basePart:Destroy()
+             basePart = nil
+         end
+
+         Rayfield:Notify({
+            Title = "Placa Desactivada",
+            Content = "Base removida.",
+            Duration = 2,
+            Image = 4483362458,
+         })
+      end
+   end,
+})
+
+-- SECCIÓN INFORMACIÓN --
+InfoTab:CreateSection("Creador del Script")
+InfoTab:CreateLabel("OWNER: LARDYLAN")
+InfoTab:CreateLabel("Usuario Creador: Fide2283")
+
+InfoTab:CreateSection("Mensaje")
+InfoTab:CreateParagraph({
+   Title = "Nota del Creador",
+   Content = "HOLA, SOY EL DUEÑO QUE CREÓ LA V1, CONSIGUE LA V2 EN MI PÁGINA WEB. ¡DISFRUTA LA MÚSICA, EL CHAT Y EL VERIFICADO FAKE!"
+})
+
