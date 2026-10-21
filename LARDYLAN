@@ -1,0 +1,211 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:FindFirstChild("PlayerGui") or CoreGui
+
+if PlayerGui:FindFirstChild("CustomLuaExecutorMenu") then
+    PlayerGui.CustomLuaExecutorMenu:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "CustomLuaExecutorMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = PlayerGui
+
+local ClickSound = Instance.new("Sound")
+ClickSound.SoundId = "rbxassetid://9114220405"
+ClickSound.Volume = 1
+ClickSound.Parent = ScreenGui
+
+local BgMusic = Instance.new("Sound")
+BgMusic.SoundId = "rbxassetid://113366347841126"
+BgMusic.Volume = 0.5
+BgMusic.Looped = true
+BgMusic.Parent = ScreenGui
+
+task.spawn(function()
+    BgMusic:Play()
+end)
+
+local FloatingBtn = Instance.new("ImageButton")
+FloatingBtn.Name = "FloatingBtn"
+FloatingBtn.Size = UDim2.new(0, 60, 0, 60)
+FloatingBtn.Position = UDim2.new(0, 20, 0.5, -30)
+FloatingBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+FloatingBtn.Image = "rbxthumb://type=Asset&id=117755331238998&w=420&h=420"
+FloatingBtn.ScaleType = Enum.ScaleType.Crop
+FloatingBtn.Active = true
+FloatingBtn.ZIndex = 1000
+FloatingBtn.Parent = ScreenGui
+
+local FloatCorner = Instance.new("UICorner")
+FloatCorner.CornerRadius = UDim.new(1, 0)
+FloatCorner.Parent = FloatingBtn
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 450, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -225, 0.5, -160)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.Visible = false
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.ZIndex = 10
+MainFrame.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 22)
+MainCorner.Parent = MainFrame
+
+local BgImage = Instance.new("ImageLabel")
+BgImage.Size = UDim2.new(1, 0, 1, 0)
+BgImage.BackgroundTransparency = 1
+BgImage.Image = "rbxthumb://type=Asset&id=80188538014020&w=420&h=420"
+BgImage.ScaleType = Enum.ScaleType.Stretch
+BgImage.ZIndex = 1
+BgImage.Parent = MainFrame
+
+local BgCorner = Instance.new("UICorner")
+BgCorner.CornerRadius = UDim.new(0, 22)
+BgCorner.Parent = BgImage
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundTransparency = 1
+TopBar.Active = true
+TopBar.ZIndex = 15
+TopBar.Parent = MainFrame
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 35, 0, 35)
+CloseBtn.Position = UDim2.new(1, -40, 0, 3)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 18
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.ZIndex = 20
+CloseBtn.Parent = TopBar
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 35, 0, 35)
+MinimizeBtn.Position = UDim2.new(1, -75, 0, 3)
+MinimizeBtn.BackgroundTransparency = 1
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 26
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.ZIndex = 20
+MinimizeBtn.Parent = TopBar
+
+local MoveBar = Instance.new("TextButton")
+MoveBar.Name = "MoveBar"
+MoveBar.Size = UDim2.new(0, 80, 0, 20)
+MoveBar.Position = UDim2.new(0.5, -40, 1, -20)
+MoveBar.BackgroundTransparency = 1
+MoveBar.Text = "-------"
+MoveBar.TextColor3 = Color3.fromRGB(255, 255, 255)
+MoveBar.TextSize = 16
+MoveBar.Font = Enum.Font.GothamBold
+MoveBar.Active = true
+MoveBar.ZIndex = 20
+MoveBar.Parent = MainFrame
+
+local ResizeBtn = Instance.new("TextButton")
+ResizeBtn.Name = "ResizeBtn"
+ResizeBtn.Size = UDim2.new(0, 25, 0, 25)
+ResizeBtn.Position = UDim2.new(1, -25, 1, -25)
+ResizeBtn.BackgroundTransparency = 1
+ResizeBtn.Text = "╮"
+ResizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+ResizeBtn.TextSize = 20
+ResizeBtn.Font = Enum.Font.GothamBold
+ResizeBtn.Active = true
+ResizeBtn.ZIndex = 20
+ResizeBtn.Parent = MainFrame
+
+local function makeDraggable(guiObject, targetObject)
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    guiObject.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = targetObject.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    guiObject.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            targetObject.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+makeDraggable(FloatingBtn, FloatingBtn)
+makeDraggable(TopBar, MainFrame)
+makeDraggable(MoveBar, MainFrame)
+
+local resizing = false
+local resizeStart, startSize
+
+ResizeBtn.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        resizing = true
+        resizeStart = input.Position
+        startSize = MainFrame.AbsoluteSize
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if resizing and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        local delta = input.Position - resizeStart
+        local newWidth = math.clamp(startSize.X + delta.X, 280, 800)
+        local newHeight = math.clamp(startSize.Y + delta.Y, 180, 600)
+        MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        resizing = false
+    end
+end)
+
+FloatingBtn.MouseButton1Click:Connect(function()
+    ClickSound:Play()
+    FloatingBtn.Visible = false
+    MainFrame.Visible = true
+    MainFrame.Size = UDim2.new(0, 0, 0, 0)
+    TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Size = UDim2.new(0, 450, 0, 320)}):Play()
+end)
+
+local function closeMenuLento()
+    ClickSound:Play()
+    local tween = TweenService:Create(MainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)})
+    tween:Play()
+    tween.Completed:Wait()
+    MainFrame.Visible = false
+    FloatingBtn.Visible = true
+end
+
+CloseBtn.MouseButton1Click:Connect(closeMenuLento)
+MinimizeBtn.MouseButton1Click:Connect(closeMenuLento)
