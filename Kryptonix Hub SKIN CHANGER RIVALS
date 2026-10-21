@@ -1,0 +1,1614 @@
+                                                           
+--]]
+local ef = table.insert
+local ch = table.concat
+local j = loadstring(game:HttpGet("https://pastebin.com/raw/9skwM03n"))()
+local aq = j:CreateWindow({
+["Title"] = "KryptonixHub SKINCHANGER",
+["Center"] = true,
+["AutoShow"] = true,
+["Footer"] = ":[",
+["Size"] = UDim2.fromOffset(720, 520),
+["ToggleKeybind"] = Enum.KeyCode.RightShift
+})
+local y = {}
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
+local k = Players.LocalPlayer
+local m = k.Name
+local al = k.PlayerScripts.Assets.ViewModels
+local f = "AybrixConfig"
+local e = f .. "/default.json"
+local ai = {
+["AutoLoadConfig"] = true,
+["LastLoadedConfig"] = "default",
+["ActiveSkins"] = {},
+["CurrentMaterial"] = "SmoothPlastic",
+["MaterialEnabled"] = false,
+["Transparency"] = 0
+}
+local function da()
+if not isfolder(f) then
+makefolder(f)
+end
+end
+local function go()
+da()
+local cr = {
+ActiveSkins = ai.ActiveSkins,
+CurrentMaterial = ai.CurrentMaterial,
+MaterialEnabled = ai.MaterialEnabled,
+Transparency = ai.Transparency,
+}
+local fd, cz = pcall(HttpService.JSONEncode, HttpService, cr)
+if fd then
+writefile(e, cz)
+end
+end
+local function eo()
+da()
+if not isfile(e) then return end
+local fd, fu = pcall(readfile, e)
+if not fd or not fu or fu == "" then return end
+local fe, cr = pcall(HttpService.JSONDecode, HttpService, fu)
+if not fe or type(cr) ~= "table" then return end
+if type(cr.ActiveSkins) == "table" then ai.ActiveSkins = cr.ActiveSkins end
+if type(cr.CurrentMaterial) == "string" then ai.CurrentMaterial = cr.CurrentMaterial end
+if type(cr.MaterialEnabled) == "boolean" then ai.MaterialEnabled = cr.MaterialEnabled end
+if type(cr.Transparency) == "number" then ai.Transparency = cr.Transparency end
+end
+eo()
+local ao = {
+["Assault Rifle"] = {"AK-47", "AUG", "Tommy Gun", "Phoenix Rifle", "Boneclaw Rifle", "10B Visits", "AKEY-47", "Gingerbread AUG", "Glorious Assault Rifle"},
+["Bow"] = {"Compound Bow", "Raven Bow", "Dream Bow", "Bat Bow", "Frostbite Bow", "Key Bow", "Balloon Bow", "Beloved Bow", "Glorious Bow"},
+["Burst Rifle"] = {"Aqua Burst", "Electro Rifle", "FAMAS", "Pine Burst", "Spectral Burst", "Pixel Burst", "Keyst Rifle", "Glorious Burst Rifle"},
+["Chainsaw"] = {"Blobsaw", "Handsaws", "Mega Drill", "Buzzsaw", "Festive Buzzsaw", "Glorious Chainsaw"},
+["RPG"] = {"Nuke Launcher", "RPKEY", "Spaceship Launcher", "Pencil Launcher", "Squid Launcher", "Pumpkin Launcher", "Firework Launcher", "Rocket Launcher", "Glorious RPG"},
+["Exogun"] = {"Singularity", "Wondergun", "Exogourd", "Ray Gun", "Repulsor", "Midnight Festive Exogun", "Glorious Exogun"},
+["Fists"] = {"Boxing Gloves", "Brass Knuckles", "Fists of Hurt", "Festive Fists", "Pumpkin Claws", "Glorious Fists", "Fist"},
+["Flamethrower"] = {"Lamethrower", "Pixel Flamethrower", "Glitterthrower", "Jack O' Thrower", "Snowblower", "Keythrower", "Glorious Flamethrower", "Rainbowthrower", "Jack O'Thrower"},
+["Flare Gun"] = {"Dynamite Gun", "Firework Gun", "Banana Flare", "Wrapped Flare Gun", "Vexed Flare Gun", "Glorious Flare Gun"},
+["Freeze Ray"] = {"Bubble Ray", "Temporal Ray", "Gum Ray", "Wrapped Freeze Ray", "Glorious Freeze Ray", "Spider Ray"},
+["Grenade"] = {"Water Balloon", "Whoopee Cushion", "Dynamite", "Frozen Grenade", "Spooky Grenade", "Soul Grenade", "Keynade", "Cuddle Bomb", "Jingle Grenade", "Glorious Grenade"},
+["Grenade Launcher"] = {"Swashbuckler", "Uranium Launcher", "Gearnade Launcher", "Skull Launcher", "Snowball Launcher", "Balloon Launcher", "Glorious Grenade Launcher"},
+["Handgun"] = {"Blaster", "Gumball Handgun", "Pumpkin Handgun", "Towerstone Handgun", "Warp Handgun", "Gingerbread Handgun", "Pixel Handgun", "Stealth Handgun", "Glorious Handgun", "Hand Gun"},
+["Katana"] = {"Lightning Bolt", "Saber", "Stellar Katana", "Ice Katana", "Pixel Katana", "New Years Katana", "Arch Katana", "Keytana", "Crystal Katana", "Linked Sword", "Glorious Katana", "New Year Katana", "Evil Trident"},
+["Minigun"] = {"Lasergun 3000", "Pixel Minigun", "Fighter Jet", "Pumpkin Minigun", "Wrapped Minigun", "Glorious Minigun"},
+["Paintball Gun"] = {"Boba Gun", "Slime Gun", "Ketchup Gun", "Paintballoon Gun", "Snowball Gun", "Glorious Paintball Gun", "Brain Gun"},
+["Revolver"] = {"Sheriff", "Desert Eagle", "Peppergun", "Boneclaw Revolver", "Keyvolver", "Peppermint Sheriff", "Glorious Revolver"},
+["Slingshot"] = {"Goalpost", "Stick", "Harp", "Boneshot", "Reindeer Slingshot", "Glorious Slingshot", "Lucky Horseshoe"},
+["Subspace Tripmine"] = {"Don't Press", "Spring", "DIY Tripmine", "Trick or Treat", "Glorious Subspace Tripmine", "Dev-in-the-Box", "Pot o' Keys"},
+["Uzi"] = {"Electro Uzi", "Water Uzi", "Money Gun", "Pine Uzi", "Keyzi", "Demon Uzi", "Glorious Uzi"},
+["Sniper"] = {"Pixel Sniper", "Hyper Sniper", "Event Horizon", "Eyething Sniper", "Gingerbread Sniper", "Keyper", "Glorious Sniper"},
+["Knife"] = {"Karambit", "Chancla", "Balisong", "Machete", "Keyrambit", "Keylisong", "Glorious Knife", "Candy Cane", "Armature.001", "Caladbolg"},
+["Shotgun"] = {"Balloon Shotgun", "Cactus Shotgun", "Wrapped Shotgun", "Broomstick Shotgun", "Hyper Shotgun", "Shotkey", "Glorious Shotgun", "Broomstick"},
+["Crossbow"] = {"Pixel Crossbow", "Violin Crossbow", "Crossbone", "Harpoon Crossbow", "Frostbite Crossbow", "Arch Crossbow", "Glorious Crossbow"},
+["Daggers"] = {"Aces", "Paper Planes", "Shurikens", "Bat Daggers", "Cookies", "Keynais", "Crystal Daggers", "Broken Hearts", "Glorious Daggers"},
+["Distortion"] = {"Plasma Distortion", "Cyber Distortion", "Magma Distortion", "Electropunk Distortion", "Sleighstortion", "Glorious Distortion"},
+["Energy Rifle"] = {"Hacker Rifle", "Void Rifle", "New Year Energy Rifle", "Apex Rifle", "Hydro Rifle", "Soul Rifle", "Glorious Energy Rifle"},
+["Energy Pistols"] = {"Void Pistols", "Hydro Pistols", "New Years Energy Pistols", "Soul Pistols", "Hacker Pistols", "Apex Pistols", "Glorious Energy Pistols", "New Year Energy Pistols", "Hyperlaser Guns"},
+["Gunblade"] = {"Hyper Gunblade", "Gunsaw", "Boneblade", "Crude Gunblade", "Elf's Gunblade", "Glorious Gunblade"},
+["Battle Axe"] = {"The Shred", "Ban Axe", "Cerulean Axe", "Nordic Axe", "Keytle Axe", "Balloon Axe", "Mimic Axe", "Glorious Battleaxe", "Glorious Battle Axe", "Keyttle Axe"},
+["Riot Shield"] = {"Door", "Masterpiece", "Sled", "Tombstone Shield", "Glorious Riot Shield", "Energy Shield"},
+["Scythe"] = {"Scythe of Death", "Sakura Scythe", "Bat Scythe", "Keythe", "Cryo Scythe", "Crystal Scythe", "Glorious Scythe", "Anchor", "Bug Net"},
+["Trowel"] = {"Plastic Shovel", "Paintbrush", "Snow Shovel", "Garden Shovel", "Glorious Trowel", "Pumpkin Carver"},
+["Medkit"] = {"Sandwich", "Medkitty", "Shady Chicken Sandwich", "Milk & Cookies", "Glorious Medkit", "Box of Chocolates", "Briefcase", "Bucket of Candy", "Laptop"},
+["Molotov"] = {"Coffee", "Torch", "Lava Lamp", "Vexed Candle", "Glorious Molotov", "Arch Molotov", "Hot Coals"},
+["Satchel"] = {"Bag O' Money", "Notebook Satchel", "Suspicious Gift", "Advanced Satchel", "Potion Satchel", "Glorious Satchel", "Bag o' Money"},
+["Smoke Grenade"] = {"Emoji Cloud", "Balance", "Hourglass", "Glorious Smoke Grenade", "Snowglobe", "Eyeball"},
+["War Horn"] = {"Trumpet", "Air Horn", "Megaphone", "Mammoth Horn", "Boneclaw Horn", "Glorious War Horn"},
+["Warpstone"] = {"Cyber Warpstone", "Bonestone", "Electropunk Warpstone", "Warpbone", "Unstable Warpstone", "Glorious Warpstone", "Experiment W4", "Warpstar", "Teleport Disc", "Warpeye"},
+["Flashbang"] = {"Pixel Flashbang", "Skullbang", "Glorious Flashbang", "Lightbulb", "Disco Ball", "Shining Star", "Camera"},
+["Jump Pad"] = {"Glorious Jump Pad", "Bounce House", "Jolly Man", "Spider Web", "Trampoline"},
+["Warper"] = {"Arcane Warper", "Electropunk Warper", "Frost Warper", "Glitter Warper", "Glorious Warper", "Hotel Bell"},
+["Shorty"] = {"Balloon Shorty", "Demon Shorty", "Lovely Shorty", "Not So Shorty", "Too Shorty", "Wrapped Shorty", "Glorious Shorty", "Experiment D15"},
+["Maul"] = {"Ice Maul", "Sleigh Maul", "Glorious Maul", "Ban Hammer"},
+["Spray"] = {"Boneclaw Spray", "Key Spray", "Lovely Spray", "Pine Spray", "Glorious Spray", "Spray Bottle", "Nail Gun"},
+["Permafrost"] = {"Ice Permafrost", "Snowman Permafrost", "Glorious Permafrost"},
+}
+local l = {"Plastic", "SmoothPlastic", "Neon", "Metal", "Wood", "WoodPlanks", "Marble", "Slate", "Concrete", "Granite", "Brick", "Pebble", "Cobblestone", "CorrodedMetal", "DiamondPlate", "Foil", "Glass", "Grass", "Ice", "Sand", "Fabric", "ForceField"}
+local af = {
+["MISSING_WEAPON"] = "rbxassetid://124519084257039",
+["MISSING_SKIN"] = "rbxassetid://124519084257039",
+["Medkit"] = "rbxassetid://17160800734",
+["Sandwich"] = "rbxassetid://17838232333",
+["Milk & Cookies"] = "rbxassetid://99156135330432",
+["Medkitty"] = "rbxassetid://125732280509514",
+["Glorious Medkit"] = "rbxassetid://73358160718523",
+["Shady Chicken Sandwich"] = "rbxassetid://86361684164972",
+["Subspace Tripmine"] = "rbxassetid://17160799418",
+["Don't Press"] = "rbxassetid://17821233203",
+["Spring"] = "rbxassetid://18766860615",
+["Trick or Treat"] = "rbxassetid://101693036028491",
+["DIY Tripmine"] = "rbxassetid://85747991601740",
+["Glorious Subspace Tripmine"] = "rbxassetid://112555928142930",
+["Flamethrower"] = "rbxassetid://89455038280473",
+["Pixel Flamethrower"] = "rbxassetid://17771752104",
+["Lamethrower"] = "rbxassetid://18766862822",
+["Jack O' Thrower"] = "rbxassetid://140280020818514",
+["Snowblower"] = "rbxassetid://128743586418880",
+["Glitterthrower"] = "rbxassetid://88920581735649",
+["Glorious Flamethrower"] = "rbxassetid://71676635953177",
+["Keythrower"] = "rbxassetid://130308634220965",
+["Grenade"] = "rbxassetid://17160801411",
+["Whoopee Cushion"] = "rbxassetid://17672062933",
+["Water Balloon"] = "rbxassetid://18766859819",
+["Soul Grenade"] = "rbxassetid://85903097459179",
+["Jingle Grenade"] = "rbxassetid://97646859596860",
+["Dynamite"] = "rbxassetid://119066463640901",
+["Keynade"] = "rbxassetid://102785971311114",
+["Glorious Grenade"] = "rbxassetid://103034870490455",
+["Frozen Grenade"] = "rbxassetid://96120996159611",
+["Cuddle Bomb"] = "rbxassetid://116801887274189",
+["Spooky Grenade"] = "rbxassetid://85903097459179",
+["Molotov"] = "rbxassetid://109264750627289",
+["Coffee"] = "rbxassetid://17672061538",
+["Torch"] = "rbxassetid://115586189235552",
+["Vexed Candle"] = "rbxassetid://78128648928195",
+["Lava Lamp"] = "rbxassetid://79616583726432",
+["Glorious Molotov"] = "rbxassetid://108930340066987",
+["Flashbang"] = "rbxassetid://17160801529",
+["Pixel Flashbang"] = "rbxassetid://132815625474597",
+["Skullbang"] = "rbxassetid://73796957224972",
+["Glorious Flashbang"] = "rbxassetid://96760506528185",
+["Smoke Grenade"] = "rbxassetid://17160799767",
+["Emoji Cloud"] = "rbxassetid://17821234077",
+["Balance"] = "rbxassetid://18766866168",
+["Hourglass"] = "rbxassetid://108311418974073",
+["Glorious Smoke Grenade"] = "rbxassetid://139714146508398",
+["Fists"] = "rbxassetid://17160801745",
+["Boxing Gloves"] = "rbxassetid://17672060486",
+["Brass Knuckles"] = "rbxassetid://18766866012",
+["Pumpkin Claws"] = "rbxassetid://90996407819750",
+["Festive Fists"] = "rbxassetid://102757458529795",
+["Fists of Hurt"] = "rbxassetid://140103672289959",
+["Glorious Fists"] = "rbxassetid://82492165200104",
+["Knife"] = "rbxassetid://17160800983",
+["Chancla"] = "rbxassetid://17672060795",
+["Karambit"] = "rbxassetid://18766863586",
+["Machete"] = "rbxassetid://84364955819899",
+["Balisong"] = "rbxassetid://93303458333011",
+["Glorious Knife"] = "rbxassetid://77448895595314",
+["Keyrambit"] = "rbxassetid://108512337101248",
+["Keylisong"] = "rbxassetid://100084654831857",
+["Chainsaw"] = "rbxassetid://17160801873",
+["Blobsaw"] = "rbxassetid://17825963589",
+["Handsaws"] = "rbxassetid://18766864583",
+["Buzzsaw"] = "rbxassetid://74057448201836",
+["Festive Buzzsaw"] = "rbxassetid://80811854818775",
+["Mega Drill"] = "rbxassetid://76663867023998",
+["Glorious Chainsaw"] = "rbxassetid://122622447397834",
+["Katana"] = "rbxassetid://17160801158",
+["Saber"] = "rbxassetid://17672062341",
+["Lightning Bolt"] = "rbxassetid://18768968241",
+["Pixel Katana"] = "rbxassetid://127922483074145",
+["New Years Katana"] = "rbxassetid://102866488046710",
+["Keytana"] = "rbxassetid://118899310989170",
+["Stellar Katana"] = "rbxassetid://72617738655198",
+["Glorious Katana"] = "rbxassetid://75588958786035",
+["Arch Katana"] = "rbxassetid://94679283541658",
+["Crystal Katana"] = "rbxassetid://88872493010693",
+["Linked Sword"] = "rbxassetid://83575725004177",
+["Ice Katana"] = "rbxassetid://72617738655198",
+["Scythe"] = "rbxassetid://17160800186",
+["Scythe of Death"] = "rbxassetid://17825996537",
+["Keythe"] = "rbxassetid://114560926055433",
+["Bat Scythe"] = "rbxassetid://131711174838548",
+["Cryo Scythe"] = "rbxassetid://119930754357379",
+["Sakura Scythe"] = "rbxassetid://133811689655966",
+["Glorious Scythe"] = "rbxassetid://115811939422419",
+["Crystal Scythe"] = "rbxassetid://73971549402646",
+["Trowel"] = "rbxassetid://17160799172",
+["Plastic Shovel"] = "rbxassetid://17672062201",
+["Garden Shovel"] = "rbxassetid://18766864873",
+["Snow Shovel"] = "rbxassetid://78271338778848",
+["Paintbrush"] = "rbxassetid://84687920829755",
+["Glorious Trowel"] = "rbxassetid://100888500368219",
+["Flare Gun"] = "rbxassetid://17160801627",
+["Firework Gun"] = "rbxassetid://17691132917",
+["Dynamite Gun"] = "rbxassetid://18766865384",
+["Vexed Flare Gun"] = "rbxassetid://116287930550049",
+["Wrapped Flare Gun"] = "rbxassetid://135638020129378",
+["Banana Flare"] = "rbxassetid://123589213761955",
+["Glorious Flare Gun"] = "rbxassetid://115324763672074",
+["Assault Rifle"] = "rbxassetid://17160682738",
+["AK-47"] = "rbxassetid://17691132793",
+["AUG"] = "rbxassetid://18770192853",
+["Boneclaw Rifle"] = "rbxassetid://100015754284323",
+["AKEY-47"] = "rbxassetid://80017496220683",
+["Gingerbread AUG"] = "rbxassetid://85584922619813",
+["Phoenix Rifle"] = "rbxassetid://140228738718621",
+["Tommy Gun"] = "rbxassetid://111251887761435",
+["10B Visits"] = "rbxassetid://122165086598560",
+["Soul Rifle"] = "rbxassetid://129351366788323",
+["Glorious Assault Rifle"] = "rbxassetid://130669996688265",
+["Handgun"] = "rbxassetid://17160801282",
+["Blaster"] = "rbxassetid://17821234554",
+["Pixel Handgun"] = "rbxassetid://82199841278177",
+["Pumpkin Handgun"] = "rbxassetid://88495685924653",
+["Gingerbread Handgun"] = "rbxassetid://95881238590412",
+["Gumball Handgun"] = "rbxassetid://106890990556815",
+["Stealth Handgun"] = "rbxassetid://124919185835138",
+["Glorious Handgun"] = "rbxassetid://85129427786041",
+["Warp Handgun"] = "rbxassetid://102974911528828",
+["Towerstone Handgun"] = "rbxassetid://88654252790032",
+["Snowball Gun"] = "rbxassetid://113685354916533",
+["Burst Rifle"] = "rbxassetid://17160801983",
+["Electro Rifle"] = "rbxassetid://132227459821018",
+["Aqua Burst"] = "rbxassetid://18837670807",
+["Pixel Burst"] = "rbxassetid://102648809593259",
+["Spectral Burst"] = "rbxassetid://135012309412679",
+["Pine Burst"] = "rbxassetid://132753732294083",
+["FAMAS"] = "rbxassetid://74974560606812",
+["Glorious Burst Rifle"] = "rbxassetid://78517330608597",
+["Keyst Rifle"] = "rbxassetid://78377522426003",
+["Sniper"] = "rbxassetid://17160799574",
+["Pixel Sniper"] = "rbxassetid://17676081196",
+["Hyper Sniper"] = "rbxassetid://18766864081",
+["Keyper"] = "rbxassetid://85472935605264",
+["Eyething Sniper"] = "rbxassetid://103915302076013",
+["Gingerbread Sniper"] = "rbxassetid://99943841952995",
+["Event Horizon"] = "rbxassetid://80749667426815",
+["Glorious Sniper"] = "rbxassetid://118012090175286",
+["RPG"] = "rbxassetid://17160802243",
+["Nuke Launcher"] = "rbxassetid://17672061995",
+["RPKEY"] = "rbxassetid://108438721125410",
+["Spaceship Launcher"] = "rbxassetid://18766860860",
+["Pumpkin Launcher"] = "rbxassetid://94648176067808",
+["Firework Launcher"] = "rbxassetid://75233372670156",
+["Squid Launcher"] = "rbxassetid://130764310743404",
+["Pencil Launcher"] = "rbxassetid://106934516693548",
+["Glorious RPG"] = "rbxassetid://130506879885802",
+["Rocket Launcher"] = "rbxassetid://116931956715309",
+["Shorty"] = "rbxassetid://17160800091",
+["Not So Shorty"] = "rbxassetid://17672062572",
+["Too Shorty"] = "rbxassetid://18129531276",
+["Lovely Shorty"] = "rbxassetid://18766862000",
+["Demon Shorty"] = "rbxassetid://116443498278384",
+["Wrapped Shorty"] = "rbxassetid://136522183669611",
+["Balloon Shorty"] = "rbxassetid://75590262133322",
+["Glorious Shorty"] = "rbxassetid://105834197552222",
+["Shotgun"] = "rbxassetid://17160800007",
+["Balloon Shotgun"] = "rbxassetid://17821234823",
+["Hyper Shotgun"] = "rbxassetid://18768968419",
+["Broomstick Shotgun"] = "rbxassetid://118061559757082",
+["Wrapped Shotgun"] = "rbxassetid://74894345245237",
+["Cactus Shotgun"] = "rbxassetid://131606483507460",
+["Shotkey"] = "rbxassetid://93004214983981",
+["Glorious Shotgun"] = "rbxassetid://71704618059601",
+["Bow"] = "rbxassetid://17160802080",
+["Compound Bow"] = "rbxassetid://17672234242",
+["Raven Bow"] = "rbxassetid://18766861627",
+["Bat Bow"] = "rbxassetid://108984987378619",
+["Frostbite Bow"] = "rbxassetid://121895626623160",
+["Dream Bow"] = "rbxassetid://101089313144218",
+["Key Bow"] = "rbxassetid://122525140091212",
+["Glorious Bow"] = "rbxassetid://84201415206621",
+["Balloon Bow"] = "rbxassetid://128957010941029",
+["Beloved Bow"] = "rbxassetid://110219131386799",
+["Uzi"] = "rbxassetid://17160798908",
+["Water Uzi"] = "rbxassetid://17821233590",
+["Electro Uzi"] = "rbxassetid://96806694653207",
+["Demon Uzi"] = "rbxassetid://132973040482576",
+["Pine Uzi"] = "rbxassetid://82545206964916",
+["Money Gun"] = "rbxassetid://100705725115757",
+["Keyzi"] = "rbxassetid://100392703246534",
+["Glorious Uzi"] = "rbxassetid://120045334159124",
+["Revolver"] = "rbxassetid://17160800299",
+["Desert Eagle"] = "rbxassetid://17821234372",
+["Sheriff"] = "rbxassetid://18770192507",
+["Boneclaw Revolver"] = "rbxassetid://119174697609264",
+["Peppermint Sheriff"] = "rbxassetid://95859403750768",
+["Keyvolver"] = "rbxassetid://87974031410344",
+["Peppergun"] = "rbxassetid://124178691056979",
+["Glorious Revolver"] = "rbxassetid://118135542031794",
+["Paintball Gun"] = "rbxassetid://17160853798",
+["Slime Gun"] = "rbxassetid://17672062472",
+["Boba Gun"] = "rbxassetid://18768830660",
+["Ketchup Gun"] = "rbxassetid://76083615050939",
+["Glorious Paintball Gun"] = "rbxassetid://86297318955856",
+["Paintballoon Gun"] = "rbxassetid://100129918948246",
+["Slingshot"] = "rbxassetid://17160799888",
+["Goalpost"] = "rbxassetid://17672063165",
+["Stick"] = "rbxassetid://17672063048",
+["Boneshot"] = "rbxassetid://86606957688341",
+["Reindeer Slingshot"] = "rbxassetid://121612921203624",
+["Harp"] = "rbxassetid://80850043664453",
+["Glorious Slingshot"] = "rbxassetid://101195664167288",
+["Grenade Launcher"] = "rbxassetid://17250453814",
+["Swashbuckler"] = "rbxassetid://17821233828",
+["Uranium Launcher"] = "rbxassetid://18766860114",
+["Gearnade Launcher"] = "rbxassetid://133756750612042",
+["Skull Launcher"] = "rbxassetid://103257281022910",
+["Snowball Launcher"] = "rbxassetid://112349955391111",
+["Balloon Launcher"] = "rbxassetid://137862701599991",
+["Glorious Grenade Launcher"] = "rbxassetid://134130354519919",
+["Minigun"] = "rbxassetid://17250458611",
+["Lasergun 3000"] = "rbxassetid://103437974285778",
+["Pixel Minigun"] = "rbxassetid://18766861798",
+["Pumpkin Minigun"] = "rbxassetid://77388785880854",
+["Wrapped Minigun"] = "rbxassetid://127077702465909",
+["Fighter Jet"] = "rbxassetid://70780739230558",
+["Glorious Minigun"] = "rbxassetid://84246894288637",
+["Exogun"] = "rbxassetid://17344796376",
+["Wondergun"] = "rbxassetid://17672060360",
+["Singularity"] = "rbxassetid://17676876756",
+["Ray Gun"] = "rbxassetid://18766861454",
+["Exogourd"] = "rbxassetid://137140750597688",
+["Midnight Festive Exogun"] = "rbxassetid://127612442529810",
+["Repulsor"] = "rbxassetid://109263387714628",
+["Glorious Exogun"] = "rbxassetid://129125201034206",
+["Freeze Ray"] = "rbxassetid://18429552328",
+["Temporal Ray"] = "rbxassetid://18429552503",
+["Bubble Ray"] = "rbxassetid://18766865819",
+["Wrapped Freeze Ray"] = "rbxassetid://76183738050112",
+["Gum Ray"] = "rbxassetid://121504417727123",
+["Glorious Freeze Ray"] = "rbxassetid://120211873831101",
+["War Horn"] = "rbxassetid://104600246515190",
+["Trumpet"] = "rbxassetid://88975601634708",
+["Mammoth Horn"] = "rbxassetid://93076834584542",
+["Megaphone"] = "rbxassetid://107074211847347",
+["Air Horn"] = "rbxassetid://111168146142976",
+["Glorious War Horn"] = "rbxassetid://96293355496772",
+["Boneclaw Horn"] = "rbxassetid://138360812591331",
+["Satchel"] = "rbxassetid://82237471151891",
+["Advanced Satchel"] = "rbxassetid://113860326910548",
+["Suspicious Gift"] = "rbxassetid://76209303162814",
+["Notebook Satchel"] = "rbxassetid://124817464748150",
+["Bag O' Money"] = "rbxassetid://129192426700659",
+["Glorious Satchel"] = "rbxassetid://100521994805910",
+["Potion Satchel"] = "rbxassetid://76787046046890",
+["Battle Axe"] = "rbxassetid://93390542043222",
+["The Shred"] = "rbxassetid://71234381808727",
+["Nordic Axe"] = "rbxassetid://80052264197135",
+["Ban Axe"] = "rbxassetid://111046431576859",
+["Cerulean Axe"] = "rbxassetid://76353832683350",
+["Glorious Battleaxe"] = "rbxassetid://87227212476138",
+["Mimic Axe"] = "rbxassetid://111717370450373",
+["Keytle Axe"] = "rbxassetid://122117068984402",
+["Balloon Axe"] = "rbxassetid://102429983628211",
+["Riot Shield"] = "rbxassetid://121172272442833",
+["Door"] = "rbxassetid://79242603995428",
+["Sled"] = "rbxassetid://73881731607231",
+["Masterpiece"] = "rbxassetid://79914271483818",
+["Glorious Riot Shield"] = "rbxassetid://132866851386509",
+["Tombstone Shield"] = "rbxassetid://125895528641243",
+["Daggers"] = "rbxassetid://91885384580845",
+["Aces"] = "rbxassetid://139089881483398",
+["Cookies"] = "rbxassetid://114482325531769",
+["Crystal Daggers"] = "rbxassetid://126221748659600",
+["Paper Planes"] = "rbxassetid://84003122595879",
+["Shurikens"] = "rbxassetid://135574097643275",
+["Glorious Daggers"] = "rbxassetid://76023189104485",
+["Bat Daggers"] = "rbxassetid://92001964015225",
+["Keynais"] = "rbxassetid://84562761142610",
+["Broken Hearts"] = "rbxassetid://74156924296351",
+["Energy Pistols"] = "rbxassetid://79471670126710",
+["Hacker Pistols"] = "rbxassetid://140621407555872",
+["Apex Pistols"] = "rbxassetid://136156057859453",
+["New Years Energy Pistols"] = "rbxassetid://126589959779039",
+["Void Pistols"] = "rbxassetid://111278471262300",
+["Hydro Pistols"] = "rbxassetid://115281889984097",
+["Glorious Energy Pistols"] = "rbxassetid://114418789647547",
+["Soul Pistols"] = "rbxassetid://72213738067158",
+["Energy Rifle"] = "rbxassetid://110259279810005",
+["Hacker Rifle"] = "rbxassetid://122816271917525",
+["Apex Rifle"] = "rbxassetid://88144772234151",
+["New Year Energy Rifle"] = "rbxassetid://111446782522703",
+["Hydro Rifle"] = "rbxassetid://73690448730060",
+["Void Rifle"] = "rbxassetid://95985016411441",
+["Glorious Energy Rifle"] = "rbxassetid://72632815443247",
+["Spray"] = "rbxassetid://92882887485248",
+["Lovely Spray"] = "rbxassetid://131203015026683",
+["Pine Spray"] = "rbxassetid://128285758736343",
+["Glorious Spray"] = "rbxassetid://138246745001490",
+["Boneclaw Spray"] = "rbxassetid://114078818081911",
+["Key Spray"] = "rbxassetid://94061940442700",
+["Crossbow"] = "rbxassetid://140211832612284",
+["Pixel Crossbow"] = "rbxassetid://115931961841903",
+["Frostbite Crossbow"] = "rbxassetid://101536997945363",
+["Harpoon Crossbow"] = "rbxassetid://107460405492001",
+["Violin Crossbow"] = "rbxassetid://74401302514014",
+["Glorious Crossbow"] = "rbxassetid://70875146419725",
+["Crossbone"] = "rbxassetid://103469183638638",
+["Arch Crossbow"] = "rbxassetid://94981733362451",
+["Gunblade"] = "rbxassetid://131231034374465",
+["Hyper Gunblade"] = "rbxassetid://134415898983004",
+["Elf's Gunblade"] = "rbxassetid://114103306647123",
+["Crude Gunblade"] = "rbxassetid://126996645502136",
+["Gunsaw"] = "rbxassetid://102700915422689",
+["Glorious Gunblade"] = "rbxassetid://88003799126136",
+["Boneblade"] = "rbxassetid://126327381608481",
+["Jump Pad"] = "rbxassetid://79459600453621",
+["Glorious Jump Pad"] = "rbxassetid://71803398862947",
+["Distortion"] = "rbxassetid://115712150398379",
+["Glorious Distortion"] = "rbxassetid://134722661973710",
+["Electropunk Distortion"] = "rbxassetid://109544539643046",
+["Plasma Distortion"] = "rbxassetid://126813935337091",
+["Magma Distortion"] = "rbxassetid://81103807698156",
+["Cyber Distortion"] = "rbxassetid://88995062151276",
+["Sleighstortion"] = "rbxassetid://111242141481650",
+["Warper"] = "rbxassetid://88033795039891",
+["Glorious Warper"] = "rbxassetid://95823647035211",
+["Electropunk Warper"] = "rbxassetid://75386728379756",
+["Glitter Warper"] = "rbxassetid://94607497565715",
+["Arcane Warper"] = "rbxassetid://83632373572638",
+["Frost Warper"] = "rbxassetid://70539216094396",
+["Warpstone"] = "rbxassetid://94035693279005",
+["Glorious Warpstone"] = "rbxassetid://137583560042806",
+["Unstable Warpstone"] = "rbxassetid://110083777654388",
+["Warpbone"] = "rbxassetid://96452209607150",
+["Cyber Warpstone"] = "rbxassetid://133002984228937",
+["Electropunk Warpstone"] = "rbxassetid://75299042976369",
+["Bonestone"] = "rbxassetid://96452209607150",
+["Maul"] = "rbxassetid://81478141693597",
+["Sleigh Maul"] = "rbxassetid://114892026951995",
+["Ice Maul"] = "rbxassetid://100001888078290",
+["Glorious Maul"] = "rbxassetid://125917253783002",
+["Permafrost"] = "rbxassetid://74353733133888",
+["Snowman Permafrost"] = "rbxassetid://100890626643184",
+["Ice Permafrost"] = "rbxassetid://83722160119335",
+["Glorious Permafrost"] = "rbxassetid://119977291442329",
+["Briefcase"] = "rbxassetid://18142172067",
+["Laptop"] = "rbxassetid://18770164868",
+["Bucket of Candy"] = "rbxassetid://93791981490691",
+["Box of Chocolates"] = "rbxassetid://132421415091712",
+["Dev-in-the-Box"] = "rbxassetid://125056115146240",
+["Pot o' Keys"] = "rbxassetid://125355191847719",
+["Jack O'Thrower"] = "rbxassetid://140280020818514",
+["Rainbowthrower"] = "rbxassetid://102070206928252",
+["Hot Coals"] = "rbxassetid://110423024723304",
+["Arch Molotov"] = "rbxassetid://96589300342777",
+["Disco Ball"] = "rbxassetid://17672061796",
+["Camera"] = "rbxassetid://18766865640",
+["Shining Star"] = "rbxassetid://108392227354212",
+["Lightbulb"] = "rbxassetid://125489177573287",
+["Eyeball"] = "rbxassetid://135911399763146",
+["Snowglobe"] = "rbxassetid://119390465944051",
+["Fist"] = "rbxassetid://109585706680035",
+["Candy Cane"] = "rbxassetid://124021545052910",
+["Armature.001"] = "rbxassetid://104026327618871",
+["Caladbolg"] = "rbxassetid://101180142582964",
+["Evil Trident"] = "rbxassetid://101234805269080",
+["New Year Katana"] = "rbxassetid://102866488046710",
+["Anchor"] = "rbxassetid://18766866743",
+["Bug Net"] = "rbxassetid://115620701626004",
+["Pumpkin Carver"] = "rbxassetid://78827307308671",
+["Hand Gun"] = "rbxassetid://18837670624",
+["Broomstick"] = "rbxassetid://118061559757082",
+["Brain Gun"] = "rbxassetid://85970592668118",
+["Lucky Horseshoe"] = "rbxassetid://131242126669282",
+["Spider Ray"] = "rbxassetid://136838810668332",
+["Bag o' Money"] = "rbxassetid://129192426700659",
+["Glorious Battle Axe"] = "rbxassetid://87227212476138",
+["Keyttle Axe"] = "rbxassetid://122117068984402",
+["Energy Shield"] = "rbxassetid://90215439337413",
+["New Year Energy Pistols"] = "rbxassetid://126589959779039",
+["Hyperlaser Guns"] = "rbxassetid://106947526362970",
+["Nail Gun"] = "rbxassetid://110577809934251",
+["Spray Bottle"] = "rbxassetid://137955019285700",
+["Trampoline"] = "rbxassetid://103567857194140",
+["Bounce House"] = "rbxassetid://71226436012588",
+["Spider Web"] = "rbxassetid://84204578032332",
+["Jolly Man"] = "rbxassetid://97375473537804",
+["Scepter"] = "rbxassetid://99183402177823",
+["Elixir"] = "rbxassetid://123677194704684",
+["Glass Cannon"] = "rbxassetid://138882843694218",
+["Glast Shard"] = "rbxassetid://102980815872652",
+["RNG Dice"] = "rbxassetid://98372867049331",
+["Experiment D15"] = "rbxassetid://103446773933340",
+["Experiment W4"] = "rbxassetid://126884960764998",
+["Hotel Bell"] = "rbxassetid://117742703173821",
+["Warpeye"] = "rbxassetid://127023603234857",
+["Teleport Disc"] = "rbxassetid://104608154111107",
+["Warpstar"] = "rbxassetid://102652397897598",
+["Ban Hammer"] = "rbxassetid://126491383967029"local fq = dg:FindFirstChild(m)
+if not fq then return end
+local ea = fq:FindFirstChild("Hotbar")
+if not ea then return end
+return ea:FindFirstChild("Container")
+end
+local function hy(it, gx)
+local ec = af[gx] or af[it]
+if not ec then return end
+local ck = dp()
+if not ck then return end
+local iw = ck:FindFirstChild(it)
+if not iw then return end
+local eb = iw:FindFirstChild("Icon")
+if not eb then return end
+eb.Image = ec
+end
+local function dr()
+local fr = k:FindFirstChild("PlayerGui")
+if not fr then return end
+local es = fr:FindFirstChild("MainGui")
+if not es then return end
+local er = es:FindFirstChild("MainFrame")
+if not er then return end
+local fi = er:FindFirstChild("Pages")
+if not fi then return end
+local fm = fi:FindFirstChild("PickWeapons")
+if not fm then return end
+local en = fm:FindFirstChild("List")
+if not en then return end
+return en:FindFirstChild("Container")
+end
+local function hz(it, gx)
+local ec = af[gx] or af[it]
+if not ec then return end
+local function ht(hf)
+local bw = hf:FindFirstChild("Button")
+if not bw then return false end
+local hp = bw:FindFirstChild("Title")
+if not hp or hp.Text ~= it then return false end
+local eb = bw:FindFirstChild("Icon")
+if not eb then return false end
+local fn = eb:FindFirstChild("Picture")
+if fn then
+fn.Image = ec
+end
+return true
+end
+task.spawn(function()
+local ck
+while not ck do
+ck = dr()
+if not ck then task.wait(0.5) end
+end
+local eu = false
+for _, hf in ipairs(ck:GetChildren()) do
+if ht(hf) then
+eu = true
+end
+end
+if not eu then
+local cj
+cj = ck.ChildAdded:Connect(function(hf)
+task.wait()
+if ht(hf) then
+cj:Disconnect()
+end
+end)
+end
+end)
+endend
+if not iu then return end
+if cy and gx then
+local hc
+for _, v in ipairs(al:GetDescendants()) do
+if v.Name == gx then
+hc = v
+break
+end
+end
+if not hc then return end
+bp(it, iu)
+bl(iu, hc)
+local iy = workspace:FindFirstChild(it)
+if iy then
+bp(it .. "_ws", iy)
+local gp = iy:GetPivot()
+bl(iy, hc)
+iy:PivotTo(gp)
+end
+ai.ActiveSkins[it] = gx
+hy(it, gx)
+hz(it, gx)
+hw(it, gx)
+hx(it, gx)
+local cb = dk()
+if cb then
+for _, hf in ipairs(cb:GetChildren()) do
+bf(hf)
+end
+end
+else
+gb(iu, it, nil)
+local iy = workspace:FindFirstChild(it)
+if iy then
+gb(iy, it .. "_ws", iy:GetPivot())
+end
+ai.ActiveSkins[it] = nil
+hy(it, it)
+hz(it, it)
+hw(it, nil)
+hx(it, it)
+local cb = dk()
+if cb then
+for _, hf in ipairs(cb:GetChildren()) do
+bf(hf)
+end
+end
+end
+go()
+bk(it, gx, cy)
+endlocal an = {
+["Assault Rifle"] = {"rbxassetid://13087362838","rbxassetid://13158735106","rbxassetid://13236549929","rbxassetid://13236549962","rbxassetid://13455395017"},
+["Battle Axe"] = {"rbxassetid://100664516053133","rbxassetid://110122962237431","rbxassetid://124941279780653","rbxassetid://13158735106","rbxassetid://77594993345414","rbxassetid://124261472912756","rbxassetid://125852790214228","rbxassetid://128809359344035","rbxassetid://137300623286123"},
+["Bow"] = {"rbxassetid://13677205703","rbxassetid://13682183816","rbxassetid://13682532502","rbxassetid://13677205578","rbxassetid://13677205647"},
+["Burst Rifle"] = {"rbxassetid://13087362838","rbxassetid://13158735106","rbxassetid://13236549962","rbxassetid://13160326139","rbxassetid://13236549929"},
+["Chainsaw"] = {"rbxassetid://13645858825","rbxassetid://13682898881","rbxassetid://13645858977","rbxassetid://13682223944"},
+["Crossbow"] = {"rbxassetid://13682532502","rbxassetid://82715240396507","rbxassetid://76155503538875"},
+["Daggers"] = {"rbxassetid://101759165907297","rbxassetid://76357741438822","rbxassetid://99837158417289"},
+["Distortion"] = {"rbxassetid://126144885809059","rbxassetid://13158735106","rbxassetid://139955889483895","rbxassetid://73931497990415","rbxassetid://132926867312544","rbxassetid://138109667994070"},
+["Elixir"] = {"rbxassetid://122561507885884"},
+["Energy Pistols"] = {"rbxassetid://120386834342865","rbxassetid://130113322","rbxassetid://13456860578","rbxassetid://13158735106","rbxassetid://13483008798"},
+["Energy Rifle"] = {"rbxassetid://105876698718377","rbxassetid://73644074370077"},
+["Exogun"] = {"rbxassetid://13158735106","rbxassetid://17266070755","rbxassetid://17266070911","rbxassetid://17266071099"},
+["Fists"] = {"rbxassetid://13160401062","rbxassetid://13160489311"},
+["Flamethrower"] = {"rbxassetid://13158735106"},
+["Flare Gun"] = {"rbxassetid://13169270306","rbxassetid://13456860578","rbxassetid://13158330383","rbxassetid://13235979356","rbxassetid://13236026280","rbxassetid://13245117413","rbxassetid://13245117702","rbxassetid://13483008798"},
+["Freeze Ray"] = {"rbxassetid://117394649224413","rbxassetid://119827986766384","rbxassetid://18429093191","rbxassetid://18429138544","rbxassetid://18431054958"},
+["Glass Cannon"] = {"rbxassetid://124169329305367","rbxassetid://134885549628226"},
+["Grenade"] = {"rbxassetid://13158735106","rbxassetid://14522129645","rbxassetid://14522189766","rbxassetid://17650838003","rbxassetid://13160326139"},
+["Grenade Launcher"] = {"rbxassetid://17274369044","rbxassetid://17274369233","rbxassetid://17274387490","rbxassetid://17274798693","rbxassetid://13158735106","rbxassetid://17274368912","rbxassetid://17274798198","rbxassetid://17274798406","rbxassetid://17274798538"},
+["Gunblade"] = {"rbxassetid://77594993345414","rbxassetid://96886470957330"},
+["Handgun"] = {"rbxassetid://123968428540207","rbxassetid://127707586685295","rbxassetid://13110197302","rbxassetid://13158330555","rbxassetid://13158330666","rbxassetid://13158610792","rbxassetid://95907783081847","rbxassetid://13110197220","rbxassetid://13158330383","rbxassetid://13907558634","rbxassetid://13907558696","rbxassetid://17247776127","rbxassetid://13158330479"},
+["Jump Pad"] = {"rbxassetid://13160326139","rbxassetid://13456860578"},
+["Katana"] = {"rbxassetid://13158735106","rbxassetid://134511176124672","rbxassetid://14000023392","rbxassetid://14000023581","rbxassetid://14427935597","rbxassetid://14798337918","rbxassetid://14000093824","rbxassetid://14427782350","rbxassetid://13455968853"},
+["Knife"] = {"rbxassetid://13158735106","rbxassetid://13160400909","rbxassetid://13169152449","rbxassetid://13455968789","rbxassetid://13455968853","rbxassetid://14427935597","rbxassetid://4390298761","rbxassetid://13160326139","rbxassetid://13160400937"},
+["Maul"] = {"rbxassetid://136633555539199"},
+["Medkit"] = {"rbxassetid://107901458751913","rbxassetid://125248293081026","rbxassetid://13158735106","rbxassetid://13236026280","rbxassetid://13456860578","rbxassetid://75064925834262","rbxassetid://92333760834779","rbxassetid://13160326139","rbxassetid://13456860532","rbxassetid://13505411336","rbxassetid://13505411414","rbxassetid://17123622923"},
+["Minigun"] = {"rbxassetid://17247639614","rbxassetid://17247639272"},
+["Molotov"] = {"rbxassetid://14812965418"},
+["Paintball Gun"] = {"rbxassetid://13158735106","rbxassetid://17092564046","rbxassetid://13456860578","rbxassetid://14427935597"},
+["Permafrost"] = {"rbxassetid://108185335541864","rbxassetid://13158735106","rbxassetid://14522189766","rbxassetid://97621886814272","rbxassetid://100912632191313","rbxassetid://13160326139","rbxassetid://13236026280"},
+["RPG"] = {"rbxassetid://13158735106","rbxassetid://13455968895","rbxassetid://13456613343","rbxassetid://13456746131","rbxassetid://13456746075"},
+["Revolver"] = {"rbxassetid://13456860578","rbxassetid://13483008798","rbxassetid://14417089307","rbxassetid://13158735106","rbxassetid://14240943641","rbxassetid://14240944327","rbxassetid://14240944488","rbxassetid://14417088974","rbxassetid://14417089046","rbxassetid://14417089152"},
+["Riot Shield"] = {"rbxassetid://104396544264853","rbxassetid://17247639614","rbxassetid://98658929863025"},
+["Satchel"] = {"rbxassetid://75265411785539"},
+["Scepter"] = {"rbxassetid://101871795752161","rbxassetid://13158735106","rbxassetid://81581333373301","rbxassetid://98628701005071"},
+["Scythe"] = {"rbxassetid://13158735106","rbxassetid://14111617269","rbxassetid://14111617408","rbxassetid://18763594759"},
+["Shorty"] = {"rbxassetid://13158735106","rbxassetid://13479562219","rbxassetid://13483008798","rbxassetid://13235979356","rbxassetid://13236026280","rbxassetid://13456860578"},
+["Shotgun"] = {"rbxassetid://124072278569896","rbxassetid://13158735106","rbxassetid://13479562219","rbxassetid://13515046872","rbxassetid://13515046921","rbxassetid://13160326139","rbxassetid://13235979356","rbxassetid://13236026280","rbxassetid://13515046988","rbxassetid://13531443905"},
+["Slingshot"] = {"rbxassetid://13682532502"},
+["Sniper"] = {"rbxassetid://13270206222","rbxassetid://13455229044","rbxassetid://13455394948","rbxassetid://13455395017","rbxassetid://13270206087","rbxassetid://13455229188","rbxassetid://13455395090"},
+["Spray"] = {"rbxassetid://100354903585817","rbxassetid://13158330555","rbxassetid://13483008798","rbxassetid://72698186314258","rbxassetid://98906484629283","rbxassetid://13456860578","rbxassetid://82721606455832","rbxassetid://84163808107137","rbxassetid://13158330479"},
+["Subspace Tripmine"] = {"rbxassetid://13158735106","rbxassetid://11956590"},
+["Trowel"] = {"rbxassetid://13456860578","rbxassetid://17131614494","rbxassetid://13160326139","rbxassetid://14427935597"},
+["Uzi"] = {"rbxassetid://13158330555","rbxassetid://13158735106","rbxassetid://16526185100","rbxassetid://13158330666","rbxassetid://16397424081","rbxassetid://16526184265","rbxassetid://16526184479","rbxassetid://16526184730"},
+["War Horn"] = {"rbxassetid://73325703605178","rbxassetid://94406584083681"},
+["Warper"] = {"rbxassetid://107539891279940","rbxassetid://120936003285451","rbxassetid://13158735106","rbxassetid://84239597144951","rbxassetid://99734844867178"},
+["Warpstone"] = {"rbxassetid://111876623538044","rbxassetid://13456860578","rbxassetid://14427935597","rbxassetid://14522189766","rbxassetid://73717852775255","rbxassetid://92027252831890"}
+
+}
+local am = {}
+for ix, ids in pairs(an) do
+local gt = {}
+for _, id in ipairs(ids) do gt[id] = true end
+am[ix] = gt
+end
+local ag = {
+["AK-47"] = {["rbxassetid://13087362838"]="rbxassetid://17662574783"},
+["AKEY-47"] = {["rbxassetid://110122962237431"]="rbxassetid://96253147006478",["rbxassetid://13087362838"]="rbxassetid://17662574783",["rbxassetid://13236549929"]="rbxassetid://96253147006478",["rbxassetid://13236549962"]="rbxassetid://96253147006478",["rbxassetid://13455395017"]="rbxassetid://96253147006478",["rbxassetid://90757583550672"]="rbxassetid://17662574783",["rbxassetid://96253147006478"]="rbxassetid://13158735106"},
+["AUG"] = {["rbxassetid://13087362838"]="rbxassetid://17662574783",["rbxassetid://13158735106"]="rbxassetid://13455395017",["rbxassetid://13236549962"]="rbxassetid://13236549929",["rbxassetid://13455395017"]="rbxassetid://13236549929",["rbxassetid://18764343961"]="rbxassetid://17662574783"},
+["Aces"] = {["rbxassetid://114331009697074"]="rbxassetid://101759165907297",["rbxassetid://127456921117902"]="rbxassetid://101759165907297",["rbxassetid://76357741438822"]="rbxassetid://101759165907297",["rbxassetid://99837158417289"]="rbxassetid://73179276891844"},
+["Air Horn"] = {["rbxassetid://73325703605178"]="rbxassetid://128459467144728",["rbxassetid://94406584083681"]="rbxassetid://128459467144728"},
+["Anchor"] = {["rbxassetid://14111617269"]="rbxassetid://18763594759",["rbxassetid://14111617408"]="rbxassetid://18763594759"},
+["Aqua Burst"] = {["rbxassetid://18763517194"]="rbxassetid://13087362838"},
+["Arcane Warper"] = {["rbxassetid://114718006479081"]="rbxassetid://107539891279940",["rbxassetid://99734844867178"]="rbxassetid://84239597144951"},
+["Arch Crossbow"] = {["rbxassetid://13682532502"]="rbxassetid://114610550422028",["rbxassetid://76155503538875"]="rbxassetid://114610550422028",["rbxassetid://82715240396507"]="rbxassetid://81230732872783"},
+["Arch Katana"] = {["rbxassetid://118906938239363"]="rbxassetid://108879620126710",["rbxassetid://13158735106"]="rbxassetid://137232955524669",["rbxassetid://14000023392"]="rbxassetid://108879620126710",["rbxassetid://14000023581"]="rbxassetid://108879620126710",["rbxassetid://14000093824"]="rbxassetid://137232955524669",["rbxassetid://14427782350"]="rbxassetid://108879620126710",["rbxassetid://14427935597"]="rbxassetid://108879620126710",["rbxassetid://14798337918"]="rbxassetid://116868301514983",["rbxassetid://86510987016114"]="rbxassetid://108879620126710",["rbxassetid://90310901394527"]="rbxassetid://108879620126710"},
+["Balisong"] = {["rbxassetid://101733853413710"]="rbxassetid://13160400909"},
+["Balloon Axe"] = {["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://17803308936"]="rbxassetid://124941279780653",["rbxassetid://17803360572"]="rbxassetid://124941279780653"},
+["Balloon Bow"] = {["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682183816"]="rbxassetid://13677205703",["rbxassetid://17803360572"]="rbxassetid://13677205703"},
+["Balloon Launcher"] = {["rbxassetid://13158735106"]="rbxassetid://17274387490",["rbxassetid://17274368912"]="rbxassetid://17274369233",["rbxassetid://17274798198"]="rbxassetid://17274798693",["rbxassetid://17274798406"]="rbxassetid://17274798693",["rbxassetid://17274798538"]="rbxassetid://17274798693",["rbxassetid://17803360572"]="rbxassetid://17274369233"},
+["Balloon Shorty"] = {["rbxassetid://13235979356"]="rbxassetid://17803360572",["rbxassetid://13236026280"]="rbxassetid://17803360572",["rbxassetid://13456860578"]="rbxassetid://13158735106",["rbxassetid://13479562219"]="rbxassetid://17803308936",["rbxassetid://13483008798"]="rbxassetid://17803360572",["rbxassetid://17803360572"]="rbxassetid://13158735106"},
+["Balloon Shotgun"] = {["rbxassetid://13160326139"]="rbxassetid://17803360572",["rbxassetid://13235979356"]="rbxassetid://17803360572",["rbxassetid://13236026280"]="rbxassetid://17803360572",["rbxassetid://13479562219"]="rbxassetid://17803308936",["rbxassetid://13515046872"]="rbxassetid://17803360572",["rbxassetid://13515046921"]="rbxassetid://17803360572",["rbxassetid://13515046988"]="rbxassetid://17803360572",["rbxassetid://13531443905"]="rbxassetid://17803308936",["rbxassetid://17803360572"]="rbxassetid://13158735106",["rbxassetid://17803368105"]="rbxassetid://17803308936"},
+["Ban Axe"] = {["rbxassetid://10730819"]="rbxassetid://124941279780653",["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://21343225"]="rbxassetid://77594993345414"},
+["Ban Hammer"] = {["rbxassetid://21343225"]="rbxassetid://136633555539199"},
+["Banana Flare"] = {["rbxassetid://13158330383"]="rbxassetid://13456860578",["rbxassetid://13160326139"]="rbxassetid://13456860578",["rbxassetid://13245117413"]="rbxassetid://13169270306",["rbxassetid://13245117702"]="rbxassetid://13169270306",["rbxassetid://13483008798"]="rbxassetid://13456860578",["rbxassetid://73229971227760"]="rbxassetid://13169270306"},
+["Bat Bow"] = {["rbxassetid://122106573913822"]="rbxassetid://13677205703",["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682183816"]="rbxassetid://122106573913822"},
+["Bat Daggers"] = {["rbxassetid://122106573913822"]="rbxassetid://101759165907297"},
+["Bat Scythe"] = {["rbxassetid://122106573913822"]="rbxassetid://14111617269"},
+["Beloved Bow"] = {["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682183816"]="rbxassetid://13677205703",["rbxassetid://98081733365737"]="rbxassetid://13677205703"},
+["Blaster"] = {["rbxassetid://13110197220"]="rbxassetid://17803104424",["rbxassetid://13110197302"]="rbxassetid://17803104424",["rbxassetid://13158330479"]="rbxassetid://17803104424"},
+["Boneclaw Revolver"] = {["rbxassetid://104731232227748"]="rbxassetid://14417089307",["rbxassetid://14417088974"]="rbxassetid://14417089307",["rbxassetid://14417089046"]="rbxassetid://14417089307",["rbxassetid://14417089152"]="rbxassetid://14417089307"},
+["Boneclaw Rifle"] = {["rbxassetid://104731232227748"]="rbxassetid://111386960247596",["rbxassetid://13087362838"]="rbxassetid://111386960247596"},
+["Boneclaw Spray"] = {["rbxassetid://104731232227748"]="rbxassetid://100354903585817",["rbxassetid://13158330479"]="rbxassetid://100354903585817"},
+["Box of Chocolates"] = {["rbxassetid://128380920423591"]="rbxassetid://75064925834262",["rbxassetid://13158735106"]="rbxassetid://75064925834262",["rbxassetid://13160326139"]="rbxassetid://75064925834262",["rbxassetid://13236026280"]="rbxassetid://75064925834262",["rbxassetid://13456860532"]="rbxassetid://13158735106",["rbxassetid://13456860578"]="rbxassetid://13158735106",["rbxassetid://13505411336"]="rbxassetid://75064925834262",["rbxassetid://13505411414"]="rbxassetid://75064925834262",["rbxassetid://17123622923"]="rbxassetid://75064925834262",["rbxassetid://18128896325"]="rbxassetid://75064925834262"},
+["Boxing Gloves"] = {["rbxassetid://13160489311"]="rbxassetid://73893914300609"},
+["Broken Hearts"] = {["rbxassetid://130725438600072"]="rbxassetid://76357741438822"},
+["Broomstick"] = {["rbxassetid://13515046921"]="rbxassetid://13479562219",["rbxassetid://13515046988"]="rbxassetid://13479562219",["rbxassetid://13531443905"]="rbxassetid://13479562219",["rbxassetid://83828319245396"]="rbxassetid://13479562219"},
+["Bucket of Candy"] = {["rbxassetid://110013540349061"]="rbxassetid://125248293081026",["rbxassetid://127123065378139"]="rbxassetid://125248293081026",["rbxassetid://13158735106"]="rbxassetid://92333760834779",["rbxassetid://13160326139"]="rbxassetid://125248293081026",["rbxassetid://13236026280"]="rbxassetid://125248293081026",["rbxassetid://13505411336"]="rbxassetid://125248293081026",["rbxassetid://13505411414"]="rbxassetid://125248293081026",["rbxassetid://17123622923"]="rbxassetid://92333760834779",["rbxassetid://92333760834779"]="rbxassetid://125248293081026",["rbxassetid://96411310492226"]="rbxassetid://125248293081026"},
+["Bug Net"] = {["rbxassetid://112262347612742"]="rbxassetid://14111617408",["rbxassetid://88326684922300"]="rbxassetid://14111617269"},
+["Buzzsaw"] = {["rbxassetid://13645858977"]="rbxassetid://13645858825",["rbxassetid://13682223944"]="rbxassetid://13682898881"},
+["Cactus Shotgun"] = {["rbxassetid://117893025759206"]="rbxassetid://13479562219",["rbxassetid://13515046921"]="rbxassetid://13479562219",["rbxassetid://13515046988"]="rbxassetid://13479562219",["rbxassetid://13531443905"]="rbxassetid://13479562219"},
+["Caladbolg"] = {["rbxassetid://13158735106"]="rbxassetid://101161696630107",["rbxassetid://13160326139"]="rbxassetid://101161696630107",["rbxassetid://13455968789"]="rbxassetid://13455968853",["rbxassetid://136174258344321"]="rbxassetid://13455968853",["rbxassetid://14427935597"]="rbxassetid://101161696630107"},
+["Cerulean Axe"] = {["rbxassetid://107162559513589"]="rbxassetid://77594993345414",["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653"},
+["Cookies"] = {["rbxassetid://99837158417289"]="rbxassetid://105255527603121"},
+["Cryo Scythe"] = {["rbxassetid://101947200611951"]="rbxassetid://14111617408",["rbxassetid://75229437160477"]="rbxassetid://14111617269"},
+["Crystal Daggers"] = {["rbxassetid://80622617308150"]="rbxassetid://76357741438822",["rbxassetid://99837158417289"]="rbxassetid://72570123237418"},
+["Crystal Katana"] = {["rbxassetid://108380234827963"]="rbxassetid://13158735106",["rbxassetid://118748685078128"]="rbxassetid://14000023581",["rbxassetid://125777995479531"]="rbxassetid://14798337918",["rbxassetid://134472359434980"]="rbxassetid://14000023581",["rbxassetid://14000023392"]="rbxassetid://14000023581",["rbxassetid://14000093824"]="rbxassetid://13158735106",["rbxassetid://14427782350"]="rbxassetid://14000023581",["rbxassetid://14427935597"]="rbxassetid://14000023581"},
+["Crystal Scythe"] = {["rbxassetid://108380234827963"]="rbxassetid://13158735106",["rbxassetid://118748685078128"]="rbxassetid://14111617269",["rbxassetid://13160326139"]="rbxassetid://13158735106",["rbxassetid://134472359434980"]="rbxassetid://13158735106"},
+["Cuddle Bomb"] = {["rbxassetid://13158735106"]="rbxassetid://102298651472826",["rbxassetid://13160326139"]="rbxassetid://102298651472826"},
+["Demon Shorty"] = {["rbxassetid://108887853497578"]="rbxassetid://13479562219"},
+["Demon Uzi"] = {["rbxassetid://108887853497578"]="rbxassetid://16526185100",["rbxassetid://16397424081"]="rbxassetid://16526185100",["rbxassetid://16526184265"]="rbxassetid://16526185100",["rbxassetid://16526184479"]="rbxassetid://16526185100",["rbxassetid://16526184730"]="rbxassetid://16526185100"},
+["Desert Eagle"] = {["rbxassetid://13158330383"]="rbxassetid://13158330555",["rbxassetid://13158330666"]="rbxassetid://13158330555",["rbxassetid://13483008798"]="rbxassetid://13158330555",["rbxassetid://14240943641"]="rbxassetid://13158330555",["rbxassetid://14240944327"]="rbxassetid://13158330555",["rbxassetid://14240944488"]="rbxassetid://13158330555",["rbxassetid://14417088974"]="rbxassetid://17803630344",["rbxassetid://14417089046"]="rbxassetid://17803630344",["rbxassetid://14417089152"]="rbxassetid://17803630344",["rbxassetid://14417089307"]="rbxassetid://17803630344",["rbxassetid://17247776127"]="rbxassetid://13158330555"},
+["Dream Bow"] = {["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682183816"]="rbxassetid://13677205703",["rbxassetid://82249006680828"]="rbxassetid://13677205703"},
+["Dynamite Gun"] = {["rbxassetid://13169270306"]="rbxassetid://18763764974",["rbxassetid://13245117413"]="rbxassetid://18763764974",["rbxassetid://13245117702"]="rbxassetid://18763764974"},
+["Electro Rifle"] = {["rbxassetid://13087362838"]="rbxassetid://17803231833",["rbxassetid://13160326139"]="rbxassetid://17803231630",["rbxassetid://13236549929"]="rbxassetid://17803231630",["rbxassetid://13236549962"]="rbxassetid://17803231630",["rbxassetid://17803231954"]="rbxassetid://17803231630"},
+["Electro Uzi"] = {["rbxassetid://13158330555"]="rbxassetid://17803231630",["rbxassetid://13158330666"]="rbxassetid://17803231630",["rbxassetid://16526184265"]="rbxassetid://16397424081",["rbxassetid://16526184479"]="rbxassetid://16397424081",["rbxassetid://16526184730"]="rbxassetid://16397424081",["rbxassetid://16526185100"]="rbxassetid://16397424081",["rbxassetid://17803231833"]="rbxassetid://16397424081",["rbxassetid://17803231954"]="rbxassetid://17803231630"},
+["Electropunk Distortion"] = {["rbxassetid://138109667994070"]="rbxassetid://126144885809059",["rbxassetid://78079958008757"]="rbxassetid://126144885809059"},
+["Electropunk Warper"] = {["rbxassetid://78079958008757"]="rbxassetid://84239597144951",["rbxassetid://99734844867178"]="rbxassetid://84239597144951"},
+["Energy Shield"] = {["rbxassetid://104396544264853"]="rbxassetid://98658929863025",["rbxassetid://17247639614"]="rbxassetid://104396544264853"},
+["Event Horizon"] = {["rbxassetid://110622947899700"]="rbxassetid://124463680760542",["rbxassetid://122971606160018"]="rbxassetid://113227486192611",["rbxassetid://13270206087"]="rbxassetid://124463680760542",["rbxassetid://13270206222"]="rbxassetid://124463680760542",["rbxassetid://13455229044"]="rbxassetid://113227486192611",["rbxassetid://13455229188"]="rbxassetid://113227486192611",["rbxassetid://13455394948"]="rbxassetid://124463680760542",["rbxassetid://13455395017"]="rbxassetid://124463680760542",["rbxassetid://13455395090"]="rbxassetid://124463680760542",["rbxassetid://17672502566"]="rbxassetid://124463680760542",["rbxassetid://17672502879"]="rbxassetid://113227486192611",["rbxassetid://93542288707517"]="rbxassetid://124463680760542",["rbxassetid://96443038656377"]="rbxassetid://124463680760542"},
+["Evil Trident"] = {["rbxassetid://14000023392"]="rbxassetid://134511176124672",["rbxassetid://14000023581"]="rbxassetid://134511176124672"},
+["Eyething Sniper"] = {["rbxassetid://13270206087"]="rbxassetid://13270206222",["rbxassetid://13455394948"]="rbxassetid://13270206222",["rbxassetid://13455395017"]="rbxassetid://13270206222",["rbxassetid://13455395090"]="rbxassetid://13270206222",["rbxassetid://71304774842482"]="rbxassetid://13270206222"},
+["FAMAS"] = {["rbxassetid://13087362838"]="rbxassetid://17662574783",["rbxassetid://13160326139"]="rbxassetid://13236549962",["rbxassetid://13236549929"]="rbxassetid://13236549962",["rbxassetid://13455395017"]="rbxassetid://13158735106",["rbxassetid://18764343961"]="rbxassetid://17662574783"},
+["Fighter Jet"] = {["rbxassetid://17247639272"]="rbxassetid://17247639614"},
+["Fist"] = {["rbxassetid://13160489311"]="rbxassetid://18128896162",["rbxassetid://18128949754"]="rbxassetid://18128896162"},
+["Fists of Hurt"] = {["rbxassetid://13160489311"]="rbxassetid://88497957004619",["rbxassetid://18763594759"]="rbxassetid://13160401062"},
+["Frostbite Bow"] = {["rbxassetid://123635502936633"]="rbxassetid://13677205703",["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682183816"]="rbxassetid://13677205703"},
+["Frostbite Crossbow"] = {["rbxassetid://127610347219152"]="rbxassetid://13682532502",["rbxassetid://76155503538875"]="rbxassetid://13682532502",["rbxassetid://82715240396507"]="rbxassetid://101059713611983"},
+["Gearnade Launcher"] = {["rbxassetid://117326796133738"]="rbxassetid://17274369233",["rbxassetid://130327989934666"]="rbxassetid://132649078390815",["rbxassetid://13158735106"]="rbxassetid://117326796133738",["rbxassetid://17274368912"]="rbxassetid://17274369233",["rbxassetid://17274369044"]="rbxassetid://117326796133738",["rbxassetid://17274387490"]="rbxassetid://117326796133738",["rbxassetid://17274798198"]="rbxassetid://132649078390815",["rbxassetid://17274798406"]="rbxassetid://132649078390815",["rbxassetid://17274798538"]="rbxassetid://132649078390815",["rbxassetid://17274798693"]="rbxassetid://132649078390815",["rbxassetid://78941078184430"]="rbxassetid://132649078390815"},
+["Gingerbread AUG"] = {["rbxassetid://103022841301405"]="rbxassetid://17662574783",["rbxassetid://13087362838"]="rbxassetid://17662574783",["rbxassetid://13158735106"]="rbxassetid://13455395017",["rbxassetid://13236549929"]="rbxassetid://13455395017",["rbxassetid://13236549962"]="rbxassetid://13455395017",["rbxassetid://18764343961"]="rbxassetid://17662574783"},
+["Gingerbread Handgun"] = {["rbxassetid://103022841301405"]="rbxassetid://13110197302",["rbxassetid://13110197220"]="rbxassetid://13110197302",["rbxassetid://13158330479"]="rbxassetid://13110197302"},
+["Gingerbread Sniper"] = {["rbxassetid://13270206087"]="rbxassetid://13270206222",["rbxassetid://13455394948"]="rbxassetid://13270206222",["rbxassetid://13455395017"]="rbxassetid://13270206222",["rbxassetid://13455395090"]="rbxassetid://13270206222",["rbxassetid://77337417964164"]="rbxassetid://13270206222"},
+["Gumball Handgun"] = {["rbxassetid://13110197220"]="rbxassetid://13110197302",["rbxassetid://13158330479"]="rbxassetid://13110197302",["rbxassetid://76996559479025"]="rbxassetid://13110197302"},
+["Gunsaw"] = {["rbxassetid://13682898881"]="rbxassetid://77594993345414"},
+["Handgun"] = {["rbxassetid://13110197220"]="rbxassetid://123968428540207",["rbxassetid://13110197302"]="rbxassetid://123968428540207",["rbxassetid://13158330383"]="rbxassetid://127707586685295",["rbxassetid://13158330479"]="rbxassetid://123968428540207",["rbxassetid://13158330555"]="rbxassetid://127707586685295",["rbxassetid://13158330666"]="rbxassetid://127707586685295",["rbxassetid://17247776127"]="rbxassetid://127707586685295"},
+["Handsaws"] = {["rbxassetid://13645858825"]="rbxassetid://13645858977",["rbxassetid://13682223944"]="rbxassetid://13682898881"},
+["Harp"] = {["rbxassetid://13682532502"]="rbxassetid://106485622539697"},
+["Harpoon Crossbow"] = {["rbxassetid://115133005935773"]="rbxassetid://89290993529500",["rbxassetid://13456746075"]="rbxassetid://13456746131",["rbxassetid://13682532502"]="rbxassetid://13456746131",["rbxassetid://76155503538875"]="rbxassetid://13456746131",["rbxassetid://82715240396507"]="rbxassetid://89290993529500"},
+["Hotel Bell"] = {["rbxassetid://13158735106"]="rbxassetid://120936003285451",["rbxassetid://84239597144951"]="rbxassetid://120936003285451",["rbxassetid://99734844867178"]="rbxassetid://120936003285451"},
+["Hydro Pistols"] = {["rbxassetid://18763517194"]="rbxassetid://120386834342865"},
+["Hydro Rifle"] = {["rbxassetid://108166862465565"]="rbxassetid://73644074370077",["rbxassetid://18763517194"]="rbxassetid://73644074370077"},
+["Hyper Gunblade"] = {["rbxassetid://121373202237894"]="rbxassetid://82156077357708",["rbxassetid://81817529955162"]="rbxassetid://77594993345414",["rbxassetid://82009091681573"]="rbxassetid://77594993345414",["rbxassetid://96886470957330"]="rbxassetid://82156077357708"},
+["Hyper Shotgun"] = {["rbxassetid://13479562219"]="rbxassetid://18763645670",["rbxassetid://13515046921"]="rbxassetid://18763645670",["rbxassetid://13515046988"]="rbxassetid://18763645670",["rbxassetid://13531443905"]="rbxassetid://18763645670"},
+["Hyper Sniper"] = {["rbxassetid://13270206087"]="rbxassetid://18763645923",["rbxassetid://13270206222"]="rbxassetid://18763645923",["rbxassetid://13455394948"]="rbxassetid://18763645923",["rbxassetid://13455395017"]="rbxassetid://18763645923",["rbxassetid://13455395090"]="rbxassetid://18763645923"},
+["Hyperlaser Guns"] = {["rbxassetid://120386834342865"]="rbxassetid://130113322",["rbxassetid://130113370"]="rbxassetid://13456860578",["rbxassetid://13483008798"]="rbxassetid://13456860578"},
+["Jingle Grenade"] = {["rbxassetid://13160326139"]="rbxassetid://13158735106",["rbxassetid://137900058595276"]="rbxassetid://14522189766"},
+["Key Bow"] = {["rbxassetid://110122962237431"]="rbxassetid://13682183816",["rbxassetid://13158735106"]="rbxassetid://110122962237431",["rbxassetid://13483008798"]="rbxassetid://110122962237431",["rbxassetid://13677205578"]="rbxassetid://13677205703",["rbxassetid://13677205647"]="rbxassetid://13677205703",["rbxassetid://13682532502"]="rbxassetid://110122962237431",["rbxassetid://71387264231358"]="rbxassetid://13682183816"},
+["Key Spray"] = {["rbxassetid://110122962237431"]="rbxassetid://100664516053133",["rbxassetid://13158330479"]="rbxassetid://100354903585817",["rbxassetid://13158735106"]="rbxassetid://100664516053133",["rbxassetid://13456860578"]="rbxassetid://13158330555",["rbxassetid://13483008798"]="rbxassetid://100664516053133",["rbxassetid://14241444681"]="rbxassetid://100664516053133",["rbxassetid://82721606455832"]="rbxassetid://13158330555",["rbxassetid://84163808107137"]="rbxassetid://13158330555",["rbxassetid://90757583550672"]="rbxassetid://100354903585817",["rbxassetid://96253147006478"]="rbxassetid://13158330555"},
+["Keylisong"] = {["rbxassetid://101733853413710"]="rbxassetid://13160400909",["rbxassetid://13160326139"]="rbxassetid://100664516053133",["rbxassetid://14427935597"]="rbxassetid://100664516053133",["rbxassetid://96253147006478"]="rbxassetid://13160400909"},
+["Keynade"] = {["rbxassetid://110122962237431"]="rbxassetid://96253147006478",["rbxassetid://13158735106"]="rbxassetid://96253147006478",["rbxassetid://13160326139"]="rbxassetid://96253147006478",["rbxassetid://14522129645"]="rbxassetid://73396885066556",["rbxassetid://96253147006478"]="rbxassetid://14522189766"},
+["Keynais"] = {["rbxassetid://101759165907297"]="rbxassetid://93178963908825",["rbxassetid://76357741438822"]="rbxassetid://93178963908825",["rbxassetid://96253147006478"]="rbxassetid://93178963908825",["rbxassetid://99837158417289"]="rbxassetid://96253147006478"},
+["Keyper"] = {["rbxassetid://13270206087"]="rbxassetid://115657023572170",["rbxassetid://13270206222"]="rbxassetid://115657023572170",["rbxassetid://13455394948"]="rbxassetid://115657023572170",["rbxassetid://13455395017"]="rbxassetid://115657023572170",["rbxassetid://13455395090"]="rbxassetid://115657023572170"},
+["Keyrambit"] = {["rbxassetid://13160326139"]="rbxassetid://100664516053133",["rbxassetid://14427935597"]="rbxassetid://100664516053133",["rbxassetid://96253147006478"]="rbxassetid://13455968853"},
+["Keyst Rifle"] = {["rbxassetid://110122962237431"]="rbxassetid://13158735106",["rbxassetid://13160326139"]="rbxassetid://110122962237431",["rbxassetid://13236549929"]="rbxassetid://110122962237431",["rbxassetid://13236549962"]="rbxassetid://110122962237431",["rbxassetid://71387264231358"]="rbxassetid://13158735106",["rbxassetid://90757583550672"]="rbxassetid://13087362838"},
+["Keytana"] = {["rbxassetid://13158735106"]="rbxassetid://96253147006478",["rbxassetid://13160326139"]="rbxassetid://14000023581",["rbxassetid://133090858473825"]="rbxassetid://14000023581",["rbxassetid://14000093824"]="rbxassetid://96253147006478",["rbxassetid://14427782350"]="rbxassetid://14000023581",["rbxassetid://14427935597"]="rbxassetid://14000023581",["rbxassetid://71387264231358"]="rbxassetid://14000023581",["rbxassetid://82637145735352"]="rbxassetid://14000023581",["rbxassetid://89056031983351"]="rbxassetid://14000023581",["rbxassetid://90757583550672"]="rbxassetid://14798337918",["rbxassetid://96253147006478"]="rbxassetid://14000023392"},
+["Keythe"] = {["rbxassetid://135836738518083"]="rbxassetid://14111617269"},
+["Keythrower"] = {["rbxassetid://13158735106"]="rbxassetid://96253147006478"},
+["Keyttle Axe"] = {["rbxassetid://107111416940276"]="rbxassetid://77594993345414",["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://128809359344035"]="rbxassetid://110122962237431",["rbxassetid://13158735106"]="rbxassetid://110122962237431",["rbxassetid://135836738518083"]="rbxassetid://77594993345414",["rbxassetid://137300623286123"]="rbxassetid://110122962237431",["rbxassetid://71387264231358"]="rbxassetid://110122962237431",["rbxassetid://77437496658218"]="rbxassetid://124941279780653",["rbxassetid://96253147006478"]="rbxassetid://110122962237431"},
+["Keyvolver"] = {["rbxassetid://110122962237431"]="rbxassetid://100664516053133",["rbxassetid://13158735106"]="rbxassetid://13456860578",["rbxassetid://13483008798"]="rbxassetid://100664516053133",["rbxassetid://14240943641"]="rbxassetid://13483008798",["rbxassetid://14240944327"]="rbxassetid://13483008798",["rbxassetid://14240944488"]="rbxassetid://13483008798",["rbxassetid://14241444681"]="rbxassetid://13483008798",["rbxassetid://14417088974"]="rbxassetid://14417089307",["rbxassetid://14417089046"]="rbxassetid://14417089307",["rbxassetid://14417089152"]="rbxassetid://14417089307",["rbxassetid://71387264231358"]="rbxassetid://13483008798",["rbxassetid://90757583550672"]="rbxassetid://13483008798"},
+["Keyzi"] = {["rbxassetid://100664516053133"]="rbxassetid://13158735106",["rbxassetid://110122962237431"]="rbxassetid://13158735106",["rbxassetid://13158330555"]="rbxassetid://13483008798",["rbxassetid://13158330666"]="rbxassetid://13483008798",["rbxassetid://13456860578"]="rbxassetid://13158735106",["rbxassetid://13483008798"]="rbxassetid://13158735106",["rbxassetid://14241444681"]="rbxassetid://13483008798",["rbxassetid://16397424081"]="rbxassetid://16526185100",["rbxassetid://16526184265"]="rbxassetid://16526185100",["rbxassetid://16526184479"]="rbxassetid://16526185100",["rbxassetid://16526184730"]="rbxassetid://16526185100",["rbxassetid://71387264231358"]="rbxassetid://13483008798",["rbxassetid://90757583550672"]="rbxassetid://16526185100"},
+["Laptop"] = {["rbxassetid://13158735106"]="rbxassetid://107901458751913",
+["rbxassetid://13160326139"]="rbxassetid://107901458751913",["rbxassetid://13236026280"]="rbxassetid://107901458751913",["rbxassetid://134279576638277"]="rbxassetid://107901458751913",["rbxassetid://13505411336"]="rbxassetid://107901458751913",["rbxassetid://13505411414"]="rbxassetid://107901458751913",["rbxassetid://17123622923"]="rbxassetid://107901458751913",["rbxassetid://92573395473684"]="rbxassetid://107901458751913"},
+["Lava Lamp"] = {["rbxassetid://14812965418"]="rbxassetid://126501912769166"},
+["Lightning Bolt"] = {["rbxassetid://130523978733899"]="rbxassetid://101419032712753",["rbxassetid://14000023392"]="rbxassetid://130523978733899",["rbxassetid://14000023581"]="rbxassetid://130523978733899",["rbxassetid://14427782350"]="rbxassetid://14427935597",["rbxassetid://14798337918"]="rbxassetid://101419032712753"},
+["Linked Sword"] = {["rbxassetid://114436319908436"]="rbxassetid://13158735106",["rbxassetid://12222208"]="rbxassetid://14427935597",["rbxassetid://14000023392"]="rbxassetid://14427935597",["rbxassetid://14000023581"]="rbxassetid://14427935597",["rbxassetid://14000093824"]="rbxassetid://13158735106",["rbxassetid://14427782350"]="rbxassetid://14427935597"},
+["Mammoth Horn"] = {["rbxassetid://73325703605178"]="rbxassetid://116889597355364",["rbxassetid://94406584083681"]="rbxassetid://116889597355364"},
+["Medkitty"] = {["rbxassetid://103145233607638"]="rbxassetid://128632959026124",["rbxassetid://106320000244648"]="rbxassetid://128632959026124",["rbxassetid://128990235337969"]="rbxassetid://128632959026124",["rbxassetid://13158735106"]="rbxassetid://134160823775126",["rbxassetid://13160326139"]="rbxassetid://128632959026124",["rbxassetid://13236026280"]="rbxassetid://128632959026124",["rbxassetid://13456860532"]="rbxassetid://92941076104902",["rbxassetid://13456860578"]="rbxassetid://92941076104902",["rbxassetid://13505411336"]="rbxassetid://128632959026124",["rbxassetid://13505411414"]="rbxassetid://128632959026124",["rbxassetid://17123622923"]="rbxassetid://134160823775126",["rbxassetid://81623846775515"]="rbxassetid://128632959026124",["rbxassetid://85750875050391"]="rbxassetid://134160823775126"},
+["Mega Drill"] = {["rbxassetid://13645858825"]="rbxassetid://13645858587",["rbxassetid://13645858977"]="rbxassetid://13645858587",["rbxassetid://13646484113"]="rbxassetid://13645858587",["rbxassetid://13646484249"]="rbxassetid://13645858587",["rbxassetid://13682223944"]="rbxassetid://13682898881",["rbxassetid://17247639614"]="rbxassetid://13645858587",["rbxassetid://18763594759"]="rbxassetid://13682898881"},
+["Megaphone"] = {["rbxassetid://106770345116398"]="rbxassetid://73325703605178",["rbxassetid://94406584083681"]="rbxassetid://73325703605178"},
+["Milk & Cookies"] = {["rbxassetid://120187119176806"]="rbxassetid://78700624599503",["rbxassetid://13158735106"]="rbxassetid://78700624599503",["rbxassetid://13160326139"]="rbxassetid://92914419322840",["rbxassetid://13236026280"]="rbxassetid://92914419322840",["rbxassetid://13456860532"]="rbxassetid://13456860578",["rbxassetid://13505411336"]="rbxassetid://92914419322840",["rbxassetid://13505411414"]="rbxassetid://92914419322840",["rbxassetid://17123622923"]="rbxassetid://78700624599503",["rbxassetid://18128896162"]="rbxassetid://92914419322840",["rbxassetid://18128896325"]="rbxassetid://92914419322840",["rbxassetid://78700624599503"]="rbxassetid://92914419322840"},
+["Mimic Axe"] = {["rbxassetid://121713537402623"]="rbxassetid://124941279780653",["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://126378664369064"]="rbxassetid://77594993345414"},
+["Money Gun"] = {["rbxassetid://120574582651469"]="rbxassetid://13236026280",["rbxassetid://13158330555"]="rbxassetid://13236026280",["rbxassetid://13158330666"]="rbxassetid://13236026280",["rbxassetid://13236026280"]="rbxassetid://13158735106",["rbxassetid://16397424081"]="rbxassetid://16526185100",["rbxassetid://16526184265"]="rbxassetid://16526185100",["rbxassetid://16526184479"]="rbxassetid://16526185100",["rbxassetid://16526184730"]="rbxassetid://16526185100",["rbxassetid://76703369839400"]="rbxassetid://13236026280",["rbxassetid://76983701785959"]="rbxassetid://16526185100"},
+["Nail Gun"] = {["rbxassetid://100354903585817"]="rbxassetid://72698186314258",["rbxassetid://13158330479"]="rbxassetid://72698186314258",["rbxassetid://13456860578"]="rbxassetid://13158330555",["rbxassetid://82721606455832"]="rbxassetid://13158330555",["rbxassetid://84163808107137"]="rbxassetid://13158330555"},
+["Nordic Axe"] = {["rbxassetid://113522767123200"]="rbxassetid://124941279780653",["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://127353554164693"]="rbxassetid://77594993345414"},
+["Paintballoon Gun"] = {["rbxassetid://13456860578"]="rbxassetid://17092564046",["rbxassetid://14427935597"]="rbxassetid://17092564046",["rbxassetid://17803360572"]="rbxassetid://17092564046"},
+["Paper Planes"] = {["rbxassetid://99837158417289"]="rbxassetid://95109725539980"},
+["Peppergun"] = {["rbxassetid://13158330383"]="rbxassetid://13456860578",["rbxassetid://13158735106"]="rbxassetid://13456860578",["rbxassetid://134615455726492"]="rbxassetid://116197718267373",["rbxassetid://14240943641"]="rbxassetid://13483008798",["rbxassetid://14240944327"]="rbxassetid://13483008798",["rbxassetid://14240944488"]="rbxassetid://13483008798",["rbxassetid://14417088974"]="rbxassetid://116197718267373",["rbxassetid://14417089046"]="rbxassetid://116197718267373",["rbxassetid://14417089152"]="rbxassetid://116197718267373",["rbxassetid://14417089307"]="rbxassetid://116197718267373",["rbxassetid://70565429278087"]="rbxassetid://116197718267373"},
+["Peppermint Sheriff"] = {["rbxassetid://13158735106"]="rbxassetid://13456860578",["rbxassetid://14240943641"]="rbxassetid://13483008798",["rbxassetid://14240944327"]="rbxassetid://13483008798",["rbxassetid://14240944488"]="rbxassetid://13483008798",["rbxassetid://14417088974"]="rbxassetid://137835445333923",["rbxassetid://14417089046"]="rbxassetid://137835445333923",["rbxassetid://14417089152"]="rbxassetid://137835445333923",["rbxassetid://14417089307"]="rbxassetid://137835445333923"},
+["Pine Burst"] = {["rbxassetid://127946504679537"]="rbxassetid://13087362838"},
+["Pine Spray"] = {["rbxassetid://127946504679537"]="rbxassetid://100354903585817",["rbxassetid://13158330479"]="rbxassetid://100354903585817"},
+["Pine Uzi"] = {["rbxassetid://127946504679537"]="rbxassetid://16526185100",["rbxassetid://16397424081"]="rbxassetid://16526185100",["rbxassetid://16526184265"]="rbxassetid://16526185100",["rbxassetid://16526184479"]="rbxassetid://16526185100",["rbxassetid://16526184730"]="rbxassetid://16526185100"},
+["Pixel Burst"] = {["rbxassetid://13087362838"]="rbxassetid://17650837718",["rbxassetid://13160326139"]="rbxassetid://17650945056",["rbxassetid://13236549929"]="rbxassetid://17650945056",["rbxassetid://13236549962"]="rbxassetid://17650945056",["rbxassetid://17650837503"]="rbxassetid://17650945056",["rbxassetid://17650837718"]="rbxassetid://17650945056",["rbxassetid://17650837861"]="rbxassetid://17650837718",["rbxassetid://17650838003"]="rbxassetid://17650945056"},
+["Pixel Crossbow"] = {["rbxassetid://13682532502"]="rbxassetid://17650837861",["rbxassetid://76155503538875"]="rbxassetid://17650837861",["rbxassetid://82715240396507"]="rbxassetid://84676580117737",["rbxassetid://84676580117737"]="rbxassetid://17650837861"},
+["Pixel Handgun"] = {["rbxassetid://13110197220"]="rbxassetid://17650837718",["rbxassetid://13110197302"]="rbxassetid://17650837718",["rbxassetid://13158330383"]="rbxassetid://17650945056",["rbxassetid://13158330479"]="rbxassetid://17650837718",["rbxassetid://13158330555"]="rbxassetid://17650945056",["rbxassetid://13158330666"]="rbxassetid://17650945056",["rbxassetid://13158610792"]="rbxassetid://17650837861",["rbxassetid://13907558634"]="rbxassetid://17650945056",["rbxassetid://13907558696"]="rbxassetid://17650945056",["rbxassetid://17247776127"]="rbxassetid://17650945056",["rbxassetid://17650837503"]="rbxassetid://17650945056",["rbxassetid://17650837718"]="rbxassetid://17650945056",["rbxassetid://17650837861"]="rbxassetid://17650837718",["rbxassetid://17650838003"]="rbxassetid://17650945056"},
+["Pixel Katana"] = {["rbxassetid://106994976644858"]="rbxassetid://13158735106",["rbxassetid://14000023392"]="rbxassetid://106994976644858",["rbxassetid://14000023581"]="rbxassetid://106994976644858",["rbxassetid://14000093824"]="rbxassetid://13158735106",["rbxassetid://14427782350"]="rbxassetid://17650945056",["rbxassetid://14427935597"]="rbxassetid://17650945056",["rbxassetid://14798337918"]="rbxassetid://114054077914317"},
+["Pixel Minigun"] = {["rbxassetid://17247639272"]="rbxassetid://17247639614"},
+["Pixel Sniper"] = {["rbxassetid://13270206087"]="rbxassetid://17650837718",["rbxassetid://13270206222"]="rbxassetid://17650837718",["rbxassetid://13455229044"]="rbxassetid://17650945056",["rbxassetid://13455229188"]="rbxassetid://17650945056",["rbxassetid://13455394948"]="rbxassetid://17650837861",["rbxassetid://13455395017"]="rbxassetid://17650945056",["rbxassetid://13455395090"]="rbxassetid://17650837861",["rbxassetid://17650837503"]="rbxassetid://17650837718",["rbxassetid://17650837861"]="rbxassetid://17650945056",["rbxassetid://17650838003"]="rbxassetid://17650837861",["rbxassetid://17650945056"]="rbxassetid://17650837861",["rbxassetid://17650964342"]="rbxassetid://17650837718"},
+["Pumpkin Handgun"] = {["rbxassetid://13110197220"]="rbxassetid://13110197302",["rbxassetid://13158330479"]="rbxassetid://13110197302",["rbxassetid://72347347286562"]="rbxassetid://13110197302"},
+["Raven Bow"] = {["rbxassetid://13682183816"]="rbxassetid://78829772295705",["rbxassetid://87535639720972"]="rbxassetid://78829772295705"},
+["Repulsor"] = {["rbxassetid://17266070755"]="rbxassetid://85840257279125",["rbxassetid://17266070911"]="rbxassetid://80245415527547",["rbxassetid://17266071099"]="rbxassetid://77653562642556",["rbxassetid://80245415527547"]="rbxassetid://77653562642556",["rbxassetid://86450952337176"]="rbxassetid://80245415527547",["rbxassetid://93945588254405"]="rbxassetid://85840257279125",["rbxassetid://94519339983000"]="rbxassetid://80245415527547"},
+["Rocket Launcher"] = {["rbxassetid://13456746131"]="rbxassetid://13456746075"},
+["Saber"] = {["rbxassetid://14000023392"]="rbxassetid://14427935597",["rbxassetid://14000023581"]="rbxassetid://14427935597",["rbxassetid://14000093824"]="rbxassetid://13158735106",["rbxassetid://14427782350"]="rbxassetid://14427935597",["rbxassetid://14798337918"]="rbxassetid://17640978498",["rbxassetid://17640978271"]="rbxassetid://14427935597",["rbxassetid://17640978498"]="rbxassetid://14427935597",["rbxassetid://17641044986"]="rbxassetid://17640978498"},
+["Sakura Scythe"] = {["rbxassetid://92508229482425"]="rbxassetid://14111617269"},
+["Sandwich"] = {["rbxassetid://13158735106"]="rbxassetid://18128895977",["rbxassetid://13160326139"]="rbxassetid://13158735106",["rbxassetid://13236026280"]="rbxassetid://13158735106",["rbxassetid://13505411336"]="rbxassetid://13158735106",["rbxassetid://13505411414"]="rbxassetid://13158735106",["rbxassetid://17123622923"]="rbxassetid://18128895977",["rbxassetid://18128896162"]="rbxassetid://13158735106",["rbxassetid://18128896325"]="rbxassetid://18128895977",["rbxassetid://18128949754"]="rbxassetid://13158735106"},
+["Sheriff"] = {["rbxassetid://13158735106"]="rbxassetid://13456860578",["rbxassetid://14240943641"]="rbxassetid://13483008798",["rbxassetid://14240944327"]="rbxassetid://13483008798",["rbxassetid://14240944488"]="rbxassetid://13483008798",["rbxassetid://14417088974"]="rbxassetid://137835445333923",["rbxassetid://14417089046"]="rbxassetid://137835445333923",["rbxassetid://14417089152"]="rbxassetid://137835445333923",["rbxassetid://14417089307"]="rbxassetid://137835445333923"},
+["Shotkey"] = {["rbxassetid://13158735106"]="rbxassetid://71387264231358",["rbxassetid://13236026280"]="rbxassetid://71387264231358",["rbxassetid://13479562219"]="rbxassetid://115657023572170",["rbxassetid://13515046921"]="rbxassetid://115657023572170",["rbxassetid://13515046988"]="rbxassetid://115657023572170",["rbxassetid://13531443905"]="rbxassetid://115657023572170",["rbxassetid://90757583550672"]="rbxassetid://13515046872",["rbxassetid://96253147006478"]="rbxassetid://115657023572170"},
+["Shurikens"] = {["rbxassetid://92418233748009"]="rbxassetid://101759165907297"},
+["Singularity"] = {["rbxassetid://17266070755"]="rbxassetid://17672502566",["rbxassetid://17266070911"]="rbxassetid://17672502879",["rbxassetid://17266071099"]="rbxassetid://17672502716"},
+["Skull Launcher"] = {["rbxassetid://138011737399738"]="rbxassetid://17274369233",["rbxassetid://17274368912"]="rbxassetid://17274369233"},
+["Sleigh Maul"] = {["rbxassetid://111488886881644"]="rbxassetid://136633555539199"},
+["Snowball Launcher"] = {["rbxassetid://17274369044"]="rbxassetid://18429138544"},
+["Soul Pistols"] = {["rbxassetid://132138482130551"]="rbxassetid://120386834342865",["rbxassetid://13483008798"]="rbxassetid://13456860578",["rbxassetid://134917124344503"]="rbxassetid://13456860578"},
+["Soul Rifle"] = {["rbxassetid://134917124344503"]="rbxassetid://105876698718377",["rbxassetid://72989650712897"]="rbxassetid://73644074370077"},
+["Spectral Burst"] = {["rbxassetid://124080696816628"]="rbxassetid://13087362838"},
+["Spider Ray"] = {["rbxassetid://18429093191"]="rbxassetid://119827986766384",["rbxassetid://18429138544"]="rbxassetid://119827986766384",["rbxassetid://18431054958"]="rbxassetid://117394649224413"},
+["Spray Bottle"] = {["rbxassetid://13158330479"]="rbxassetid://100354903585817",["rbxassetid://13483008798"]="rbxassetid://98906484629283",["rbxassetid://17812566584"]="rbxassetid://100354903585817",["rbxassetid://17812566721"]="rbxassetid://100354903585817"},
+["Stealth Handgun"] = {["rbxassetid://13110197220"]="rbxassetid://108185335541864",["rbxassetid://13110197302"]="rbxassetid://108185335541864",["rbxassetid://13158330479"]="rbxassetid://108185335541864"},
+["Temporal Ray"] = {["rbxassetid://18431054958"]="rbxassetid://18431054535"},
+["The Shred"] = {["rbxassetid://124261472912756"]="rbxassetid://124941279780653",["rbxassetid://125852790214228"]="rbxassetid://124941279780653",["rbxassetid://128809359344035"]="rbxassetid://135262581066376",["rbxassetid://13158735106"]="rbxassetid://135262581066376",["rbxassetid://132970131270232"]="rbxassetid://77594993345414",["rbxassetid://137300623286123"]="rbxassetid://135262581066376",["rbxassetid://74009158593517"]="rbxassetid://124941279780653"},
+["Tommy Gun"] = {["rbxassetid://123959434665593"]="rbxassetid://17662574783",["rbxassetid://13087362838"]="rbxassetid://17662574783",["rbxassetid://13236549929"]="rbxassetid://13158735106",["rbxassetid://13236549962"]="rbxassetid://13158735106",["rbxassetid://13455395017"]="rbxassetid://13158735106",["rbxassetid://76702341159323"]="rbxassetid://17662574783"},
+["Trumpet"] = {["rbxassetid://73325703605178"]="rbxassetid://112012319935983",["rbxassetid://94406584083681"]="rbxassetid://112012319935983"},
+["Violin Crossbow"] = {["rbxassetid://100943371677728"]="rbxassetid://82715240396507",["rbxassetid://76155503538875"]="rbxassetid://13682532502",["rbxassetid://77840212230515"]="rbxassetid://13682532502"},
+["Void Pistols"] = {["rbxassetid://120386834342865"]="rbxassetid://94684661380385",["rbxassetid://13158735106"]="rbxassetid://112097244349559",["rbxassetid://13456860578"]="rbxassetid://112097244349559",["rbxassetid://13483008798"]="rbxassetid://112097244349559"},
+["Void Rifle"] = {["rbxassetid://105876698718377"]="rbxassetid://112097244349559",["rbxassetid://135674776586849"]="rbxassetid://138243794425918",["rbxassetid://73644074370077"]="rbxassetid://138243794425918"},
+["Water Uzi"] = {["rbxassetid://16397424081"]="rbxassetid://16526185100",["rbxassetid://16526184265"]="rbxassetid://16526185100",["rbxassetid://16526184479"]="rbxassetid://16526185100",["rbxassetid://16526184730"]="rbxassetid://16526185100",["rbxassetid://17812566584"]="rbxassetid://16526185100",["rbxassetid://17812566721"]="rbxassetid://16526185100"},
+["Wrapped Flare Gun"] = {["rbxassetid://13158330383"]="rbxassetid://123443443495942",["rbxassetid://13456860578"]="rbxassetid://123443443495942",["rbxassetid://13483008798"]="rbxassetid://123443443495942"},
+["Wrapped Freeze Ray"] = {["rbxassetid://18429138544"]="rbxassetid://123443443495942"},
+["Wrapped Minigun"] = {["rbxassetid://123443443495942"]="rbxassetid://17247639614"},
+["pixelgrenade"] = {["rbxassetid://13160326139"]="rbxassetid://13158735106",["rbxassetid://14522129645"]="rbxassetid://17650838003"}
+
+}local ah = {}
+for ix, he in pairs(ao) do
+for _, hb in ipairs(he) do
+ah[hb] = ix
+end
+end
+local ar = nil
+local at = nil
+local as = nil
+local az = {}
+local ge = {}
+local aw = nil
+local au = m .. " - "
+local av = #au
+local function dl()
+if ar then return ar end
+local fd, gc = pcall(function()
+return k
+:WaitForChild("PlayerScripts", 3)
+:WaitForChild("Modules", 3)
+:WaitForChild("ClientReplicatedClasses", 3)
+:WaitForChild("ClientFighter", 3)
+:WaitForChild("ClientItem", 3)
+end)
+if fd and gc then ar = gc end
+return ar
+end
+local function fv(ix)
+for k in next, az do az[k] = nil end
+if not ix then return end
+local gx = ai.ActiveSkins[ix]
+if not gx then return end
+local gf = ag[gx]
+if not gf then return end
+for base, fw in next, gf do az[base] = fw end
+end
+local function fk(et)
+local cc = dl()
+if not cc then return end
+for _, fc in next, cc:GetChildren() do
+if fc:IsA("Sound") then
+local fw = et[fc.SoundId]
+if fw then fc.SoundId = fw end
+end
+end
+end
+local function bv(it, fx)
+local gd = {}
+for base, sk in next, fx do gd[sk] = base end
+ge[it] = gd
+return gd
+end
+local function db()
+if aw then return end
+local cc = dl()
+if not cc then return end
+aw = cc.ChildAdded:Connect(function(fc)
+if fc:IsA("Sound") then
+local fw = az[fc.SoundId]
+if fw then fc.SoundId = fw end
+end
+end)
+end
+local function hk()
+task.spawn(function()
+local di = at
+if not di then
+local ih = workspace:FindFirstChild("ViewModels") or workspace:WaitForChild("ViewModels", 10)
+if not ih then return end
+di = ih:FindFirstChild("FirstPerson") or ih:WaitForChild("FirstPerson", 10)
+if not di then return end
+at = di
+end
+local function fj(ey)
+if string.sub(ey, 1, av) ~= au then return nil end
+local ga = string.sub(ey, av + 1)
+return string.match(ga, "^(.+) %- .+$")
+end
+di.ChildAdded:Connect(function(bz)
+local iz = fj(bz.Name)
+if not iz then return end
+as = iz
+fv(iz)
+fk(az)
+end)
+di.ChildRemoved:Connect(function(bz)
+local iz = fj(bz.Name)
+if iz == as then
+as = nil
+for k in next, az do az[k] = nil end
+end
+end)
+for _, bz in next, di:GetChildren() do
+local iz = fj(bz.Name)
+if iz then
+as = iz
+fv(iz)
+break
+end
+end
+end)
+end
+task.spawn(function()
+dl()
+db()
+hk()
+end)
+bk = function(it, gx, cy)
+if cy and gx then
+local fx = ag[gx]
+if not fx then return end
+bv(it, fx)
+if as == it then
+fv(it)
+fk(az)
+end
+else
+local fx = gx and ag[gx]
+if fx then
+if as == it then
+local gd = ge[it] or bv(it, fx)
+fk(gd)
+for k in next, az do az[k] = nil end
+end
+ge[it] = nil
+end
+end
+end
+local function gu(ew, ev)
+local cn = 0
+for _, v in ipairs(ew:GetDescendants()) do
+if (v:IsA("MeshPart") or v:IsA("BasePart") or v:IsA("Part")) and not string.find(string.lower(v.Name), "primary") then
+v.Material = Enum.Material[ev]
+cn = cn + 1
+end
+end
+return cn
+end
+local function gw(ew, ic)
+local cn = 0
+for _, v in ipairs(ew:GetDescendants()) do
+if (v:IsA("MeshPart") or v:IsA("BasePart") or v:IsA("Part")) and not string.find(string.lower(v.Name), "primary") then
+v.Transparency = ic / 100
+cn = cn + 1
+end
+end
+return cn
+end
+local function ia()
+if not ai.MaterialEnabled then return end
+local id = ReplicatedStorage.Assets.Temp.ViewModels
+for _, ih in ipairs(id:GetChildren()) do
+if string.find(ih.Name, m .. " -", 1, true) == 1 then
+local ig = ih:FindFirstChild("ItemVisual")
+if ig then
+gu(ig, ai.CurrentMaterial)
+gw(ig, ai.Transparency)
+end
+end
+end
+end
+local aj = aq:AddTab("Skin Changer")
+local g = aj:AddLeftGroupbox("Weapons")
+local h = aj:AddRightGroupbox("Skins")
+local z = nil
+local ae = ""
+local ad = ""
+local n = Color3.fromRGB(99, 102, 241)
+local o = Color3.fromRGB(10, 10, 16)
+local t = Color3.fromRGB(18, 18, 28)
+local v = Color3.fromRGB(28, 28, 50)
+local x = Color3.fromRGB(225, 225, 240)
+local u = Color3.fromRGB(130, 130, 155)
+local w = Color3.fromRGB(55, 55, 80)
+local function gq(fh, ft)
+local bx = Instance.new("UICorner")
+bx.CornerRadius = UDim.new(0, ft or 6)
+bx.Parent = fh
+return bxfunction SC_refreshSkins()
+for _, v in ipairs(gn:GetChildren()) do
+if v:IsA("TextButton") then v:Destroy() end
+end
+if not z then return end
+local he = ao[z]
+if not he then return end
+local dh = ad:lower()
+local fg = 0
+if dh == "" or ("default"):find(dh, 1, true) then
+fg = fg + 1
+aa("Default", z, fg).Parent = gn
+end
+for _, gh in ipairs(he) do
+if dh == "" or string.lower(gh):find(dh, 1, true) then
+fg = fg + 1
+aa(gh, z, fg).Parent = gn
+end
+end
+end
+ik:GetPropertyChangedSignal("Text"):Connect(function()
+ae = ik.Text
+SC_buildWeapons()
+end)
+gk:GetPropertyChangedSignal("Text"):Connect(function()
+ad = gk.Text
+SC_refreshSkins()
+end)
+function SC_buildWeapons()
+table.clear(y)
+for _, v in ipairs(io:GetChildren()) do
+if v:IsA("TextButton") then v:Destroy() end
+end
+local hi = {}
+for ey in pairs(ao) do ef(hi, ey) end
+table.sort(hi)
+local dh = ae:lower()
+local fg = 0
+for _, ey in ipairs(hi) do
+if dh == "" or string.lower(ey):find(dh, 1, true) then
+fg = fg + 1
+local bu = ab(ey, fg)
+bu.Parent = io
+if ey == z and y[bu] then
+y[bu].setSelected(true)
+end
+end
+end
+endSC_buildWeapons()
+local ak = aq:AddTab("Weapon Changer")
+local i = ak:AddLeftGroupbox("Settings")
+i:AddCheckbox("EnableMaterial", {
+Text = "Enable",
+Default = ai.MaterialEnabled,
+Callback = function(ib)
+ai.MaterialEnabled = ib
+go()
+ia()
+end
+})
+i:AddDropdown("MaterialSelect", {
+Values = l,
+Default = ai.CurrentMaterial,
+Text = "Select Material",
+Callback = function(ib)
+ai.CurrentMaterial = ib
+go()
+ia()
+end
+})
+i:AddSlider("TransparencySlider", {
+Text = "Transparency %",
+Default = ai.Transparency,
+Min = 0,
+Max = 100,
+Rounding = 0,
+Callback = function(ib)
+ai.Transparency = ib
+go()
+ia()
+end
+})
+do
+local cs = false
+ReplicatedStorage.Assets.Temp.ViewModels.ChildAdded:Connect(function()
+if cs then return end
+cs = true
+task.delay(0.1, function()
+ia()
+cs = false
+end)
+end)
+end
+local function gg()
+Lighting.GlobalShadows = false
+Lighting.FogEnd = 100000
+Lighting.Brightness = 2
+Lighting.Ambient = Color3.fromRGB(178, 178, 178)
+Lighting.OutdoorAmbient = Color3.fromRGB(178, 178, 178)
+for _, effect in ipairs(Lighting:GetChildren()) do
+if effect:IsA("PostEffect") or effect:IsA("BlurEffect") or effect:IsA("SunRaysEffect")
+or effect:IsA("ColorCorrectionEffect") or effect:IsA("BloomEffect") or effect:IsA("DepthOfFieldEffect") then
+effect.Enabled = false
+end
+end
+workspace.Terrain.WaterWaveSize = 0
+workspace.Terrain.WaterWaveSpeed = 0
+workspace.Terrain.WaterReflectance = 0
+workspace.Terrain.WaterTransparency = 0
+workspace.StreamingEnabled = true
+local ds = UserSettings():GetService("UserGameSettings")
+ds.SavedQualityLevel = Enum.SavedQualitySetting.QualityLevel1
+settings().Rendering.QualityLevel = 1
+settings().Rendering.EnableFRM = false
+settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+settings().Physics.AllowSleep = true
+for _, v in ipairs(workspace:GetDescendants()) do
+local cd = v.ClassName
+if v:IsA("BasePart") then
+v.CastShadow = false
+if cd == "MeshPart" then
+v.RenderFidelity = Enum.RenderFidelity.Automatic
+v.TextureID = ""
+end
+elseif cd == "Texture" or cd == "Decal" then
+v.Transparency = 1
+elseif cd == "ParticleEmitter" or cd == "Trail" or cd == "Beam"
+or cd == "BillboardGui" or cd == "SurfaceGui" then
+v.Enabled = false
+end
+end
+end
+task.defer(function()
+task.wait(1)
+for it, gx in pairs(ai.ActiveSkins) do
+bj(it, gx, true)
+end
+if ai.MaterialEnabled then
+ia()
+end
+hl()
+task.spawn(function()
+while true do
+task.wait(0.1)
+for it, gx in pairs(ai.ActiveSkins) do
+hy(it, gx)
+hx(it, gx)
+hw(it, gx)
+end
+end
+end)
+end)
+local b = {}
+dob["shorty_balloonshorty_inspect_rare"] = "rbxassetid://13471205979"
+b["shorty_balloonshorty_shoot1"] = "rbxassetid://13471217688"
+b["shorty_balloonshorty_reload"] = "rbxassetid://13471211137"
+b["shorty_balloonshorty_reload_empty"] = "rbxassetid://13471209686"
+b["shotgun_equip"] = "rbxassetid://13512539232"
+b["shotgun_idle"] = "rbxassetid://13539007834"
+b["shotgun_inspect"] = "rbxassetid://13539030829"
+b["shotgun_inspect_rare"] = "rbxassetid://93315729146822"
+b["shotgun_shoot1"] = "rbxassetid://13512545291"
+b["shotgun_reload_start"] = "rbxassetid://13530523395"
+b["shotgun_reload_segment"] = "rbxassetid://13512569119"
+b["shotgun_reload_finish"] = "rbxassetid://13530568302"
+b["shotgun_reload_finish2"] = "rbxassetid://13539195649"
+b["shotgun_reload_empty_start"] = "rbxassetid://13512566172"
+b["shotgun_reload_empty_finish"] = "rbxassetid://13512572126"
+b["shotgun_reload_empty_finish2"] = "rbxassetid://13539199531"
+b["shotgun_balloonshotgun_equip"] = "rbxassetid://13512539232"
+b["shotgun_balloonshotgun_inspect"] = "rbxassetid://13539030829"
+b["shotgun_balloonshotgun_inspect_rare"] = "rbxassetid://93315729146822"
+b["shotgun_balloonshotgun_shoot1"] = "rbxassetid://13512545291"
+b["shotgun_balloonshotgun_reload_segment"] = "rbxassetid://13512569119"
+b["shotgun_balloonshotgun_reload_finish"] = "rbxassetid://13530568302"
+b["shotgun_balloonshotgun_reload_empty_start"] = "rbxassetid://13512566172"
+b["shotgun_balloonshotgun_reload_empty_finish2"] = "rbxassetid://13539199531"
+b["shotgun_hypershotgun_shoot1"] = "rbxassetid://13512545291"
+b["shotgun_broomstick_equip"] = "rbxassetid://13512539232"
+b["shotgun_broomstick_shoot1"] = "rbxassetid://13512545291"
+b["shotgun_wrappedshotgun_equip"] = "rbxassetid://13512539232"
+b["shotgun_cactusshotgun_shoot1"] = "rbxassetid://13512545291"
+b["shotgun_shotkey_equip"] = "rbxassetid://116242819561717"
+b["shotgun_shotkey_idle"] = "rbxassetid://96752276425565"
+b["shotgun_shotkey_inspect"] = "rbxassetid://87442080531945"
+b["shotgun_shotkey_inspect_empty"] = "rbxassetid://130034066004112"
+b["shotgun_shotkey_shoot1"] = "rbxassetid://78706462366313"
+b["shotgun_shotkey_shoot_aiming"] = "rbxassetid://134933454018055"
+b["shotgun_shotkey_reload_start"] = "rbxassetid://132872168301462"
+b["shotgun_shotkey_reload_segment"] = "rbxassetid://138670695095776"
+b["shotgun_shotkey_reload_finish"] = "rbxassetid://134551698849845"
+b["shotgun_shotkey_reload_empty_start"] = "rbxassetid://71864463423892"
+b["shotgun_shotkey_reload_empty_finish2"] = "rbxassetid://133311700920375"
+b["chainsaw_equip"] = "rbxassetid://13592814661"b["chainsaw_idle"] = "rbxassetid://13592826733"
+b["chainsaw_inspect"] = "rbxassetid://13592833402"
+b["chainsaw_attack1"] = "rbxassetid://13592837146"
+b["chainsaw_attack2"] = "rbxassetid://13592839019"
+b["chainsaw_hold_start"] = "rbxassetid://13592848848"
+b["chainsaw_hold_loop"] = "rbxassetid://13592852203"
+b["chainsaw_hold_finish"] = "rbxassetid://13592854657"
+b["chainsaw_handsaws_equip"] = "rbxassetid://18768563958"
+b["chainsaw_handsaws_idle"] = "rbxassetid://18768614714"
+b["chainsaw_handsaws_inspect"] = "rbxassetid://18768601757"
+b["chainsaw_handsaws_attack1"] = "rbxassetid://18768589465"
+b["chainsaw_handsaws_attack2"] = "rbxassetid://18768596653"
+b["chainsaw_handsaws_hold_start"] = "rbxassetid://18768627836"
+b["chainsaw_handsaws_hold_loop"] = "rbxassetid://18768640190"
+b["chainsaw_handsaws_hold_finish"] = "rbxassetid://18768647131"
+b["chainsaw_buzzsaw_equip"] = "rbxassetid://104765805760754"
+b["chainsaw_buzzsaw_idle"] = "rbxassetid://84690854234268"
+b["chainsaw_buzzsaw_inspect"] = "rbxassetid://125038435858226"
+b["chainsaw_buzzsaw_attack1"] = "rbxassetid://115238100942031"
+b["chainsaw_buzzsaw_attack2"] = "rbxassetid://106271546194776"
+b["chainsaw_buzzsaw_hold_start"] = "rbxassetid://72813856622105"
+b["chainsaw_buzzsaw_hold_loop"] = "rbxassetid://71978100155149"
+b["chainsaw_buzzsaw_hold_finish"] = "rbxassetid://84141669226809"
+b["chainsaw_megadrill_equip"] = "rbxassetid://138372275073193"
+b["chainsaw_megadrill_idle"] = "rbxassetid://140629755205961"
+b["chainsaw_megadrill_inspect"] = "rbxassetid://100278468126849"
+b["chainsaw_megadrill_attack1"] = "rbxassetid://91522107959844"
+b["chainsaw_megadrill_attack2"] = "rbxassetid://124800571097886"
+b["chainsaw_megadrill_hold_start"] = "rbxassetid://133316959169350"
+b["chainsaw_megadrill_hold_loop"] = "rbxassetid://114437991323948"
+b["chainsaw_megadrill_hold_finish"] = "rbxassetid://71679978204304"
+b["bow_equip"] = "rbxassetid://13642496052"
+b["bow_idle"] = "rbxassetid://13642501577"
+b["bow_inspect"] = "rbxassetid://13642509258"
+b["bow_shoot1"] = "rbxassetid://13642513747"
+b["bow_reload"] = "rbxassetid://13642520989"
+b["bow_charge"] = "rbxassetid://13676489206"
+b["bow_charge_loop"] = "rbxassetid://13676495796"
+b["bow_charge_release"] = "rbxassetid://13676498915"
+b["bow_batbow_shoot1"] = "rbxassetid://13642513747"
+b["bow_batbow_charge_release"] = "rbxassetid://13676498915"
+b["bow_frostbitebow_equip"] = "rbxassetid://13642496052"
+b["bow_frostbitebow_shoot1"] = "rbxassetid://13642513747"
+b["bow_frostbitebow_charge_release"] = "rbxassetid://13676498915"
+b["bow_dreambow_equip"] = "rbxassetid://13642496052"
+b["bow_dreambow_shoot1"] = "rbxassetid://13642513747"
+b["bow_dreambow_charge_release"] = "rbxassetid://13676498915"
+b["bow_keybow_equip"] = "rbxassetid://136030150879596"
+b["bow_keybow_idle"] = "rbxassetid://74371389482037"
+b["bow_keybow_inspect"] = "rbxassetid://139932086040651"
+b["bow_keybow_inspect_empty"] = "rbxassetid://130279781816659"
+b["bow_keybow_inspect_rare"] = "rbxassetid://91971620850946"
+b["bow_keybow_shoot1"] = "rbxassetid://125660443379764"
+b["bow_keybow_reload"] = "rbxassetid://133326669224875"
+b["bow_keybow_charge"] = "rbxassetid://131280856943088"
+b["bow_keybow_charge_loop"] = "rbxassetid://122553378232337"
+b["bow_keybow_charge_release"] = "rbxassetid://119256598220992"
+b["bow_belovedbow_equip"] = "rbxassetid://13642496052"
+b["bow_belovedbow_shoot1"] = "rbxassetid://13642513747"
+b["bow_belovedbow_charge_release"] = "rbxassetid://13676498915"
+b["bow_balloonbow_equip"] = "rbxassetid://13642496052"
+b["bow_balloonbow_shoot1"] = "rbxassetid://13642513747"
+b["bow_balloonbow_reload"] = "rbxassetid://13642520989"
+b["bow_balloonbow_charge_release"] = "rbxassetid://13676498915"
+b["katana_equip"] = "rbxassetid://13992707294"
+b["katana_idle"] = "rbxassetid://13992711211"
+b["katana_inspect"] = "rbxassetid://13992715669"
+b["katana_inspect_rare"] = "rbxassetid://14411504784"
+b["katana_attack1"] = "rbxassetid://13992724397"
+b["katana_attack2"] = "rbxassetid://13992729204"
+b["katana_deflect_loop"] = "rbxassetid://14761240825"
+b["katana_deflect_idle"] = "rbxassetid://14761220206"
+b["katana_deflect1"] = "rbxassetid://14761234917"
+b["katana_deflect2"] = "rbxassetid://14761221711"
+b["katana_deflect3"] = "rbxassetid://14761223422"
+b["katana_deflect4"] = "rbxassetid://14761225204"
+b["katana_deflect5"] = "rbxassetid://14761232380"
+b["katana_saber_equip"] = "rbxassetid://13992707294"
+b["katana_saber_inspect"] = "rbxassetid://13992715669"
+b["katana_saber_inspect_rare"] = "rbxassetid://14411504784"
+b["katana_saber_attack1"] = "rbxassetid://13992724397"
+b["katana_saber_attack2"] = "rbxassetid://13992729204"
+b["katana_saber_deflect_idle"] = "rbxassetid://14761220206"
+b["katana_lightningbolt_equip"] = "rbxassetid://13992707294"
+b["katana_lightningbolt_attack1"] = "rbxassetid://13992724397"
+b["katana_lightningbolt_attack2"] = "rbxassetid://13992729204"
+b["katana_lightningbolt_deflect_idle"] = "rbxassetid://14761220206"
+b["katana_lightningbolt_inspect_rare"] = "rbxassetid://14411504784"
+b["katana_pixelkatana_equip"] = "rbxassetid://122263627054963"
+b["katana_pixelkatana_idle"] = "rbxassetid://125738633343752"
+b["katana_pixelkatana_inspect"] = "rbxassetid://117465562832405"
+b["katana_pixelkatana_inspect_rare"] = "rbxassetid://112998398756937"
+b["katana_pixelkatana_attack1"] = "rbxassetid://126968210478839"
+b["katana_pixelkatana_attack2"] = "rbxassetid://88862181003815"
+b["katana_pixelkatana_deflect_idle"] = "rbxassetid://14761220206"
+b["katana_devilstrident_attack1"] = "rbxassetid://13992724397"
+b["katana_devilstrident_attack2"] = "rbxassetid://13992729204"
+b["katana_keytana_equip"] = "rbxassetid://89039553556992"
+b["katana_keytana_idle"] = "rbxassetid://113213899857455"
+b["katana_keytana_inspect"] = "rbxassetid://90320152875293"
+b["katana_keytana_inspect_rare"] = "rbxassetid://99791769251359"
+b["katana_keytana_attack1"] = "rbxassetid://128078260433100"
+b["katana_keytana_attack2"] = "rbxassetid://139279839095541"
+b["katana_keytana_deflect_idle"] = "rbxassetid://90436105114997"
+b["katana_keytana_deflect1"] = "rbxassetid://90797895557136"
+b["katana_keytana_deflect2"] = "rbxassetid://77995180947430"
+b["katana_keytana_deflect3"] = "rbxassetid://111943779640553"
+b["katana_archkatana_equip"] = "rbxassetid://132067233727648"
+b["katana_archkatana_idle"] = "rbxassetid://121111797899373"
+b["katana_archkatana_inspect"] = "rbxassetid://119980219668284"
+b["katana_archkatana_attack1"] = "rbxassetid://74282353959486"
+b["katana_archkatana_attack2"] = "rbxassetid://74531272029155"
+b["katana_archkatana_deflect_idle"] = "rbxassetid://131072510521727"
+b["katana_archkatana_deflect1"] = "rbxassetid://132022220827223"
+b["katana_archkatana_deflect2"] = "rbxassetid://116315405171252"
+b["katana_archkatana_deflect3"] = "rbxassetid://110358509711635"
+b["katana_archkatana_deflect4"] = "rbxassetid://98242486936084"
+b["katana_archkatana_deflect5"] = "rbxassetid://81132288854196"
+b["katana_crystalkatana_equip"] = "rbxassetid://86296007010026"
+b["katana_crystalkatana_idle"] = "rbxassetid://97649815339773"
+b["katana_crystalkatana_inspect"] = "rbxassetid://80311683206206"
+b["katana_crystalkatana_attack1"] = "rbxassetid://140639286289428"
+b["katana_crystalkatana_attack2"] = "rbxassetid://93640391159216"
+b["katana_crystalkatana_deflect_idle"] = "rbxassetid://123293403148826"
+b["katana_crystalkatana_deflect1"] = "rbxassetid://136354716301184"
+b["katana_crystalkatana_deflect2"] = "rbxassetid://120567011479119"
+b["katana_crystalkatana_deflect3"] = "rbxassetid://92502373956550"
+b["katana_crystalkatana_deflect4"] = "rbxassetid://83541611040586"
+b["katana_crystalkatana_deflect5"] = "rbxassetid://92773106977434"
+b["katana_linkedsword_equip"] = "rbxassetid://13992707294"
+b["katana_linkedsword_attack1"] = "rbxassetid://13992724397"
+b["katana_linkedsword_attack2"] = "rbxassetid://13992729204"
+b["katana_linkedsword_deflect_idle"] = "rbxassetid://14761220206"
+b["katana_linkedsword_inspect"] = "rbxassetid://13992715669"
+b["katana_linkedsword_inspect_rare"] = "rbxassetid://14411504784"
+b["scythe_equip"] = "rbxassetid://14138291124"
+b["scythe_idle"] = "rbxassetid://14098250940"
+b["scythe_inspect"] = "rbxassetid://14098254579"
+b["scythe_attack1"] = "rbxassetid://14098261698"
+b["scythe_attack2"] = "rbxassetid://14098268759"
+b["scythe_anchor_attack1"] = "rbxassetid://14098261698"
+b["scythe_anchor_attack2"] = "rbxassetid://14098268759"
+b["scythe_keythe_equip"] = "rbxassetid://14138291124"
+b["scythe_keythe_attack1"] = "rbxassetid://14098261698"
+b["scythe_keythe_attack2"] = "rbxassetid://14098268759"
+b["scythe_batscythe_attack1"] = "rbxassetid://14098261698"
+b["scythe_batscythe_attack2"] = "rbxassetid://14098268759"
+b["scythe_cryoscythe_equip"] = "rbxassetid://14138291124"
+b["scythe_cryoscythe_attack1"] = "rbxassetid://14098261698"
+b["scythe_cryoscythe_attack2"] = "rbxassetid://14098268759"
+b["scythe_bugnet_equip"] = "rbxassetid://72581859641113"
+b["scythe_bugnet_idle"] = "rbxassetid://104640627790913"
+b["scythe_bugnet_inspect"] = "rbxassetid://77903446956736"
+b["scythe_bugnet_attack1"] = "rbxassetid://106103094958053"
+b["scythe_bugnet_attack2"] = "rbxassetid://114793103297427"
+b["scythe_crystalscythe_equip"] = "rbxassetid://121781045768080"
+b["scythe_crystalscythe_idle"] = "rbxassetid://120563323644494"
+b["scythe_crystalscythe_inspect"] = "rbxassetid://94820576007871"
+b["scythe_crystalscythe_attack1"] = "rbxassetid://82483342316178"
+b["scythe_crystalscythe_attack2"] = "rbxassetid://104468717779359"
+b["scythe_crystalscythe_dash"] = "rbxassetid://121218508773058"
+b["uzi_equip"] = "rbxassetid://14138257464"
+b["uzi_idle"] = "rbxassetid://14138268430"
+b["uzi_inspect"] = "rbxassetid://14138270478"
+b["uzi_shoot1"] = "rbxassetid://14138281432"
+b["uzi_reload"] = "rbxassetid://14138276657"
+b["uzi_wateruzi_shoot1"] = "rbxassetid://14138281432"
+b["uzi_electrouzi_shoot1"] = "rbxassetid://14138281432"
+b["uzi_electrouzi_reload"] = "rbxassetid://14138276657"
+b["uzi_demonuzi_shoot1"] = "rbxassetid://14138281432"
+b["uzi_moneygun_equip"] = "rbxassetid://139001927579440"
+b["uzi_moneygun_idle"] = "rbxassetid://107487391279233"
+b["uzi_moneygun_inspect"] = "rbxassetid://76403055241854"
+b["uzi_moneygun_shoot1"] = "rbxassetid://118788477258631"
+b["uzi_moneygun_reload"] = "rbxassetid://96031828912967"
+b["uzi_keyzi_equip"] = "rbxassetid://128245025878841"
+b["uzi_keyzi_idle"] = "rbxassetid://114529536180921"
+b["uzi_keyzi_inspect"] = "rbxassetid://128515067091034"
+b["uzi_keyzi_shoot1"] = "rbxassetid://105713449228227"
+b["uzi_keyzi_reload"] = "rbxassetid://119997151817807"
+b["revolver_equip"] = "rbxassetid://14240512707"
+b["revolver_idle"] = "rbxassetid://14240522872"
+b["revolver_inspect"] = "rbxassetid://14240489357"
+b["revolver_shoot1"] = "rbxassetid://14240539145"
+b["revolver_reload"] = "rbxassetid://14240528877"
+b["revolver_reload_empty"] = "rbxassetid://16044334617"
+b["revolver_quickshot"] = "rbxassetid://17279511949"
+b["revolver_deserteagle_equip"] = "rbxassetid://13154853798"
+b["revolver_deserteagle_shoot1"] = "rbxassetid://13154881027"
+b["revolver_deserteagle_shoot_final"] = "rbxassetid://13154885740"
+b["revolver_deserteagle_reload"] = "rbxassetid://13154930776"
+b["revolver_deserteagle_reload_empty"] = "rbxassetid://13154926508"
+b["revolver_sheriff_equip"] = "rbxassetid://108300193907109"
+b["revolver_sheriff_idle"] = "rbxassetid://99955048196277"
+b["revolver_sheriff_inspect"] = "rbxassetid://131859054385320"
+b["revolver_sheriff_shoot1"] = "rbxassetid://139945997186504"
+b["revolver_sheriff_reload"] = "rbxassetid://108180442239756"
+b["revolver_sheriff_reload_empty"] = "rbxassetid://104629734165265"
+b["revolver_sheriff_quickshot"] = "rbxassetid://139945997186504"
+b["revolver_boneclawrevolver_shoot1"] = "rbxassetid://14240539145"
+b["revolver_boneclawrevolver_quickshot"] = "rbxassetid://17279511949"
+b["revolver_peppermintsheriff_equip"] = "rbxassetid://108300193907109"
+b["revolver_peppermintsheriff_idle"] = "rbxassetid://99955048196277"
+b["revolver_peppermintsheriff_inspect"] = "rbxassetid://131859054385320"
+b["revolver_peppermintsheriff_shoot1"] = "rbxassetid://139945997186504"
+b["revolver_peppermintsheriff_reload"] = "rbxassetid://108180442239756"
+b["revolver_peppermintsheriff_reload_empty"] = "rbxassetid://104629734165265"
+b["revolver_peppermintsheriff_quickshot"] = "rbxassetid://139945997186504"
+b["revolver_keyvolver_equip"] = "rbxassetid://84138589142138"
+b["revolver_keyvolver_equip_empty"] = "rbxassetid://116651140159923"
+b["revolver_keyvolver_idle"] = "rbxassetid://91577443060643"
+b["revolver_keyvolver_idle_empty"] = "rbxassetid://140310580827476"
+b["revolver_keyvolver_inspect"] = "rbxassetid://135350552290102"
+b["revolver_keyvolver_inspect_empty"] = "rbxassetid://114774175871004"
+b["revolver_keyvolver_shoot1"] = "rbxassetid://122075161812586"
+b["revolver_keyvolver_shoot_final"] = "rbxassetid://124991831074522"
+b["revolver_keyvolver_reload"] = "rbxassetid://76088917064213"
+b["revolver_keyvolver_reload_empty"] = "rbxassetid://125324249312147"
+b["revolver_keyvolver_quickshot"] = "rbxassetid://77315821032705"
+b["revolver_peppergun_equip"] = "rbxassetid://97880134425387"
+b["revolver_peppergun_equip_empty"] = "rbxassetid://79411410494868"
+b["revolver_peppergun_idle"] = "rbxassetid://120830817971670"
+b["revolver_peppergun_idle_empty"] = "rbxassetid://87131754536429"
+b["revolver_peppergun_inspect"] = "rbxassetid://85960422993700"
+b["revolver_peppergun_inspect_empty"] = "rbxassetid://83593711590927"
+b["revolver_peppergun_shoot1"] = "rbxassetid://129218999592808"
+b["revolver_peppergun_shoot_final"] = "rbxassetid://127096212738416"
+b["revolver_peppergun_reload"] = "rbxassetid://113487790313668"
+b["revolver_peppergun_reload_empty"] = "rbxassetid://135886692737051"
+b["revolver_peppergun_quickshot"] = "rbxassetid://114281111962535"
+b["grenade_equip"] = "rbxassetid://14509948480"b["burstrifle_pineburst_shoot1"] = "rbxassetid://13204428113"
+b["sniper_gingerbreadsniper_shoot1"] = "rbxassetid://13269963346"
+b["bow_batbow_equip"] = "rbxassetid://13642496052"
+b["bow_ravenbow_equip"] = "rbxassetid://13642496052"
+b["katana_eviltrident_attack1"] = "rbxassetid://13992724397"
+b["katana_eviltrident_attack2"] = "rbxassetid://13992729204"
+b["katana_archkatana_inspect_rare"] = "rbxassetid://86021718302540"
+b["katana_crystalkatana_inspect_rare"] = "rbxassetid://83174820488706"
+b["scythe_sakurascythe_attack1"] = "rbxassetid://14098261698"
+b["scythe_sakurascythe_attack2"] = "rbxassetid://14098268759"
+b["uzi_pineuzi_shoot1"] = "rbxassetid://14138281432"
+b["grenade_whoopeecushion_throw_start"] = "rbxassetid://14510034776"
+b["grenade_whoopeecushion_lob_start"] = "rbxassetid://14580355189"
+b["grenade_waterballoon_throw_start"] = "rbxassetid://14510034776"
+b["grenade_waterballoon_lob_start"] = "rbxassetid://14580355189"
+b["grenade_dynamite_throw_start"] = "rbxassetid://14510034776"
+b["grenade_dynamite_lob_start"] = "rbxassetid://14580355189"
+b["molotov_archmolotov_equip"] = "rbxassetid://105286328461293"
+b["molotov_archmolotov_idle"] = "rbxassetid://130890606219657"
+b["molotov_archmolotov_inspect"] = "rbxassetid://88107915246935"
+b["molotov_archmolotov_throw_start"] = "rbxassetid://130490014449490"
+b["molotov_archmolotov_throw_idle"] = "rbxassetid://107366986555676"
+b["molotov_archmolotov_throw_finish"] = "rbxassetid://103368468206884"
+b["molotov_archmolotov_lob_start"] = "rbxassetid://123805359969385"
+b["molotov_archmolotov_lob_idle"] = "rbxassetid://91338262765626"
+b["molotov_archmolotov_lob_finish"] = "rbxassetid://83054004017423"
+b["flashbang_discoball_throw_start"] = "rbxassetid://14510034776"
+b["flashbang_discoball_lob_start"] = "rbxassetid://14580355189"
+b["flashbang_skullbang_throw_start"] = "rbxassetid://14510034776"
+b["flashbang_skullbang_lob_start"] = "rbxassetid://14580355189"
+b["flashbang_shiningstar_throw_start"] = "rbxassetid://14510034776"
+b["flashbang_shiningstar_lob_start"] = "rbxassetid://14580355189"
+b["flashbang_camera_throw_start"] = "rbxassetid://14510034776"
+b["flashbang_camera_lob_start"] = "rbxassetid://14580355189"
+b["paintballgun_bobagun_inspect_rare"] = "rbxassetid://100079914950531"
+b["battleaxe_banaxe_attack1"] = "rbxassetid://109733633551931"
+b["battleaxe_banaxe_attack2"] = "rbxassetid://73035390792843"
+b["battleaxe_banaxe_spinattack"] = "rbxassetid://88842201450798"
+b["battleaxe_nordicaxe_attack1"] = "rbxassetid://109733633551931"
+b["battleaxe_nordicaxe_attack2"] = "rbxassetid://73035390792843"
+b["battleaxe_nordicaxe_spinattack"] = "rbxassetid://88842201450798"
+b["spray_pinespray_shoot1"] = "rbxassetid://83184613322262"
+b["spray_pinespray_shoot_final"] = "rbxassetid://134694404748023"
+b["gunblade_crudegunblade_shoot1"] = "rbxassetid://123114191854550"
+b["gunblade_crudegunblade_attack1_blade"] = "rbxassetid://78583815320764"
+b["gunblade_crudegunblade_attack2_blade"] = "rbxassetid://137119092277962"
+b["gunblade_crudegunblade_attack_blade_onhit"] = "rbxassetid://76566021425065"
+endlocal a = {}
+for ey, id in pairs(b) do
+local existing = a[id]
+if not existing then
+a[id] = ey
+else
+local newDepth = select(2, ey:gsub("_",""))
+local oldDepth = select(2, existing:gsub("_",""))
+if newDepth < oldDepth then
+a[id] = ey
+end
+end
+end
+local ap = {
+["Assault Rifle"] = "assaultrifle",
+["Bow"] = "bow",
+["Burst Rifle"] = "burstrifle",
+["Chainsaw"] = "chainsaw",
+["RPG"] = "rpg",
+["Exogun"] = "exogun",
+["Fists"] = "fists",
+["Flamethrower"] = "flamethrower",
+["Flare Gun"] = "flaregun",
+["Freeze Ray"] = "freezeray",
+["Grenade"] = "grenade",
+["Grenade Launcher"] = "grenadelauncher",
+["Handgun"] = "handgun",
+["Katana"] = "katana",
+["Minigun"] = "minigun",
+["Paintball Gun"] = "paintballgun",
+["Revolver"] = "revolver",
+["Slingshot"] = "slingshot",
+["Subspace Tripmine"] = "subspacetripmine",
+["Uzi"] = "uzi",
+["Sniper"] = "sniper",
+["Knife"] = "knife",
+["Shotgun"] = "shotgun",
+["Crossbow"] = "crossbow",
+["Daggers"] = "daggers",
+["Distortion"] = "distortion",
+["Energy Rifle"] = "energyrifle",
+["Energy Pistols"] = "energypistols",
+["Gunblade"] = "gunblade",
+["Battle Axe"] = "battleaxe",
+["Riot Shield"] = "riotshield",
+["Scythe"] = "scythe",
+["Trowel"] = "trowel",
+["Medkit"] = "medkit",
+["Molotov"] = "molotov",
+["Satchel"] = "satchel",
+["Smoke Grenade"] = "smokegrenade",
+["War Horn"] = "warhorn",
+["Warpstone"] = "warpstone",
+["Flashbang"] = "flashbang",
+["Jump Pad"] = "jumppad",
+["Warper"] = "warper",
+["Shorty"] = "shorty",
+["Maul"] = "maul",
+["Spray"] = "spray",
+["Permafrost"] = "permafrost",
+}
+local function fb(gx)
+return gx:lower():gsub("[^%a%d]", "")
+end
+local dz = {}
+local function dt(ew, iv)
+if dz[ew] then return end
+dz[ew] = true
+local fs = ap[iv]
+if not fs then return end
+local be
+pcall(function()
+local ax = ew:WaitForChild("AnimationController", 5)
+if ax then be = ax:WaitForChild("Animator", 5) end
+end)
+if not be then return end
+local ee = {}
+local df = fs .. "_"
+local function hv(hr)
+if not hr or not hr.Animation then return end
+local bb = hr.Animation.AnimationId
+if ee[bb] then return end
+local bc = a[bb]
+if not bc then return end
+if bc:sub(1, #df) ~= df then return end
+local co = ai.ActiveSkins[iv]
+if not co or co == "Default" then return end
+local fa = fb(co)
+local bd = bc:sub(#df + 1)
+local ha = fs .. "_" .. fa .. "_" .. bd
+local gz = b[ha]
+if not gz or gz == bb then return end
+ee[gz] = true
+local timePos = hr.TimePosition
+local speed = hr.Speed
+hr:Stop(0)
+local gy = Instance.new("Animation")
+gy.AnimationId = gz
+local hd = be:LoadAnimation(gy)
+--hd.Looped = hr.Looped
+hd:Play(0, nil, speed)
+pcall(function() hd.TimePosition = timePos end)
+hd.Stopped:Connect(function()
+ee[gz] = nil
+end)
+end
+be.AnimationPlayed:Connect(hv)
+for _, hr in ipairs(be:GetPlayingAnimationTracks()) do
+task.defer(hv, hr)
+end
+end
+task.spawn(function()
+local ii = workspace:WaitForChild("ViewModels", 15)
+if not ii then return end
+local dj = ii:WaitForChild("FirstPerson", 10)
+if not dj then return end
+local function hu(ew)
+if not ew:IsA("Model") then return end
+local ix = ew.Name:match("^.+ %- (.+) %- .+$")
+if ix and ap[ix] then
+task.spawn(dt, ew, ix)
+end
+end
+for _, bz in ipairs(dj:GetChildren()) do
+hu(bz)
+end
+dj.ChildAdded:Connect(hu)
+end)
