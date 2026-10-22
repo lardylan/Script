@@ -1,0 +1,254 @@
+local LibraryUrl = "https://raw.githubusercontent.com/Vovabro46/trash/refs/heads/main/Test.lua"
+
+local Success, Library = pcall(function()
+    return loadstring(game:HttpGet(LibraryUrl))()
+end)
+
+if not Success or not Library then 
+    return warn("Error loading UI library!") 
+end
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
+
+local AimbotEnabled = false
+local HitboxEnabled = false
+local ESP_BoxEnabled = false
+local ESP_NameDistEnabled = false
+
+local OriginalSizes = {}
+local ESP_Drawings = {}
+
+Library:Watermark("Kryptonix Hub | v1.0")
+local Window = Library:Window("Kryptonix Hub")
+
+Window:Section("Combat & Visuals")
+local CombatTab = Window:Tab("COMBAT", "7733771472")
+local SettingsTab = Window:Tab("Settings", "eye")
+
+local CombatPage = CombatTab:SubTab("Main Combat")
+local SettingsPage = SettingsTab:SubTab("Menu Settings")
+
+local AimbotGroup = CombatPage:Groupbox("Aimbot Settings", "Left", "7733774602", "true")
+local HitboxGroup = CombatPage:Groupbox("HitBox Settings", "Right")
+local VisualsGroup = CombatPage:Groupbox("VISUAL", "Left")
+
+AimbotGroup:AddToggle({
+    Title = "AIMBOT",
+    Default = false,
+    Flag = "AimbotToggle",
+    Callback = function(Value)
+        AimbotEnabled = Value
+    end
+})
+
+local function GetClosestPlayerToCenter()
+    local ClosestPlayer = nil
+    local ShortestDistance = math.huge
+    local Center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local pos, onScreen = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+            if onScreen then
+                local dist = (Vector2.new(pos.X, pos.Y) - Center).Magnitude
+                if dist < ShortestDistance then
+                    ShortestDistance = dist
+                    ClosestPlayer = player
+                end
+            end
+        end
+    end
+    return ClosestPlayer
+end
+
+RunService.RenderStepped:Connect(function()
+    if AimbotEnabled then
+        local Target = GetClosestPlayerToCenter()
+        if Target and Target.Character and Target.Character:FindFirstChild("Head") then
+            local TargetHead = Target.Character.Head.Position
+            local CurrentCamCFrame = Camera.CFrame
+            Camera.CFrame = CurrentCamCFrame:Lerp(CFrame.new(CurrentCamCFrame.Position, TargetHead), 0.15)
+        end
+    end
+end)
+
+HitboxGroup:AddToggle({
+    Title = "HitBox Expansion",
+    Default = false,
+    Flag = "HitboxToggle",
+    Callback = function(Value)
+        HitboxEnabled = Value
+        if not Value then
+            for part, size in pairs(OriginalSizes) do
+                if part and part.Parent then
+                    part.Size = size
+                    part.Transparency = 0
+                    part.CanCollide = true
+                end
+            end
+            OriginalSizes = {}
+        end
+    end
+})
+
+RunService.RenderStepped:Connect(function()
+    if HitboxEnabled then
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
+                local char = player.Character
+                for _, partName in pairs({"Head", "HumanoidRootPart"}) do
+                    local part = char:FindFirstChild(partName)
+                    if part then
+                        if not OriginalSizes[part] then
+                            OriginalSizes[part] = part.Size
+                        end
+                        part.Size = Vector3.new(10, 10, 10)
+                        part.Transparency = 0.6
+                        part.Color = Color3.fromRGB(255, 0, 0)
+                        part.Material = Enum.Material.ForceField
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end
+    end
+end)
+
+if VisualsGroup:TreeNode("VISUAL OPTIONS") then
+
+    VisualsGroup:AddToggle({
+        Title = "Box / Skeleton ESP",
+        Default = false,
+        Callback = function(Value)
+            ESP_BoxEnabled = Value
+            if not Value then
+                for _, draw in pairs(ESP_Drawings) do
+                    if draw.Box then draw.Box.Visible = false end
+                end
+            end
+        end
+    })
+
+    VisualsGroup:AddToggle({
+        Title = "Name / Distance ESP",
+        Default = false,
+        Callback = function(Value)
+            ESP_NameDistEnabled = Value
+            if not Value then
+                for _, draw in pairs(ESP_Drawings) do
+                    if draw.Text then draw.Text.Visible = false end
+                end
+            end
+        end
+    })
+
+    VisualsGroup:TreePop()
+end
+
+local function CreateESP(player)
+    local drawings = {
+        Box = Drawing.new("Square"),
+        Text = Drawing.new("Text")
+    }
+    
+    drawings.Box.Visible = false
+    drawings.Box.Color = Color3.fromRGB(255, 0, 0)
+    drawings.Box.Thickness = 2
+    drawings.Box.Filled = false
+
+    drawings.Text.Visible = false
+    drawings.Text.Color = Color3.fromRGB(255, 255, 255)
+    drawings.Text.Size = 14
+    drawings.Text.Center = true
+    drawings.Text.Outline = true
+
+    ESP_Drawings[player] = drawings
+end
+
+Players.PlayerAdded:Connect(CreateESP)
+for _, p in pairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then CreateESP(p) end
+end
+
+Players.PlayerRemoving:Connect(function(player)
+    if ESP_Drawings[player] then
+        ESP_Drawings[player].Box:Remove()
+        ESP_Drawings[player].Text:Remove()
+        ESP_Drawings[player] = nil
+    end
+end)
+
+RunService.RenderStepped:Connect(function()
+    for player, drawings in pairs(ESP_Drawings) do
+        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChildOfClass("Humanoid").Health > 0 then
+            local hrp = player.Character.HumanoidRootPart
+            local vector, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+
+            if onScreen then
+                local dist = math.floor((LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (LocalPlayer.Character.HumanoidRootPart.Position - hrp.Position).Magnitude) or 0)
+
+                if ESP_BoxEnabled then
+                    drawings.Box.Size = Vector2.new(2000 / vector.Z, 3000 / vector.Z)
+                    drawings.Box.Position = Vector2.new(vector.X - drawings.Box.Size.X / 2, vector.Y - drawings.Box.Size.Y / 2)
+                    drawings.Box.Visible = true
+                else
+                    drawings.Box.Visible = false
+                end
+
+                if ESP_NameDistEnabled then
+                    drawings.Text.Position = Vector2.new(vector.X, vector.Y - (3000 / vector.Z) / 2 - 15)
+                    drawings.Text.Text = player.Name .. " [" .. tostring(dist) .. "m]"
+                    drawings.Text.Visible = true
+                else
+                    drawings.Text.Visible = false
+                end
+            else
+                drawings.Box.Visible = false
+                drawings.Text.Visible = false
+            end
+        else
+            drawings.Box.Visible = false
+            drawings.Text.Visible = false
+        end
+    end
+end)
+
+local ConfigGroup = SettingsPage:Groupbox("Configuration", "Left")
+local Configs = Library:GetConfigs()
+
+ConfigGroup:AddDropdown({
+    Title = "Select Config",
+    Values = Configs,
+    Default = "default",
+    Multi = false,
+    Flag = "SelectedConfig",
+    Callback = function(Value) end
+})
+
+ConfigGroup:AddButton({
+    Title = "Save Config",
+    Callback = function()
+        Library:SaveConfig("Kryptonix_Config")
+        Library:Notify("Config", "Guardado exitosamente", 2)
+    end
+})
+
+local UISettings = SettingsPage:Groupbox("UI Settings", "Right")
+
+UISettings:AddButton({
+    Title = "Unload / Destroy UI",
+    Callback = function()
+        for _, draw in pairs(ESP_Drawings) do
+            draw.Box:Remove()
+            draw.Text:Remove()
+        end
+        local gui = game:GetService("CoreGui"):FindFirstChild("RedOnyx")
+        local water = game:GetService("CoreGui"):FindFirstChild("Watermark")
+        if gui then gui:Destroy() end
+        if water then water:Destroy() end
+    end
+})
