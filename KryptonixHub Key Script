@@ -38,7 +38,7 @@ Library:Watermark("Kryptonix Hub | v1.0")
 local Window = Library:Window("KeySystem", {
     Enabled = true,
     Key = "Key-KryptonixHub1DAy",
-    Link = "https://pastefy.app/tuqBrLGr/raw",
+    Link = "https://link-center.net/5159847/DtAXUyEELdqO",
     SiteName = "Kryptonix Key",
     SaveKey = true
 })
@@ -333,6 +333,36 @@ local Configs = Library:GetConfigs()
 ConfigGroup:AddDropdown({
     Title = "Select Config",
     Values = Configs,
+    Default = "default",
+    Multi = false,
+    Flag = "SelectedConfig",
+    Callback = function(Value) end
+})
+
+ConfigGroup:AddButton({
+    Title = "Save Config",
+    Callback = function()
+        Library:SaveConfig("Kryptonix_Config")
+        Library:Notify("Config", "Guardado exitosamente", 2)
+    end
+})
+
+local UISettings = SettingsPage:Groupbox("UI Settings", "Right")
+
+UISettings:AddButton({
+    Title = "Unload / Destroy UI",
+    Callback = function()
+        for _, draw in pairs(ESP_Drawings) do
+            draw.Box:Remove()
+            draw.Text:Remove()
+        end
+        local gui = game:GetService("CoreGui"):FindFirstChild("RedOnyx")
+        local water = game:GetService("CoreGui"):FindFirstChild("Watermark")
+        if gui then gui:Destroy() end
+        if water then water:Destroy() end
+    end
+})
+es = Configs,
     Default = "default",
     Multi = false,
     Flag = "SelectedConfig",
