@@ -1,0 +1,114 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "@lardylan @KryptonixHub @NexxuzHub @larlan",
+   LoadingTitle = "Cargando Script...",
+   LoadingSubtitle = "by @lardylan & Team",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil,
+      FileName = "HubConfig"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink",
+      RememberJoins = true
+   },
+   KeySystem = false
+})
+
+-- Pestaña COMBAT
+local CombatTab = Window:CreateTab("COMBAT", 4483362458)
+
+-- Variables de control del Silent Aim
+local SilentAimEnabled = false
+local HeartbeatConnection = nil
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local LocalPlayer = Players.LocalPlayer
+local FireShot = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Game"):WaitForChild("FireShot")
+
+local lastShot = 0
+local fireRate = 1
+
+local function getClosestTarget()
+    local character = LocalPlayer.Character
+    local head = character and character:FindFirstChild("Head")
+
+    if not head then
+        return nil
+    end
+
+    local closestTarget = nil
+    local closestDistance = math.huge
+
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local targetCharacter = player.Character
+            local targetHead = targetCharacter and targetCharacter:FindFirstChild("Head")
+            local humanoid = targetCharacter and targetCharacter:FindFirstChildOfClass("Humanoid")
+
+            if targetHead and humanoid and humanoid.Health > 0 then
+                local distance = (targetHead.Position - head.Position).Magnitude
+
+                if distance < closestDistance then
+                    closestDistance = distance
+                    closestTarget = targetHead
+                end
+            end
+        end
+    end
+
+    return closestTarget
+end
+
+-- Toggle AIM SILENT
+local AimSilentToggle = CombatTab:CreateToggle({
+   Name = "AIM SILENT",
+   CurrentValue = false,
+   Flag = "AimSilentFlag",
+   Callback = function(Value)
+      SilentAimEnabled = Value
+
+      if SilentAimEnabled then
+         -- Activa el loop del Silent Aim
+         HeartbeatConnection = RunService.Heartbeat:Connect(function()
+             if not SilentAimEnabled then return end
+
+             local target = getClosestTarget()
+             if not target then return end
+
+             local character = LocalPlayer.Character
+             local originPart = character and character:FindFirstChild("Head")
+             if not originPart then return end
+
+             local origin = originPart.Position
+             local hitPosition = target.Position
+             local direction = (hitPosition - origin).Unit
+             local now = os.clock()
+
+             if now - lastShot < fireRate then return end
+
+             lastShot = now
+
+             FireShot:FireServer({
+                 direction = direction,
+                 hitPosition = hitPosition,
+                 origin = origin,
+                 clientTime = now,
+                 hitPart = target,
+                 shotId = math.floor(now * 1000)
+             })
+         end)
+      else
+         -- Desactiva la conexión cuando se apaga el Switch
+         if HeartbeatConnection then
+            HeartbeatConnection:Disconnect()
+            HeartbeatConnection = nil
+         end
+      end
+   end,
+})
