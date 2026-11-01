@@ -1,0 +1,482 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:PlayerGui
+
+if PlayerGui:FindFirstChild("BrookhavenPCMenu") then
+    PlayerGui.BrookhavenPCMenu:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BrookhavenPCMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+local FontRetro = Enum.Font.Code
+
+local currentSound = nil
+local masterVolume = 1
+local currentTargetType = "Character" 
+
+local function removeMusic()
+    if currentSound then
+        currentSound:Destroy()
+        currentSound = nil
+    end
+end
+
+local function getTargetParent()
+    local char = LocalPlayer.Character
+    if not char then return nil end
+
+    if currentTargetType == "Car" then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.SeatPart and humanoid.SeatPart:IsA("VehicleSeat") then
+            return humanoid.SeatPart.Parent 
+        end
+        return char:FindFirstChild("HumanoidRootPart") or char
+    elseif currentTargetType == "Plane" then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid and humanoid.SeatPart then
+            return humanoid.SeatPart.Parent
+        end
+        return char:FindFirstChild("HumanoidRootPart") or char
+    elseif currentTargetType == "Skate" then
+        local skate = char:FindFirstChild("Skateboard") or char:FindFirstChild("Skate")
+        if skate then return skate end
+        return char:FindFirstChild("HumanoidRootPart") or char
+    else
+        return char:FindFirstChild("HumanoidRootPart") or char
+    end
+end
+
+local function playMusic(soundId)
+    removeMusic()
+    if not soundId or soundId == "" then return end
+
+    local parentObj = getTargetParent()
+    if not parentObj then return end
+
+    local sound = Instance.new("Sound")
+    sound.Name = "GlobalServerAudio"
+    sound.SoundId = "rbxassetid://" .. tostring(soundId)
+    sound.Volume = masterVolume
+    sound.Looped = true
+    sound.RollOffMaxDistance = 150
+    sound.RollOffMinDistance = 10
+    sound.Parent = parentObj
+
+    sound:Play()
+    currentSound = sound
+end
+
+local OpenButton = Instance.new("TextButton")
+OpenButton.Name = "OpenButton"
+OpenButton.Size = UDim2.new(0, 50, 0, 50)
+OpenButton.Position = UDim2.new(0.05, 0, 0.4, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+OpenButton.Text = "L"
+OpenButton.Font = FontRetro
+OpenButton.TextSize = 24
+OpenButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+OpenButton.Parent = ScreenGui
+
+local OpenCorner = Instance.new("UICorner")
+OpenCorner.CornerRadius = UDim.new(0, 12)
+OpenCorner.Parent = OpenButton
+
+local OpenStroke = Instance.new("UIStroke")
+OpenStroke.Color = Color3.fromRGB(60, 60, 60)
+OpenStroke.Thickness = 3
+OpenStroke.Parent = OpenButton
+
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Name = "LoadingFrame"
+LoadingFrame.Size = UDim2.new(0, 320, 0, 160)
+LoadingFrame.Position = UDim2.new(0.5, -160, 0.5, -80)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+LoadingFrame.Visible = false
+LoadingFrame.Active = true 
+LoadingFrame.Parent = ScreenGui
+
+local LoadingCorner = Instance.new("UICorner")
+LoadingCorner.CornerRadius = UDim.new(0, 8)
+LoadingCorner.Parent = LoadingFrame
+
+local LoadingStroke = Instance.new("UIStroke")
+LoadingStroke.Color = Color3.fromRGB(0, 102, 204) 
+LoadingStroke.Thickness = 3
+LoadingStroke.Parent = LoadingFrame
+
+local LoadingText = Instance.new("TextLabel")
+LoadingText.Size = UDim2.new(1, 0, 0, 40)
+LoadingText.Position = UDim2.new(0, 0, 0, 15)
+LoadingText.BackgroundTransparency = 1
+LoadingText.Font = FontRetro
+LoadingText.Text = "LOADING SCRIPT."
+LoadingText.TextColor3 = Color3.fromRGB(255, 255, 255)
+LoadingText.TextSize = 18
+LoadingText.Parent = LoadingFrame
+
+local BarBackground = Instance.new("Frame")
+BarBackground.Size = UDim2.new(0.85, 0, 0, 26)
+BarBackground.Position = UDim2.new(0.075, 0, 0.6, 0)
+BarBackground.BackgroundColor3 = Color3.fromRGB(255, 255, 255) 
+BarBackground.ClipsDescendants = true
+BarBackground.Parent = LoadingFrame
+
+local BarBgCorner = Instance.new("UICorner")
+BarBgCorner.CornerRadius = UDim.new(0, 13)
+BarBgCorner.Parent = BarBackground
+
+local BarBgStroke = Instance.new("UIStroke")
+BarBgStroke.Color = Color3.fromRGB(0, 0, 0) 
+BarBgStroke.Thickness = 2
+BarBgStroke.Parent = BarBackground
+
+local BarFill = Instance.new("Frame")
+BarFill.Size = UDim2.new(0, 0, 1, 0)
+BarFill.BackgroundColor3 = Color3.fromRGB(220, 20, 20) 
+BarFill.BorderSizePixel = 0
+BarFill.Parent = BarBackground
+
+local BarFillCorner = Instance.new("UICorner")
+BarFillCorner.CornerRadius = UDim.new(0, 13)
+BarFillCorner.Parent = BarFill
+
+local WhiteBall = Instance.new("Frame")
+WhiteBall.Size = UDim2.new(0, 20, 0, 20)
+WhiteBall.AnchorPoint = Vector2.new(0.5, 0.5)
+WhiteBall.Position = UDim2.new(1, -10, 0.5, 0)
+WhiteBall.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+WhiteBall.Parent = BarFill
+
+local BallCorner = Instance.new("UICorner")
+BallCorner.CornerRadius = UDim.new(1, 0)
+BallCorner.Parent = WhiteBall
+
+local MainGui = Instance.new("Frame")
+MainGui.Name = "MainGui"
+MainGui.Size = UDim2.new(0, 360, 0, 220)
+MainGui.Position = UDim2.new(0.5, -180, 0.5, -110)
+MainGui.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+MainGui.BackgroundTransparency = 1
+MainGui.Visible = false
+MainGui.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 6) 
+MainCorner.Parent = MainGui
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = Color3.fromRGB(40, 40, 40)
+MainStroke.Thickness = 2
+MainStroke.Transparency = 1
+MainStroke.Parent = MainGui
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, -70, 0, 30)
+TitleLabel.Position = UDim2.new(0, 10, 0, 5)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Font = FontRetro
+TitleLabel.Text = "BROOKHAVEN 3.0"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 18
+TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+TitleLabel.Parent = MainGui
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+MinimizeBtn.Position = UDim2.new(1, -60, 0, 5)
+MinimizeBtn.BackgroundTransparency = 1
+MinimizeBtn.Font = FontRetro
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.TextSize = 20
+MinimizeBtn.Parent = MainGui
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0, 5)
+CloseBtn.BackgroundTransparency = 1
+CloseBtn.Font = FontRetro
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.TextSize = 18
+CloseBtn.Parent = MainGui
+
+local IdBox = Instance.new("TextBox")
+IdBox.Size = UDim2.new(0.9, 0, 0, 35)
+IdBox.Position = UDim2.new(0.05, 0, 0.22, 0)
+IdBox.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+IdBox.Font = FontRetro
+IdBox.PlaceholderText = "INTRODUCE ID DE MUSICA"
+IdBox.Text = ""
+IdBox.TextColor3 = Color3.fromRGB(0, 0, 0)
+IdBox.TextSize = 13
+IdBox.Parent = MainGui
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 4)
+BoxCorner.Parent = IdBox
+
+local PlayBtn = Instance.new("TextButton")
+PlayBtn.Size = UDim2.new(0.42, 0, 0, 35)
+PlayBtn.Position = UDim2.new(0.05, 0, 0.45, 0)
+PlayBtn.BackgroundColor3 = Color3.fromRGB(220, 20, 20)
+PlayBtn.Font = FontRetro
+PlayBtn.Text = "PLAY🔈"
+PlayBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlayBtn.TextSize = 14
+PlayBtn.Parent = MainGui
+
+local PlayCorner = Instance.new("UICorner")
+PlayCorner.CornerRadius = UDim.new(0, 6)
+PlayCorner.Parent = PlayBtn
+
+local PlayStroke = Instance.new("UIStroke")
+PlayStroke.Color = Color3.fromRGB(0, 0, 0)
+PlayStroke.Thickness = 2
+PlayStroke.Parent = PlayBtn
+
+local RemoveBtn = Instance.new("TextButton")
+RemoveBtn.Size = UDim2.new(0.46, 0, 0, 35)
+RemoveBtn.Position = UDim2.new(0.49, 0, 0.45, 0)
+RemoveBtn.BackgroundColor3 = Color3.fromRGB(220, 20, 20)
+RemoveBtn.Font = FontRetro
+RemoveBtn.Text = "REMOVE MUSIC🔇"
+RemoveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+RemoveBtn.TextSize = 11
+RemoveBtn.Parent = MainGui
+
+local RemoveCorner = Instance.new("UICorner")
+RemoveCorner.CornerRadius = UDim.new(0, 6)
+RemoveCorner.Parent = RemoveBtn
+
+local RemoveStroke = Instance.new("UIStroke")
+RemoveStroke.Color = Color3.fromRGB(0, 0, 0)
+RemoveStroke.Thickness = 2
+RemoveStroke.Parent = RemoveBtn
+
+local VolLabel = Instance.new("TextLabel")
+VolLabel.Size = UDim2.new(0.9, 0, 0, 20)
+VolLabel.Position = UDim2.new(0.05, 0, 0.66, 0)
+VolLabel.BackgroundTransparency = 1
+VolLabel.Font = FontRetro
+VolLabel.Text = "VOLUMEN: 100%"
+VolLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+VolLabel.TextSize = 12
+VolLabel.Parent = MainGui
+
+local VolDownBtn = Instance.new("TextButton")
+VolDownBtn.Size = UDim2.new(0.2, 0, 0, 25)
+VolDownBtn.Position = UDim2.new(0.2, 0, 0.78, 0)
+VolDownBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+VolDownBtn.Font = FontRetro
+VolDownBtn.Text = "VOL -"
+VolDownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+VolDownBtn.TextSize = 12
+VolDownBtn.Parent = MainGui
+
+local VolUpBtn = Instance.new("TextButton")
+VolUpBtn.Size = UDim2.new(0.2, 0, 0, 25)
+VolUpBtn.Position = UDim2.new(0.6, 0, 0.78, 0)
+VolUpBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+VolUpBtn.Font = FontRetro
+VolUpBtn.Text = "VOL +"
+VolUpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+VolUpBtn.TextSize = 12
+VolUpBtn.Parent = MainGui
+
+local TargetGui = Instance.new("Frame")
+TargetGui.Name = "TargetGui"
+TargetGui.Size = UDim2.new(0, 200, 0, 180)
+TargetGui.Position = UDim2.new(0.5, 190, 0.5, -90)
+TargetGui.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
+TargetGui.Visible = false
+TargetGui.Parent = ScreenGui
+
+local TargetCorner = Instance.new("UICorner")
+TargetCorner.CornerRadius = UDim.new(0, 6)
+TargetCorner.Parent = TargetGui
+
+local TargetStroke = Instance.new("UIStroke")
+TargetStroke.Color = Color3.fromRGB(40, 40, 40)
+TargetStroke.Thickness = 2
+TargetStroke.Parent = TargetGui
+
+local TargetTitle = Instance.new("TextLabel")
+TargetTitle.Size = UDim2.new(1, -30, 0, 30)
+TargetTitle.Position = UDim2.new(0, 5, 0, 5)
+TargetTitle.BackgroundTransparency = 1
+TargetTitle.Font = FontRetro
+TargetTitle.Text = "Select where you want the music to play."
+TargetTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetTitle.TextSize = 9
+TargetTitle.TextWrapped = true
+TargetTitle.Parent = TargetGui
+
+local TargetClose = Instance.new("TextButton")
+TargetClose.Size = UDim2.new(0, 20, 0, 20)
+TargetClose.Position = UDim2.new(1, -22, 0, 5)
+TargetClose.BackgroundTransparency = 1
+TargetClose.Font = FontRetro
+TargetClose.Text = "X"
+TargetClose.TextColor3 = Color3.fromRGB(255, 255, 255)
+TargetClose.TextSize = 14
+TargetClose.Parent = TargetGui
+
+local CarBtn = Instance.new("TextButton")
+CarBtn.Size = UDim2.new(0.9, 0, 0, 30)
+CarBtn.Position = UDim2.new(0.05, 0, 0.28, 0)
+CarBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+CarBtn.Font = FontRetro
+CarBtn.Text = "🚘CAR MUSIC"
+CarBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CarBtn.TextSize = 12
+CarBtn.Parent = TargetGui
+
+local PlaneBtn = Instance.new("TextButton")
+PlaneBtn.Size = UDim2.new(0.9, 0, 0, 30)
+PlaneBtn.Position = UDim2.new(0.05, 0, 0.5, 0)
+PlaneBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+PlaneBtn.Font = FontRetro
+PlaneBtn.Text = "🛩️MUSIC PLANE"
+PlaneBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+PlaneBtn.TextSize = 12
+PlaneBtn.Parent = TargetGui
+
+local SkateBtn = Instance.new("TextButton")
+SkateBtn.Size = UDim2.new(0.9, 0, 0, 30)
+SkateBtn.Position = UDim2.new(0.05, 0, 0.72, 0)
+SkateBtn.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+SkateBtn.Font = FontRetro
+SkateBtn.Text = "🛴SKATE MUSIC"
+SkateBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SkateBtn.TextSize = 12
+SkateBtn.Parent = TargetGui
+
+task.spawn(function()
+    local dots = {".", "..", "...", ""}
+    local idx = 1
+    while true do
+        if LoadingFrame.Visible then
+            LoadingText.Text = "LOADING SCRIPT" .. dots[idx]
+            idx = idx % #dots + 1
+        end
+        task.wait(0.4)
+    end
+end)
+
+local function animateGuiIn()
+    MainGui.Visible = true
+    MainGui.BackgroundTransparency = 1
+    MainStroke.Transparency = 1
+    
+    local tweenInfo = TweenInfo.new(1.2, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    TweenService:Create(MainGui, tweenInfo, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(MainStroke, tweenInfo, {Transparency = 0}):Play()
+end
+
+local function animateGuiOut(hideButton)
+    local tweenInfo = TweenInfo.new(1.0, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+    local tw1 = TweenService:Create(MainGui, tweenInfo, {BackgroundTransparency = 1})
+    local tw2 = TweenService:Create(MainStroke, tweenInfo, {Transparency = 1})
+    
+    tw1:Play()
+    tw2:Play()
+    
+    tw1.Completed:Wait()
+    MainGui.Visible = false
+    TargetGui.Visible = false
+    
+    if hideButton then
+        OpenButton.Visible = false
+        ScreenGui:Destroy()
+    else
+        OpenButton.Visible = true
+    end
+end
+
+local function startCustomLoading()
+    LoadingFrame.Visible = true
+    OpenButton.Visible = false
+    BarFill.Size = UDim2.new(0, 0, 1, 0)
+    
+    task.spawn(function()
+        local tween89 = TweenService:Create(BarFill, TweenInfo.new(20, Enum.EasingStyle.Linear), {Size = UDim2.new(0.89, 0, 1, 0)})
+        tween89:Play()
+        tween89.Completed:Wait()
+        
+        local tween90 = TweenService:Create(BarFill, TweenInfo.new(10, Enum.EasingStyle.Linear), {Size = UDim2.new(0.90, 0, 1, 0)})
+        tween90:Play()
+        tween90.Completed:Wait()
+        
+        for pct = 91, 100 do
+            local tweenStep = TweenService:Create(BarFill, TweenInfo.new(19, Enum.EasingStyle.Linear), {Size = UDim2.new(pct / 100, 0, 1, 0)})
+            tweenStep:Play()
+            tweenStep.Completed:Wait()
+        end
+        
+        LoadingFrame.Visible = false
+        animateGuiIn()
+    end)
+end
+
+OpenButton.MouseButton1Click:Connect(function()
+    startCustomLoading()
+end)
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    animateGuiOut(false) 
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    removeMusic()
+    animateGuiOut(true) 
+end)
+
+PlayBtn.MouseButton1Click:Connect(function()
+    TargetGui.Visible = not TargetGui.Visible
+end)
+
+RemoveBtn.MouseButton1Click:Connect(function()
+    removeMusic()
+end)
+
+TargetClose.MouseButton1Click:Connect(function()
+    TargetGui.Visible = false
+end)
+
+CarBtn.MouseButton1Click:Connect(function()
+    currentTargetType = "Car"
+    playMusic(IdBox.Text)
+    TargetGui.Visible = false
+end)
+
+PlaneBtn.MouseButton1Click:Connect(function()
+    currentTargetType = "Plane"
+    playMusic(IdBox.Text)
+    TargetGui.Visible = false
+end)
+
+SkateBtn.MouseButton1Click:Connect(function()
+    currentTargetType = "Skate"
+    playMusic(IdBox.Text)
+    TargetGui.Visible = false
+end)
+
+VolUpBtn.MouseButton1Click:Connect(function()
+    masterVolume = math.clamp(masterVolume + 0.1, 0, 2)
+    VolLabel.Text = "VOLUMEN: " .. tostring(math.floor(masterVolume * 100)) .. "%"
+    if currentSound then currentSound.Volume = masterVolume end
+end)
+
+VolDownBtn.MouseButton1Click:Connect(function()
+    masterVolume = math.clamp(masterVolume - 0.1, 0, 2)
+    VolLabel.Text = "VOLUMEN: " .. tostring(math.floor(masterVolume * 100)) .. "%"
+    if currentSound then currentSound.Volume = masterVolume end
+end)
