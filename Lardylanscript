@@ -1,0 +1,548 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+
+local Player = Players.LocalPlayer
+local PlayerGui = Player:WaitForChild("PlayerGui")
+
+if CoreGui:FindFirstChild("LardylanKentaroHub") then
+    CoreGui.LardylanKentaroHub:Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LardylanKentaroHub"
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+ScreenGui.Parent = CoreGui
+
+local IntroFrame = Instance.new("Frame")
+IntroFrame.Name = "IntroFrame"
+IntroFrame.Size = UDim2.new(1, 0, 1, 0)
+IntroFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+IntroFrame.BorderSizePixel = 0
+IntroFrame.ZIndex = 10
+IntroFrame.Parent = ScreenGui
+
+local KentaroLabel = Instance.new("TextLabel")
+KentaroLabel.Size = UDim2.new(1, 0, 0, 60)
+KentaroLabel.Position = UDim2.new(0, 0, 0.4, -40)
+KentaroLabel.BackgroundTransparency = 1
+KentaroLabel.Font = Enum.Font.Arcade
+KentaroLabel.Text = "KENTARO GAMER"
+KentaroLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+KentaroLabel.TextSize = 36
+KentaroLabel.TextTransparency = 1
+KentaroLabel.ZIndex = 11
+KentaroLabel.Parent = IntroFrame
+
+local LardylanIntroLabel = Instance.new("TextLabel")
+LardylanIntroLabel.Size = UDim2.new(1, 0, 0, 50)
+LardylanIntroLabel.Position = UDim2.new(0, 0, 0.4, 20)
+LardylanIntroLabel.BackgroundTransparency = 1
+LardylanIntroLabel.Font = Enum.Font.Code
+LardylanIntroLabel.Text = ""
+LardylanIntroLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+LardylanIntroLabel.TextSize = 24
+LardylanIntroLabel.ZIndex = 11
+LardylanIntroLabel.Parent = IntroFrame
+
+task.spawn(function()
+    TweenService:Create(KentaroLabel, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {TextTransparency = 0}):Play()
+    task.wait(2.2)
+    
+    local targetText = "LARDYLAN"
+    for i = 1, #targetText do
+        LardylanIntroLabel.Text = string.sub(targetText, 1, i)
+        task.wait(0.08)
+    end
+    
+    task.wait(1.5)
+    
+    local fadeInfo = TweenInfo.new(4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    TweenService:Create(IntroFrame, fadeInfo, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(KentaroLabel, fadeInfo, {TextTransparency = 1}):Play()
+    TweenService:Create(LardylanIntroLabel, fadeInfo, {TextTransparency = 1}):Play()
+    
+    task.wait(4)
+    IntroFrame:Destroy()
+end)
+
+local FloatButton = Instance.new("ImageButton")
+FloatButton.Name = "FloatButton"
+FloatButton.Size = UDim2.new(0, 55, 0, 55)
+FloatButton.Position = UDim2.new(0, 30, 0.5, -28)
+FloatButton.BackgroundTransparency = 1
+FloatButton.BorderSizePixel = 0
+FloatButton.Image = "rbxthumb://type=Asset&id=118544465694154&w=420&h=420"
+FloatButton.Visible = false
+FloatButton.ZIndex = 5
+FloatButton.Parent = ScreenGui
+
+local dragging, dragInput, dragStart, startPos
+FloatButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = FloatButton.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+FloatButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        FloatButton.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+end)
+
+local KeyFrame = Instance.new("ImageButton")
+KeyFrame.Name = "KeyFrame"
+KeyFrame.Size = UDim2.new(0, 340, 0, 240)
+KeyFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+KeyFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+KeyFrame.BackgroundTransparency = 1
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Image = "rbxthumb://type=Asset&id=130712334835447&w=420&h=420"
+KeyFrame.ScaleType = Enum.ScaleType.Slice
+KeyFrame.SliceCenter = Rect.new(100, 100, 100, 100)
+KeyFrame.AutoButtonColor = false
+KeyFrame.ZIndex = 6
+KeyFrame.Parent = ScreenGui
+
+KeyFrame.MouseButton1Click:Connect(function()
+end)
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.Position = UDim2.new(0, 0, 0, 10)
+KeyTitle.BackgroundTransparency = 1
+KeyTitle.Font = Enum.Font.Arcade
+KeyTitle.Text = "KENTARO_GAMER - LARDYLAN"
+KeyTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyTitle.TextSize = 16
+KeyTitle.ZIndex = 7
+KeyTitle.Parent = KeyFrame
+
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(0, 280, 0, 40)
+KeyBox.Position = UDim2.new(0.5, -140, 0, 60)
+KeyBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.PlaceholderText = "Ingrese la Key aquí..."
+KeyBox.Text = ""
+KeyBox.Font = Enum.Font.Code
+KeyBox.TextSize = 14
+KeyBox.ZIndex = 7
+KeyBox.Parent = KeyFrame
+
+local BoxCorner = Instance.new("UICorner")
+BoxCorner.CornerRadius = UDim.new(0, 6)
+BoxCorner.Parent = KeyBox
+
+local EnterKeyBtn = Instance.new("TextButton")
+EnterKeyBtn.Size = UDim2.new(0, 280, 0, 35)
+EnterKeyBtn.Position = UDim2.new(0.5, -140, 0, 115)
+EnterKeyBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+EnterKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+EnterKeyBtn.Text = "ENTER KEY"
+EnterKeyBtn.Font = Enum.Font.GothamBold
+EnterKeyBtn.TextSize = 14
+EnterKeyBtn.ZIndex = 7
+EnterKeyBtn.Parent = KeyFrame
+
+local EnterCorner = Instance.new("UICorner")
+EnterCorner.CornerRadius = UDim.new(0, 6)
+EnterCorner.Parent = EnterKeyBtn
+
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Size = UDim2.new(0, 200, 0, 30)
+GetKeyBtn.Position = UDim2.new(0.5, -100, 0, 165)
+GetKeyBtn.BackgroundTransparency = 1
+GetKeyBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+GetKeyBtn.Text = "Get Key"
+GetKeyBtn.Font = Enum.Font.Gotham
+GetKeyBtn.TextSize = 14
+GetKeyBtn.ZIndex = 7
+GetKeyBtn.Parent = KeyFrame
+
+local GetKeyIcon = Instance.new("ImageButton")
+GetKeyIcon.Size = UDim2.new(0, 24, 0, 24)
+GetKeyIcon.Position = UDim2.new(1, -30, 0, 3)
+GetKeyIcon.BackgroundTransparency = 1
+GetKeyIcon.Image = "rbxthumb://type=Asset&id=92904714959352&w=420&h=420"
+GetKeyIcon.ZIndex = 7
+GetKeyIcon.Parent = GetKeyBtn
+
+local NotificationLabel = Instance.new("TextLabel")
+NotificationLabel.Size = UDim2.new(1, 0, 0, 20)
+NotificationLabel.Position = UDim2.new(0, 0, 1, -25)
+NotificationLabel.BackgroundTransparency = 1
+NotificationLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+NotificationLabel.Text = ""
+NotificationLabel.Font = Enum.Font.Code
+NotificationLabel.TextSize = 12
+NotificationLabel.ZIndex = 7
+NotificationLabel.Parent = KeyFrame
+
+local function copyLink()
+    if setclipboard then
+        setclipboard("https://discord.gg/CuFy5NxnQ")
+    end
+    NotificationLabel.Text = "GET KEY COPIED LINK"
+    task.wait(3)
+    NotificationLabel.Text = ""
+end
+
+GetKeyBtn.MouseButton1Click:Connect(copyLink)
+GetKeyIcon.MouseButton1Click:Connect(copyLink)
+
+local MainGui = Instance.new("Frame")
+MainGui.Name = "MainGui"
+MainGui.Size = UDim2.new(0, 380, 0, 320)
+MainGui.AnchorPoint = Vector2.new(0.5, 0.5)
+MainGui.Position = UDim2.new(0.5, 0, 0.5, 0)
+MainGui.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainGui.Visible = false
+MainGui.ZIndex = 8
+MainGui.Parent = ScreenGui
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainGui
+
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 35)
+TopBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 9
+TopBar.Parent = MainGui
+
+local TopBarCorner = Instance.new("UICorner")
+TopBarCorner.CornerRadius = UDim.new(0, 10)
+TopBarCorner.Parent = TopBar
+
+local MenuTitle = Instance.new("TextLabel")
+MenuTitle.Size = UDim2.new(1, -70, 1, 0)
+MenuTitle.Position = UDim2.new(0, 10, 0, 0)
+MenuTitle.BackgroundTransparency = 1
+MenuTitle.Font = Enum.Font.Arcade
+MenuTitle.Text = "LARDYLAN KENTARO V1 script al 100"
+MenuTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+MenuTitle.TextSize = 12
+MenuTitle.TextXAlignment = Enum.TextXAlignment.Left
+MenuTitle.ZIndex = 9
+MenuTitle.Parent = TopBar
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 25, 0, 25)
+CloseBtn.Position = UDim2.new(1, -30, 0.5, -12)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 12
+CloseBtn.ZIndex = 9
+CloseBtn.Parent = TopBar
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 4)
+CloseCorner.Parent = CloseBtn
+
+local MinimizeBtn = Instance.new("TextButton")
+MinimizeBtn.Size = UDim2.new(0, 25, 0, 25)
+MinimizeBtn.Position = UDim2.new(1, -60, 0.5, -12)
+MinimizeBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+MinimizeBtn.Text = "-"
+MinimizeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MinimizeBtn.Font = Enum.Font.GothamBold
+MinimizeBtn.TextSize = 14
+MinimizeBtn.ZIndex = 9
+MinimizeBtn.Parent = TopBar
+
+local MinCorner = Instance.new("UICorner")
+MinCorner.CornerRadius = UDim.new(0, 4)
+MinCorner.Parent = MinimizeBtn
+
+local ScrollOptions = Instance.new("ScrollingFrame")
+ScrollOptions.Size = UDim2.new(1, -10, 1, -45)
+ScrollOptions.Position = UDim2.new(0, 5, 0, 40)
+ScrollOptions.BackgroundTransparency = 1
+ScrollOptions.CanvasSize = UDim2.new(0, 0, 0, 400)
+ScrollOptions.ScrollBarThickness = 4
+ScrollOptions.ZIndex = 9
+ScrollOptions.Parent = MainGui
+
+local UIListLayout = Instance.new("UIListLayout")
+UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+UIListLayout.Padding = UDim.new(0, 8)
+UIListLayout.Parent = ScrollOptions
+
+local FovRadius = Instance.new("Frame")
+FovRadius.Name = "FovRadius"
+FovRadius.Size = UDim2.new(0, 150, 0, 150)
+FovRadius.AnchorPoint = Vector2.new(0.5, 0.5)
+FovRadius.Position = UDim2.new(0.5, 0, 0.5, 0)
+FovRadius.BackgroundTransparency = 1
+FovRadius.Visible = false
+FovRadius.ZIndex = 4
+FovRadius.Parent = ScreenGui
+
+local FovRing = Instance.new("UIStroke")
+FovRing.Color = Color3.fromRGB(255, 255, 255)
+FovRing.Thickness = 2
+FovRing.Parent = FovRadius
+
+local FovCorner = Instance.new("UICorner")
+FovCorner.CornerRadius = UDim.new(1, 0)
+FovCorner.Parent = FovRadius
+
+local fovDragging = false
+FovRadius.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        fovDragging = true
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
+        fovDragging = false
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if fovDragging and (input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseMovement) then
+        FovRadius.Position = UDim2.new(0, input.Position.X, 0, input.Position.Y)
+    end
+end)
+
+local aimbotEnabled = false
+local blockFovEnabled = false
+local rainbowFovEnabled = false
+
+local function createToggle(name, callback)
+    local frame = Instance.new("Frame")
+    frame.Size = UDim2.new(1, -10, 0, 35)
+    frame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+    frame.ZIndex = 9
+    
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = frame
+    
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(0, 200, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = name
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.Font = Enum.Font.GothamMedium
+    label.TextSize = 13
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.ZIndex = 9
+    label.Parent = frame
+    
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size = UDim2.new(0, 45, 0, 20)
+    toggleBtn.Position = UDim2.new(1, -55, 0.5, -10)
+    toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    toggleBtn.Text = ""
+    toggleBtn.ZIndex = 9
+    toggleBtn.Parent = frame
+    
+    local tCorner = Instance.new("UICorner")
+    tCorner.CornerRadius = UDim.new(1, 0)
+    tCorner.Parent = toggleBtn
+    
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 16, 0, 16)
+    circle.Position = UDim2.new(0, 2, 0.5, -8)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.ZIndex = 10
+    circle.Parent = toggleBtn
+    
+    local cCorner = Instance.new("UICorner")
+    cCorner.CornerRadius = UDim.new(1, 0)
+    cCorner.Parent = circle
+    
+    local enabled = false
+    toggleBtn.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        if enabled then
+            TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(0, 170, 255)}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -18, 0.5, -8)}):Play()
+        else
+            TweenService:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 50)}):Play()
+            TweenService:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -8)}):Play()
+        end
+        if callback then callback(enabled) end
+    end)
+    
+    frame.Parent = ScrollOptions
+end
+
+EnterKeyBtn.MouseButton1Click:Connect(function()
+    if KeyBox.Text == "LARDYLAN-KENTARO-V1-2026" then
+        KeyFrame.Visible = false
+        MainGui.Visible = true
+        task.spawn(function()
+            task.wait(8)
+            FloatButton.Visible = true
+        end)
+    else
+        NotificationLabel.TextColor3 = Color3.fromRGB(255, 50, 50)
+        NotificationLabel.Text = "KEY INCORRECTA"
+        task.wait(2)
+        NotificationLabel.Text = ""
+    end
+end)
+
+FloatButton.MouseButton1Click:Connect(function()
+    MainGui.Visible = not MainGui.Visible
+end)
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+MinimizeBtn.MouseButton1Click:Connect(function()
+    MainGui.Visible = false
+    FloatButton.Visible = true
+end)
+
+createToggle("AIMBOT", function(state)
+    aimbotEnabled = state
+    FovRadius.Visible = state
+end)
+
+createToggle("BLOCK FOV", function(state)
+    blockFovEnabled = state
+    if state then
+        FovRadius.Position = UDim2.new(0.5, 0, 0.5, 0)
+    end
+end)
+
+local visualFrame = Instance.new("Frame")
+visualFrame.Size = UDim2.new(1, -10, 0, 35)
+visualFrame.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+visualFrame.ZIndex = 9
+
+local vCorner = Instance.new("UICorner")
+vCorner.CornerRadius = UDim.new(0, 6)
+vCorner.Parent = visualFrame
+
+local vLabel = Instance.new("TextLabel")
+vLabel.Size = UDim2.new(0, 200, 1, 0)
+vLabel.Position = UDim2.new(0, 10, 0, 0)
+vLabel.BackgroundTransparency = 1
+vLabel.Text = "VISUALS (WALLHACK)"
+vLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+vLabel.Font = Enum.Font.GothamMedium
+vLabel.TextSize = 13
+vLabel.TextXAlignment = Enum.TextXAlignment.Left
+vLabel.ZIndex = 9
+vLabel.Parent = visualFrame
+
+local wallhackToggle = Instance.new("TextButton")
+wallhackToggle.Size = UDim2.new(0, 45, 0, 20)
+wallhackToggle.Position = UDim2.new(1, -55, 0.5, -10)
+wallhackToggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+wallhackToggle.Text = ""
+wallhackToggle.ZIndex = 9
+wallhackToggle.Parent = visualFrame
+
+local wtCorner = Instance.new("UICorner")
+wtCorner.CornerRadius = UDim.new(1, 0)
+wtCorner.Parent = wallhackToggle
+
+local wCircle = Instance.new("Frame")
+wCircle.Size = UDim2.new(0, 16, 0, 16)
+wCircle.Position = UDim2.new(0, 2, 0.5, -8)
+wCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+wCircle.ZIndex = 10
+wCircle.Parent = wallhackToggle
+
+local wcCorner = Instance.new("UICorner")
+wcCorner.CornerRadius = UDim.new(1, 0)
+wcCorner.Parent = wCircle
+
+local whEnabled = false
+wallhackToggle.MouseButton1Click:Connect(function()
+    whEnabled = not whEnabled
+    if whEnabled then
+        TweenService:Create(wallhackToggle, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 0, 0)}):Play()
+        TweenService:Create(wCircle, TweenInfo.new(0.2), {Position = UDim2.new(1, -18, 0.5, -8)}):Play()
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= Player and p.Character then
+                for _, part in pairs(p.Character:GetChildren()) do
+                    if part:IsA("BasePart") then
+                        part.Color = Color3.fromRGB(255, 0, 0)
+                        part.Material = Enum.Material.Neon
+                    end
+                end
+            end
+        end
+    else
+        TweenService:Create(wallhackToggle, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(50, 50, 50)}):Play()
+        TweenService:Create(wCircle, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, -8)}):Play()
+    end
+end)
+
+visualFrame.Parent = ScrollOptions
+
+createToggle("FOV RAINBOW", function(state)
+    rainbowFovEnabled = state
+end)
+
+RunService.RenderStepped:Connect(function()
+    if blockFovEnabled then
+        FovRadius.Position = UDim2.new(0.5, 0, 0.5, 0)
+    end
+
+    if rainbowFovEnabled then
+        local hue = tick() % 5 / 5
+        FovRing.Color = Color3.fromHSV(hue, 1, 1)
+    else
+        FovRing.Color = Color3.fromRGB(255, 255, 255)
+    end
+
+    if aimbotEnabled then
+        local closestTarget = nil
+        local shortestDist = math.huge
+        local centerPos = Vector2.new(FovRadius.AbsolutePosition.X + FovRadius.AbsoluteSize.X / 2, FovRadius.AbsolutePosition.Y + FovRadius.AbsoluteSize.Y / 2)
+        local radius = FovRadius.AbsoluteSize.X / 2
+
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= Player and p.Character and p.Character:FindFirstChild("Head") then
+                local humanoid = p.Character:FindFirstChildOfClass("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    local head = p.Character.Head
+                    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                    if onScreen then
+                        local dist = (Vector2.new(screenPos.X, screenPos.Y) - centerPos).Magnitude
+                        if dist <= radius and dist < shortestDist then
+                            shortestDist = dist
+                            closestTarget = head
+                        end
+                    end
+                end
+            end
+        end
+
+        if closestTarget then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, closestTarget.Position)
+        end
+    end
+end)
